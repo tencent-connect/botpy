@@ -1,0 +1,15 @@
+# test yaml 用于设置test相关的参数，开源版本需要去掉参数
+token:
+  appid: "123"
+  token: "xxxx"
+test_params:
+  guild_id: "123"
+  guild_owner_id: "123"
+  guild_owner_name: "veehou"
+  guild_test_member_id: "123"
+  guild_test_role_id: "123"
+  channel_id: "123"
+  channel_name: "channel"
+  channel_parent_id: "123"
+  robot_name: "veehou's robot"
+  is_sandbox: False

@@ -1,0 +1,25 @@
+master:
+  merge_request:
+    # Python的CI检查
+    - docker:
+        image: python:3.7-slim-stretch # 通过此参数控制使用的镜像环境
+      stages:
+        - name: Start Python CI
+          script:
+            - echo "Python unit test started"
+        - name: Install Requirements #安装项目所需要的pip 依赖
+          script:
+            - echo "start to install python requirements"
+            - pip install -i https://mirrors.tencent.com/pypi/simple/ -r requirements.txt
+        - name: Install Unitest Packages
+          script:
+            - echo "start to install Unitest Packages"
+            - pip install -i https://mirrors.tencent.com/pypi/simple/ pylint
+            - pip install -i https://mirrors.tencent.com/pypi/simple/ coverage
+            - pip install -i https://mirrors.tencent.com/pypi/simple/ pytest
+        - name: Code Style Test
+          script:
+            - find . -type f -name "*.py" | xargs pylint
+        - name: Unitest
+          script:
+            - pytest

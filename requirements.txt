@@ -1,0 +1,4 @@
+requests
+websocket-client
+pre-commit
+PyYAML
