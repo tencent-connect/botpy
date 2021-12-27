@@ -139,7 +139,7 @@ cython_debug/
 
 # qqbot
 config.yml
-.test.yaml
+tests/.test.yaml
 qqbot.log.*
 temp/
 
