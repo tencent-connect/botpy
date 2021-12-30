@@ -68,7 +68,10 @@ class Http:
         self.scheme = type
 
     def get(self, api_url, params=None):
-        headers = {"Authorization": self.scheme + " " + self.token}
+        headers = {
+            "Authorization": self.scheme + " " + self.token,
+            "User-Agent": "botpy",
+        }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
         response = requests.get(
             url=api_url, params=params, timeout=self.timeout, headers=headers
@@ -77,7 +80,10 @@ class Http:
         return response
 
     def post(self, api_url, request=None, params=None):
-        headers = {"Authorization": self.scheme + " " + self.token}
+        headers = {
+            "Authorization": self.scheme + " " + self.token,
+            "User-Agent": "botpy",
+        }
         logger.debug(
             "http post headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
@@ -93,7 +99,10 @@ class Http:
         return response
 
     def delete(self, api_url, request=None, params=None):
-        headers = {"Authorization": self.scheme + " " + self.token}
+        headers = {
+            "Authorization": self.scheme + " " + self.token,
+            "User-Agent": "botpy",
+        }
         logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
         response = requests.delete(
             url=api_url,
@@ -106,7 +115,10 @@ class Http:
         return response
 
     def put(self, api_url, request=None, params=None):
-        headers = {"Authorization": self.scheme + " " + self.token}
+        headers = {
+            "Authorization": self.scheme + " " + self.token,
+            "User-Agent": "botpy",
+        }
         logger.debug(
             "http put headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
@@ -122,7 +134,10 @@ class Http:
         return response
 
     def patch(self, api_url, request=None, params=None):
-        headers = {"Authorization": self.scheme + " " + self.token}
+        headers = {
+            "Authorization": self.scheme + " " + self.token,
+            "User-Agent": "botpy",
+        }
         logger.debug(
             "http patch headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
