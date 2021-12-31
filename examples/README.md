@@ -5,10 +5,8 @@
 ```
 examples/
  ┣ README.md
- ┣ config.example.yaml
- ┣ config.yaml
- ┣ qqbot.log
- ┗ run_websocket.py # 机器人被动回复示例
+ ┣ config.example.yaml  # 示例配置文件
+ ┗ run_websocket.py  # 机器人被动回复示例
 ```
 
 ## 环境安装
