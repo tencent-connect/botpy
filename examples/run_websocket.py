@@ -5,9 +5,7 @@ import os.path
 import qqbot
 from qqbot.core.util.yaml_util import YamlUtil
 
-test_config = YamlUtil.read(
-    os.path.join(os.path.dirname(__file__), "../tests/.test.yaml")
-)
+test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
 def _message_handler(event, message: qqbot.Message):
@@ -47,7 +45,4 @@ if __name__ == "__main__":
     qqbot_handler = qqbot.Handler(
         qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler
     )
-    qqbot_direct_message_handler = qqbot.Handler(
-        qqbot.HandlerType.DIRECT_MESSAGE_EVENT_HANDLER, _direct_message_handler
-    )
-    qqbot.listen_events(t_token, False, qqbot_handler, qqbot_direct_message_handler)
+    qqbot.listen_events(t_token, False, qqbot_handler)
