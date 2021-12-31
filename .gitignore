@@ -138,7 +138,7 @@ dmypy.json
 cython_debug/
 
 # qqbot
-config.yml
+config.y*ml
 tests/.test.yaml
 qqbot.log.*
 temp/

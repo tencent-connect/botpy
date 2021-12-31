@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import platform
 import os
+from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 
 LOG_COLORS_CONFIG = {
@@ -49,11 +51,17 @@ def getLogger(name):
     if no_log == "0":
         formatter = logging.Formatter(file_format)
         log_file = os.path.join(os.getcwd(), "qqbot.log")
-        file_handler = RotatingFileHandler(
-            log_file,
-            maxBytes=1024 * 1024,
-            backupCount=5,
-        )
+        file_handler = None
+        if platform.system().lower() != 'windows':
+            # do not use RotatingFileHandler under Windows
+            # due to multi-process issue
+            file_handler = RotatingFileHandler(
+                log_file,
+                maxBytes=1024 * 1024,
+                backupCount=5,
+            )
+        else:
+            file_handler = FileHandler(log_file)
         logger.debug(
             "qqbot: dumping log file to {path}".format(path=os.path.realpath(log_file))
         )
