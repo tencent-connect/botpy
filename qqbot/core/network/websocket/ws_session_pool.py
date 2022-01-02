@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import threading
-import time
 
 from qqbot.core.util import logging
 
@@ -14,52 +12,54 @@ class SessionPool:
     这里通过设置session_id=""空则任务session需要重连
     """
 
-    def __init__(self, max_async, session_manager, loop=None, session_count=1):
-        self.max_async = max_async
+    def __init__(self, max_async, session_manager, loop=None):
+        self.max_async = 2
         self.session_manager = session_manager
-        self.loop = loop or asyncio.get_event_loop()
-        self._queue = asyncio.Queue(maxsize=session_count, loop=self.loop)
-        self.lock = threading.Lock()
+        self.loop: asyncio.AbstractEventLoop = (
+            asyncio.get_event_loop() if loop is None else loop
+        )
         # session链接同时最大并发数
-        self.work_list = []
+        self.session_list = []
 
     async def run(self, session_interval=5):
-        works = [
-            asyncio.ensure_future(self._work(session_interval), loop=self.loop)
-            for _ in range(self.max_async)
-        ]
-        self.work_list.extend(works)
-        await self._queue.join()
-        logger.info("all tasks done")
+        loop = self.loop
 
-    async def _work(self, session_interval):
+        # 根据并发数同时建立多个future
+        # 后台有频率限制，根据间隔时间发起链接请求
+        index = 0
+        session_list = self.session_list
 
-        try:
-            while True:
-                # 后台有限制，一定时间后发起链接
-                time.sleep(session_interval)
-                session = await self._queue.get()
-                logger.info("get session: %s" % session)
-                # 这里开启线程添加websocket链接，不用等待
-                thread = threading.Thread(
-                    target=self.session_manager.new_connect, args=(session,)
-                )
-                thread.start()
-                self._queue.task_done()
-                if self._queue.empty():
+        while len(session_list) > 0:
+            await asyncio.sleep(session_interval)
+            logger.info(
+                "async start session connect with max_async: %s, and list size: %s"
+                % (self.max_async, len(session_list))
+            )
+
+            tasks = []
+            for i in range(self.max_async):
+                if len(session_list) == 0:
                     break
+                logger.info("session list pop session with index %d" % i)
+                tasks.append(
+                    asyncio.ensure_future(self._runner(session_list.pop(i)), loop=loop)
+                )
 
-        except asyncio.CancelledError:
-            logger.error(asyncio.CancelledError)
+            index += self.max_async
+            await asyncio.wait(tasks)
 
-    def add_task(self, item):
-        with self.lock:
-            self._queue.put_nowait(item)
+    async def _runner(self, session):
+        logger.info("run session: %s" % session)
+        await self.session_manager.new_connect(session)
 
-    @property
-    def count(self):
-        return self._queue.qsize()
+    def add(self, session):
+        logger.info("add session: %s" % session)
+        self.session_list.append(session)
 
     def print_status(self):
-        for w in self.work_list:
-            logger.info(w.done())
+        for session in self.session_list:
+            logger.info(session.done())
+
+    async def close(self):
+        logger.info("session loop closed")
+        self.loop.close()
