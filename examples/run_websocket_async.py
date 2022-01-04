@@ -25,6 +25,7 @@ async def _message_handler(event, message: qqbot.Message):
 
 
 if __name__ == "__main__":
+    # async的异步接口的使用示例
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
     qqbot_handler = qqbot.Handler(
         qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler

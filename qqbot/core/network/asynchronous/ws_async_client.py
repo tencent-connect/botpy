@@ -27,10 +27,11 @@ class Client:
         self.connected_callback = connected_callback
         self.can_reconnect = False
 
-    async def on_error(self, message, exception: BaseException):
+    async def on_error(self, exception: BaseException):
         logger.error(
-            "websocket on_error with session: %s, exception: %s"
-            % (self.session, exception)
+            "websocket on_error with session id: %s, exception file: %s[line:%s]" % (
+                self.session.session_id, exception.__traceback__.tb_frame.f_globals["__file__"],
+                exception.__traceback__.tb_lineno)
         )
 
     async def on_close(self, ws, close_status_code, close_msg):
@@ -43,9 +44,9 @@ class Client:
         self.ws_conn = None
         # 这种不能重新链接
         if (
-            close_status_code == WebsocketError.CodeConnCloseErr
-            or close_status_code == WebsocketError.CodeInvalidSession
-            or self.can_reconnect is False
+                close_status_code == WebsocketError.CodeConnCloseErr
+                or close_status_code == WebsocketError.CodeInvalidSession
+                or self.can_reconnect is False
         ):
             self.session.session_id = ""
             self.session.last_seq = 0
@@ -69,7 +70,9 @@ class Client:
 
     async def on_connected(self, ws):
         logger.info("ws connected ok")
+        self.ws_conn = ws
         await self.connected_callback(self)
+        # 心跳检查
         asyncio.ensure_future(self._send_heartbeat(interval=30))
 
     async def connect(self):
@@ -85,7 +88,6 @@ class Client:
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(self.session.url) as websocket:
                 async for msg in websocket:
-                    self.ws_conn = websocket
                     msg: WSMessage
                     msg_text = msg.data
                     if msg.type == aiohttp.WSMsgType.TEXT:
@@ -93,7 +95,7 @@ class Client:
                     elif msg.type == aiohttp.WSMsgType.CLOSED:
                         await self.on_close(websocket, websocket.close_code, msg_text)
                     elif msg.type == aiohttp.WSMsgType.ERROR:
-                        await self.on_error(msg_text, websocket.exception())
+                        await self.on_error(websocket.exception())
 
     async def identify(self):
         """
@@ -156,7 +158,6 @@ class Client:
         系统事件
         :param message_event:消息
         :param ws:websocket
-        :param connected_callback:回调
         :return:
         """
         event_op = message_event["op"]
