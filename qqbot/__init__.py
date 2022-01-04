@@ -3,10 +3,13 @@ import json
 from enum import Enum
 from typing import List
 
+from qqbot.core.network.asynchronous.ws_async_manager import (
+    SessionManager as AsyncWsManager,
+)
 from qqbot.core.network.http import Http, HttpStatus
+from qqbot.core.network.synchronous.ws_session_manager import SessionManager
 from qqbot.core.network.url import get_url, APIConstant
 from qqbot.core.network.websocket.ws_intents_handler import register_handlers, Handler
-from qqbot.core.network.websocket.ws_session_manager import SessionManager
 from qqbot.core.util import logging
 from qqbot.core.util.json_util import JsonUtil
 from qqbot.model.audio import AudioControl
@@ -68,6 +71,24 @@ def listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
     t_intent = register_handlers(handlers)
     # 实例一个session_manager
     manager = SessionManager()
+    manager.start(ws_ap, t_token.bot_token(), t_intent)
+
+
+def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
+    """
+    异步注册并监听频道相关事件
+
+    :param t_token: Token对象
+    :param handlers: 包含事件类型和事件回调的Handler对象，支持多个对象
+    :param is_sandbox:是否沙盒环境，默认为False
+    """
+    # 通过api获取websocket链接
+    ws_api = WebsocketAPI(t_token, is_sandbox)
+    ws_ap = ws_api.ws()
+    # 新建和注册监听事件
+    t_intent = register_handlers(handlers)
+    # 实例一个session_manager
+    manager = AsyncWsManager()
     manager.start(ws_ap, t_token.bot_token(), t_intent)
 
 

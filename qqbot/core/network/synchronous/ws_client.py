@@ -12,7 +12,7 @@ from qqbot.core.network.websocket.dto.ws_payload import (
     WsIdentifyData,
     WSResumeData,
 )
-from qqbot.core.network.websocket.ws_event_handler import parse_and_handle
+from qqbot.core.network.synchronous.ws_event_handler import parse_and_handle
 from qqbot.core.util import logging
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class Client:
         self.session_manager = session_manager
         self.can_reconnect = False
 
-    async def connect(self, connected_callback):
+    def connect(self, connected_callback):
         """
         websocket向服务器端发起链接，并定时发送心跳
         :param connected_callback:链接成功后的回调
@@ -62,7 +62,7 @@ class Client:
                 self.session.session_id = ""
                 self.session.last_seq = 0
             # 断连后启动一个新的链接并透传当前的session，不使用内部重连的方式，避免死循环
-            self.session_manager.session_pool.add(self.session)
+            self.session_manager.session_pool.add_task(self.session)
             self.session_manager.start_session()
 
         def on_message(ws, message):

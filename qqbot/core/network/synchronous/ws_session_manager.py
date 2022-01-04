@@ -2,10 +2,10 @@
 
 import asyncio
 
+from qqbot.core.network.synchronous.ws_client import Client
+from qqbot.core.network.synchronous.ws_session_pool import SessionPool
 from qqbot.core.network.websocket.dto.enum_intents import Intents
-from qqbot.core.network.websocket.ws_client import Client
 from qqbot.core.network.websocket.ws_session import Session, ShardConfig
-from qqbot.core.network.websocket.ws_session_pool import SessionPool
 from qqbot.core.util import logging
 from qqbot.model.token import Token
 
@@ -48,7 +48,7 @@ class SessionManager:
 
     def start(self, websocket_ap, token=Token, intent=Intents):
         logger.info(
-            "session manager start with: %s" % websocket_ap
+            "SessionManager start:%s" % websocket_ap
             + ", token:%s" % token
             + ", intent:%s" % intent
         )
@@ -78,7 +78,7 @@ class SessionManager:
             session_manager=self,
             loop=asyncio.get_event_loop(),
         )
-        for i in range(5):
+        for i in range(shards_count):
             session = Session(
                 session_id="",
                 url=websocket_ap["url"],
@@ -87,23 +87,17 @@ class SessionManager:
                 token=token,
                 shards=ShardConfig(i, shards_count),
             )
-            self.session_pool.add(session)
+            self.session_pool.add_task(session)
 
         self.start_session(session_interval)
 
     def start_session(self, session_interval=5):
-        pool = self.session_pool
-        loop = pool.loop
-        loop.set_exception_handler(_loop_exception_handler)
-        try:
-            loop.run_until_complete(pool.run(session_interval))
-        except KeyboardInterrupt:
-            loop.run_until_complete(pool.close())
-            # cancel all tasks lingering
-        finally:
-            loop.close()
+        self.session_pool.loop.set_exception_handler(_loop_exception_handler)
+        self.session_pool.loop.run_until_complete(
+            self.session_pool.run(session_interval)
+        )
 
-    async def new_connect(self, session):
+    def new_connect(self, session):
         """
         newConnect 启动一个新的连接，如果连接在监听过程中报错了，或者被远端关闭了链接，需要识别关闭的原因，能否继续 resume
         如果能够 resume，则往 sessionChan 中放入带有 sessionID 的 session
@@ -115,4 +109,4 @@ class SessionManager:
         logger.info("_new_connect:%s" % session)
 
         client = Client(session, self)
-        await client.connect(_on_connected)
+        client.connect(_on_connected)
