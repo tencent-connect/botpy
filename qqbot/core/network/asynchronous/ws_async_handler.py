@@ -21,7 +21,7 @@ async def parse_and_handle(message_event, message):
     if call_handler is None:
         if DefaultHandler.plain is not None:
             plain = DefaultHandler.plain
-            await plain(event_type, message)
+            asyncio.ensure_future(plain(event_type, message))
         else:
             return
     else:
