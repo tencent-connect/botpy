@@ -2,8 +2,8 @@
 
 from enum import Enum
 
-from qqbot.core.network.websocket.ws_event import WsEvent
-from qqbot.core.network.websocket.ws_handler import DefaultHandler
+from qqbot.core.network.ws.ws_event import WsEvent
+from qqbot.core.network.ws.ws_handler import DefaultHandler
 
 
 class Handler:

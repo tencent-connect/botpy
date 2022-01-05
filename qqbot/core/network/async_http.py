@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import aiohttp
-import asyncio
 
 from qqbot.core.exception.error import (
     AuthenticationFailedError,
@@ -74,7 +72,9 @@ class AsyncHttp:
             "User-Agent": "botpy",
         }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
-        async with self.session.get(url=api_url, params=params, timeout=self.timeout, headers=headers) as resp:
+        async with self.session.get(
+            url=api_url, params=params, timeout=self.timeout, headers=headers
+        ) as resp:
             _handle_response(api_url, resp)
             return resp
 
@@ -88,11 +88,12 @@ class AsyncHttp:
             % (headers, api_url, request)
         )
         async with self.session.post(
-        url=api_url,
-        params=params,
-        json=request,
-        timeout=self.timeout,
-        headers=headers) as resp:
+            url=api_url,
+            params=params,
+            json=request,
+            timeout=self.timeout,
+            headers=headers,
+        ) as resp:
             _handle_response(api_url, resp)
             return resp
 
@@ -103,11 +104,12 @@ class AsyncHttp:
         }
         logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
         async with self.session.delete(
-        url=api_url,
-        params=params,
-        json=request,
-        timeout=self.timeout,
-        headers=headers) as resp:
+            url=api_url,
+            params=params,
+            json=request,
+            timeout=self.timeout,
+            headers=headers,
+        ) as resp:
             _handle_response(api_url, resp)
             return resp
 
@@ -121,11 +123,12 @@ class AsyncHttp:
             % (headers, api_url, request)
         )
         async with self.session.put(
-        url=api_url,
-        params=params,
-        json=request,
-        timeout=self.timeout,
-        headers=headers,) as resp:
+            url=api_url,
+            params=params,
+            json=request,
+            timeout=self.timeout,
+            headers=headers,
+        ) as resp:
             _handle_response(api_url, resp)
             return resp
 
@@ -139,10 +142,11 @@ class AsyncHttp:
             % (headers, api_url, request)
         )
         async with self.session.patch(
-        url=api_url,
-        params=params,
-        json=request,
-        timeout=self.timeout,
-        headers=headers,) as resp:
+            url=api_url,
+            params=params,
+            json=request,
+            timeout=self.timeout,
+            headers=headers,
+        ) as resp:
             _handle_response(api_url, resp)
             return resp

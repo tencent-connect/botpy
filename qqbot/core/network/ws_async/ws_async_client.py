@@ -6,10 +6,10 @@ import aiohttp
 from aiohttp import WSMessage
 
 from qqbot.core.exception.error import WebsocketError
-from qqbot.core.network.asynchronous.ws_async_handler import parse_and_handle
-from qqbot.core.network.websocket.dto.enum_intents import Intents
-from qqbot.core.network.websocket.dto.enum_opcode import OpCode
-from qqbot.core.network.websocket.dto.ws_payload import (
+from qqbot.core.network.ws_async.ws_async_handler import parse_and_handle
+from qqbot.core.network.ws.dto.enum_intents import Intents
+from qqbot.core.network.ws.dto.enum_opcode import OpCode
+from qqbot.core.network.ws.dto.ws_payload import (
     WSPayload,
     WsIdentifyData,
     WSResumeData,
@@ -90,12 +90,18 @@ class Client:
                     # async for msg in ws_conn:
                     msg: WSMessage
                     msg = await ws_conn.receive()
-                    if msg.type == aiohttp.WSMsgType.TEXT:
-                        await self.on_message(ws_conn, msg.data)
-                    elif msg.type == aiohttp.WSMsgType.CLOSE and msg.data is not None:
-                        await self.on_close(ws_conn, msg.data, msg.extra)
-                    elif msg.type == aiohttp.WSMsgType.ERROR:
-                        await self.on_error(ws_conn.exception())
+                    asyncio.ensure_future(self.dispatch(msg, ws_conn))
+
+    async def dispatch(self, msg, ws_conn):
+        """
+        ws事件分发
+        """
+        if msg.type == aiohttp.WSMsgType.TEXT:
+            await self.on_message(ws_conn, msg.data)
+        elif msg.type == aiohttp.WSMsgType.CLOSE and msg.data is not None:
+            await self.on_close(ws_conn, msg.data, msg.extra)
+        elif msg.type == aiohttp.WSMsgType.ERROR:
+            await self.on_error(ws_conn.exception())
 
     async def identify(self):
         """
