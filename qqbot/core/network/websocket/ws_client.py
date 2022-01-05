@@ -81,7 +81,6 @@ class Client:
 
         def on_error(ws, exception=Exception):
             logger.error("on_error: %s" % exception)
-            ws.close()
 
         def on_open(ws):
             logger.info("on_open: %s" % ws)
