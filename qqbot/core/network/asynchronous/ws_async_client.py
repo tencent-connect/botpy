@@ -29,29 +29,28 @@ class Client:
 
     async def on_error(self, exception: BaseException):
         logger.error(
-            "websocket on_error with session id: %s, exception file: %s[line:%s]" % (
-                self.session.session_id, exception.__traceback__.tb_frame.f_globals["__file__"],
-                exception.__traceback__.tb_lineno)
+            "websocket on_error with connection: %s, exception : %s"
+            % (self.ws_conn, exception)
         )
 
     async def on_close(self, ws, close_status_code, close_msg):
         logger.info(
             "on_close: websocket connection %s" % ws
             + ", code: %s" % close_status_code
-            + ", msg:%s" % close_msg
+            + ", msg: %s" % close_msg
         )
         # 关闭心跳包线程
         self.ws_conn = None
         # 这种不能重新链接
         if (
-                close_status_code == WebsocketError.CodeConnCloseErr
-                or close_status_code == WebsocketError.CodeInvalidSession
-                or self.can_reconnect is False
+            close_status_code == WebsocketError.CodeConnCloseErr
+            or close_status_code == WebsocketError.CodeInvalidSession
+            or self.can_reconnect is False
         ):
             self.session.session_id = ""
             self.session.last_seq = 0
         # 断连后启动一个新的链接并透传当前的session，不使用内部重连的方式，避免死循环
-        self.session_manager.session_pool.add_task(self.session)
+        self.session_manager.session_pool.add(self.session)
         self.session_manager.start_session()
 
     async def on_message(self, ws, message):
@@ -86,16 +85,17 @@ class Client:
             raise Exception("session url is none")
 
         async with aiohttp.ClientSession() as session:
-            async with session.ws_connect(self.session.url) as websocket:
-                async for msg in websocket:
+            async with session.ws_connect(self.session.url) as ws_conn:
+                while True:
+                    # async for msg in ws_conn:
                     msg: WSMessage
-                    msg_text = msg.data
+                    msg = await ws_conn.receive()
                     if msg.type == aiohttp.WSMsgType.TEXT:
-                        await self.on_message(websocket, msg_text)
-                    elif msg.type == aiohttp.WSMsgType.CLOSED:
-                        await self.on_close(websocket, websocket.close_code, msg_text)
+                        await self.on_message(ws_conn, msg.data)
+                    elif msg.type == aiohttp.WSMsgType.CLOSE and msg.data is not None:
+                        await self.on_close(ws_conn, msg.data, msg.extra)
                     elif msg.type == aiohttp.WSMsgType.ERROR:
-                        await self.on_error(websocket.exception())
+                        await self.on_error(ws_conn.exception())
 
     async def identify(self):
         """
@@ -126,7 +126,10 @@ class Client:
         """
         send_msg = event_json
         logger.info("send_msg: %s" % send_msg)
-        await self.ws_conn.send_str(data=send_msg)
+        if self.ws_conn is None:
+            logger.error("send_msg: websocket connection has closed")
+        else:
+            await self.ws_conn.send_str(data=send_msg)
 
     async def reconnect(self):
         """

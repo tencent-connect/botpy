@@ -69,7 +69,7 @@ class SessionManager:
         )
 
     def init_session_pool(
-            self, intent, shards_count, token, websocket_ap, session_interval
+        self, intent, shards_count, token, websocket_ap, session_interval
     ):
 
         # 实例一个session_pool
@@ -96,6 +96,7 @@ class SessionManager:
         loop.set_exception_handler(_loop_exception_handler)
         try:
             loop.run_until_complete(pool.run(session_interval))
+            loop.run_forever()
         except KeyboardInterrupt:
             logger.info("ws pool is stopped by key board interrupt")
             # cancel all tasks lingering
