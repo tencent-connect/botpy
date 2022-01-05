@@ -1,4 +1,6 @@
 # qq-bot-python
+![PyPI](https://img.shields.io/pypi/v/qq-bot)
+[![BK Pipelines Status](https://api.bkdevops.qq.com/process/api/external/pipelines/projects/qq-guild-open/p-f17c900164974f5785c436b359876877/badge?X-DEVOPS-PROJECT-ID=qq-guild-open)](http://devops.oa.com/process/api-html/user/builds/projects/qq-guild-open/pipelines/p-f17c900164974f5785c436b359876877/latestFinished?X-DEVOPS-PROJECT-ID=qq-guild-open)
 
 ## sdk安装
 
