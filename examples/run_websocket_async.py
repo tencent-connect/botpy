@@ -35,7 +35,7 @@ async def _message_handler(event, message: qqbot.Message):
     # 打印返回信息
     qqbot.logger.info("event %s" % event + ",receive message %s" % message.content)
     # 构造消息发送请求数据对象
-    send = qqbot.MessageSendRequest("<@%s>谢谢你，加油" % message.author.id, message.id)
+    send = qqbot.MessageSendRequest("<@%s>谢谢你，加油 " % message.author.id, message.id)
     # 通过api发送回复消息
     msg_api.post_message(message.channel_id, send)
 
