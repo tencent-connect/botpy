@@ -2,10 +2,10 @@
 
 import asyncio
 
-from qqbot.core.network.synchronous.ws_client import Client
-from qqbot.core.network.synchronous.ws_session_pool import SessionPool
-from qqbot.core.network.websocket.dto.enum_intents import Intents
-from qqbot.core.network.websocket.ws_session import Session, ShardConfig
+from qqbot.core.network.ws_sync.ws_client import Client
+from qqbot.core.network.ws_sync.ws_session_pool import SessionPool
+from qqbot.core.network.ws.dto.enum_intents import Intents
+from qqbot.core.network.ws.ws_session import Session, ShardConfig
 from qqbot.core.util import logging
 from qqbot.model.token import Token
 

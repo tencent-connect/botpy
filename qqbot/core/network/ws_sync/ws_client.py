@@ -5,14 +5,14 @@ import threading
 import websocket
 
 from qqbot.core.exception.error import WebsocketError
-from qqbot.core.network.websocket.dto.enum_intents import Intents
-from qqbot.core.network.websocket.dto.enum_opcode import OpCode
-from qqbot.core.network.websocket.dto.ws_payload import (
+from qqbot.core.network.ws.dto.enum_intents import Intents
+from qqbot.core.network.ws.dto.enum_opcode import OpCode
+from qqbot.core.network.ws.dto.ws_payload import (
     WSPayload,
     WsIdentifyData,
     WSResumeData,
 )
-from qqbot.core.network.synchronous.ws_event_handler import parse_and_handle
+from qqbot.core.network.ws_sync.ws_event_handler import parse_and_handle
 from qqbot.core.util import logging
 
 logger = logging.getLogger(__name__)

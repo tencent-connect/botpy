@@ -2,8 +2,8 @@
 import asyncio
 import json
 
-from qqbot.core.network.websocket.ws_event import WsEvent
-from qqbot.core.network.websocket.ws_handler import DefaultHandler
+from qqbot.core.network.ws.ws_event import WsEvent
+from qqbot.core.network.ws.ws_handler import DefaultHandler
 from qqbot.core.util import logging
 from qqbot.model.audio import AudioAction
 from qqbot.model.channel import Channel
