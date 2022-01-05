@@ -100,8 +100,6 @@ class SessionManager:
         except KeyboardInterrupt:
             logger.info("ws pool is stopped by key board interrupt")
             # cancel all tasks lingering
-        finally:
-            loop.close()
 
     async def new_connect(self, session, time_interval):
         """
