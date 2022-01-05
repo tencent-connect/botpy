@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# This relies on each of the submodules having an __all__ variable.
 from enum import Enum
 
 from qqbot.api import *
