@@ -7,7 +7,7 @@ from typing import List
 import aiohttp
 
 from qqbot import WebsocketAPI
-from qqbot.core.network.async_http import AsyncHttp, HttpStatus
+from qqbot.core.network.async_http import AsyncHttp
 from qqbot.core.network.url import get_url, APIConstant
 from qqbot.core.network.ws.ws_intents_handler import Handler, register_handlers
 from qqbot.core.network.ws_async.ws_async_manager import SessionManager
@@ -63,6 +63,7 @@ def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
 
 class AsyncAPIBase:
     timeout = 3
+    client_session = aiohttp.ClientSession()
 
     def __init__(self, token: Token, is_sandbox: bool):
         """
@@ -73,8 +74,8 @@ class AsyncAPIBase:
         """
         self.is_sandbox = is_sandbox
         self.token = token
-        self.async_http = AsyncHttp(
-            aiohttp.ClientSession(), self.timeout, token.get_string(), token.get_type()
+        self.http_async = AsyncHttp(
+            self.client_session, self.timeout, token.get_string(), token.get_type()
         )
 
     def with_timeout(self, timeout):
@@ -95,8 +96,8 @@ class AsyncGuildAPI(AsyncAPIBase):
         :return: 频道Guild对象
         """
         url = get_url(APIConstant.guildURI, self.is_sandbox).format(guild_id=guild_id)
-        async with self.async_http.get(url) as response:
-            return json.loads(response.content, object_hook=Guild)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=Guild)
 
 
 class AsyncGuildRoleAPI(AsyncAPIBase):
@@ -112,8 +113,8 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         :return:GuildRoles对象
         """
         url = get_url(APIConstant.rolesURI, self.is_sandbox).format(guild_id=guild_id)
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=GuildRoles)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=GuildRoles)
 
     async def create_guild_role(
         self, guild_id: str, role_info: RoleUpdateInfo
@@ -131,8 +132,8 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         params.guild_id = guild_id
         params.info = role_info
         serialize = JsonUtil.obj2json_serialize(params)
-        response = self.async_http.post(url, request=serialize)
-        return json.loads(response.content, object_hook=RoleUpdateResult)
+        response = await self.http_async.post(url, request=serialize)
+        return json.loads(response, object_hook=RoleUpdateResult)
 
     async def update_guild_role(
         self, guild_id: str, role_id: str, role_info: RoleUpdateInfo
@@ -153,8 +154,8 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         params.guild_id = guild_id
         params.info = role_info
         serialize = JsonUtil.obj2json_serialize(params)
-        response = self.async_http.patch(url, request=serialize)
-        return json.loads(response.content, object_hook=RoleUpdateResult)
+        response = await self.http_async.patch(url, request=serialize)
+        return json.loads(response, object_hook=RoleUpdateResult)
 
     async def delete_guild_role(self, guild_id: str, role_id: str) -> bool:
         """
@@ -167,8 +168,8 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         url = get_url(APIConstant.roleURI, self.is_sandbox).format(
             guild_id=guild_id, role_id=role_id
         )
-        async with self.async_http.delete(url) as response:
-            return response.status_code == HttpStatus.ACTION_OK
+        response = await self.http_async.delete(url)
+        return response == ""
 
     async def create_guild_role_member(
         self,
@@ -191,10 +192,10 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         url = get_url(APIConstant.memberRoleURI, self.is_sandbox).format(
             guild_id=guild_id, role_id=role_id, user_id=user_id
         )
-        response = self.async_http.put(
+        response = await self.http_async.put(
             url, request=JsonUtil.obj2json_serialize(role_req)
         )
-        return response.status_code == HttpStatus.ACTION_OK
+        return response == ""
 
     async def delete_guild_role_member(
         self,
@@ -217,10 +218,10 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         url = get_url(APIConstant.memberRoleURI, self.is_sandbox).format(
             guild_id=guild_id, role_id=role_id, user_id=user_id
         )
-        response = self.async_http.delete(
+        response = await self.http_async.delete(
             url, request=JsonUtil.obj2json_serialize(role_req)
         )
-        return response.status_code == HttpStatus.ACTION_OK
+        return response == ""
 
 
 class AsyncGuildMemberAPI(AsyncAPIBase):
@@ -239,8 +240,8 @@ class AsyncGuildMemberAPI(AsyncAPIBase):
         url = get_url(APIConstant.guildMemberURI, self.is_sandbox).format(
             guild_id=guild_id, user_id=user_id
         )
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=Member)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=Member)
 
     async def get_guild_members(
         self, guild_id: str, guild_member_pager: QueryParams
@@ -255,8 +256,8 @@ class AsyncGuildMemberAPI(AsyncAPIBase):
         url = get_url(APIConstant.guildMembersURI, self.is_sandbox).format(
             guild_id=guild_id
         )
-        response = self.async_http.get(url, params=guild_member_pager.__dict__)
-        return json.loads(response.content, object_hook=Member)
+        response = await self.http_async.get(url, params=guild_member_pager.__dict__)
+        return json.loads(response, object_hook=Member)
 
 
 class AsyncChannelAPI(AsyncAPIBase):
@@ -272,8 +273,8 @@ class AsyncChannelAPI(AsyncAPIBase):
         url = get_url(APIConstant.channelURI, self.is_sandbox).format(
             channel_id=channel_id
         )
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=Channel)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=Channel)
 
     async def get_channels(self, guild_id: str) -> List[Channel]:
         """
@@ -285,8 +286,8 @@ class AsyncChannelAPI(AsyncAPIBase):
         url = get_url(APIConstant.channelsURI, self.is_sandbox).format(
             guild_id=guild_id
         )
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=Channel)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=Channel)
 
     async def create_channel(
         self, guild_id: str, request: CreateChannelRequest
@@ -302,8 +303,8 @@ class AsyncChannelAPI(AsyncAPIBase):
             guild_id=guild_id
         )
         request_json = JsonUtil.obj2json_serialize(request)
-        response = self.async_http.post(url, request_json)
-        return json.loads(response.content, object_hook=ChannelResponse)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=ChannelResponse)
 
     async def update_channel(
         self, channel_id: str, request: PatchChannelRequest
@@ -319,8 +320,8 @@ class AsyncChannelAPI(AsyncAPIBase):
             channel_id=channel_id
         )
         request_json = JsonUtil.obj2json_serialize(request)
-        response = self.async_http.patch(url, request_json)
-        return json.loads(response.content, object_hook=ChannelResponse)
+        response = await self.http_async.patch(url, request_json)
+        return json.loads(response, object_hook=ChannelResponse)
 
     async def delete_channel(self, channel_id: str) -> ChannelResponse:
         """
@@ -332,8 +333,8 @@ class AsyncChannelAPI(AsyncAPIBase):
         url = get_url(APIConstant.channelURI, self.is_sandbox).format(
             channel_id=channel_id
         )
-        response = self.async_http.delete(url)
-        return json.loads(response.content, object_hook=ChannelResponse)
+        response = await self.http_async.delete(url)
+        return json.loads(response, object_hook=ChannelResponse)
 
 
 class AsyncChannelPermissionsAPI(AsyncAPIBase):
@@ -352,8 +353,8 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         url = get_url(APIConstant.channelPermissionsURI, self.is_sandbox).format(
             channel_id=channel_id, user_id=user_id
         )
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=ChannelPermissions)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=ChannelPermissions)
 
     async def update_channel_permissions(
         self, channel_id, user_id, request: ChannelPermissionsUpdateRequest
@@ -373,10 +374,10 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
             request.add = str(int(request.add, 16))
         if request.remove != "":
             request.remove = str(int(request.remove, 16))
-        response = self.async_http.put(
+        response = await self.http_async.put(
             url, request=JsonUtil.obj2json_serialize(request)
         )
-        return response.status_code == HttpStatus.ACTION_OK
+        return response == ""
 
 
 class AsyncMessageAPI(AsyncAPIBase):
@@ -393,8 +394,8 @@ class AsyncMessageAPI(AsyncAPIBase):
         url = get_url(APIConstant.messageURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
         )
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=Message)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=Message)
 
     async def get_messages(
         self, channel_id: str, pager: MessagesPager
@@ -416,8 +417,8 @@ class AsyncMessageAPI(AsyncAPIBase):
         if pager.type != "" and pager.id != "":
             query[pager.type] = pager.id
 
-        response = self.async_http.get(url, params=query)
-        return json.loads(response.content, object_hook=Message)
+        response = await self.http_async.get(url, params=query)
+        return json.loads(response, object_hook=Message)
 
     async def post_message(
         self, channel_id: str, message_send: MessageSendRequest
@@ -440,8 +441,8 @@ class AsyncMessageAPI(AsyncAPIBase):
             channel_id=channel_id
         )
         request_json = JsonUtil.obj2json_serialize(message_send)
-        async with self.async_http.post(url, request_json) as response:
-            return json.loads(response.content, object_hook=Message)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=Message)
 
     async def create_direct_message(
         self, create_direct_message: CreateDirectMessageRequest
@@ -454,8 +455,8 @@ class AsyncMessageAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.userMeDMURI, self.is_sandbox)
         request_json = JsonUtil.obj2json_serialize(create_direct_message)
-        response = self.async_http.post(url, request_json)
-        return json.loads(response.content, object_hook=DirectMessageGuild)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=DirectMessageGuild)
 
     async def post_direct_message(
         self, guild_id: str, message_send: MessageSendRequest
@@ -469,8 +470,8 @@ class AsyncMessageAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.dmsURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(message_send)
-        response = self.async_http.post(url, request_json)
-        return json.loads(response.content, object_hook=Message)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=Message)
 
 
 class AsyncAudioAPI(AsyncAPIBase):
@@ -488,8 +489,8 @@ class AsyncAudioAPI(AsyncAPIBase):
             channel_id=channel_id
         )
         request_json = JsonUtil.obj2json_serialize(audio_control)
-        response = self.async_http.post(url, request=request_json)
-        return response.status_code == HttpStatus.ACTION_OK
+        response = await self.http_async.post(url, request=request_json)
+        return response == ""
 
 
 class AsyncUserAPI(AsyncAPIBase):
@@ -500,8 +501,8 @@ class AsyncUserAPI(AsyncAPIBase):
         :return:使用当前用户信息填充的 User 对象
         """
         url = get_url(APIConstant.userMeURI, self.is_sandbox)
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=User)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=User)
 
     async def me_guilds(self) -> List[Guild]:
         """
@@ -510,5 +511,15 @@ class AsyncUserAPI(AsyncAPIBase):
         :return:Guild对象列表
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-        response = self.async_http.get(url)
-        return json.loads(response.content, object_hook=Guild)
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=Guild)
+
+
+class AsyncWebsocketAPI(AsyncAPIBase):
+    """WebsocketAPI"""
+
+    async def ws(self):
+        url = get_url(APIConstant.gatewayBotURI, self.is_sandbox)
+        response = await self.http_async.get(url)
+        websocket_ap = json.loads(response)
+        return websocket_ap

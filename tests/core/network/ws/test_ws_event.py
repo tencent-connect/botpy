@@ -3,7 +3,7 @@
 
 import unittest
 
-from qqbot.core.network.websocket.ws_event import WsEvent
+from qqbot.core.network.ws.ws_event import WsEvent
 
 
 class EventTestCase(unittest.TestCase):

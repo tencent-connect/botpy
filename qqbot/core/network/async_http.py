@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 
+from aiohttp import ClientResponse
+
 from qqbot.core.exception.error import (
     AuthenticationFailedError,
     NotFoundError,
@@ -37,23 +39,23 @@ class HttpStatus:
     ACTION_OK = 204
 
 
-def _handle_response(api_url, response):
-    if response.status_code in (HttpStatus.ACTION_OK, HttpStatus.OK):
+def _handle_response(api_url, response: ClientResponse, content: str):
+    if response.status in (HttpStatus.ACTION_OK, HttpStatus.OK):
         return
     else:
         logger.error(
             "http request error with api_url:%s, error: %s, content: %s, trace_id:%s"
             % (
                 api_url,
-                response.status_code,
-                response.content,
+                response.status,
+                content,
                 response.headers.get(X_TPS_TRACE_ID),
             )  # trace_id 用于定位接口问题
         )
         error_message_: HttpErrorMessage = json.loads(
-            response.content, object_hook=HttpErrorMessage
+            content, object_hook=HttpErrorMessage
         )
-        error_dict_get = HttpErrorDict.get(response.status_code)
+        error_dict_get = HttpErrorDict.get(response.status)
         if error_dict_get is None:
             raise ServerError(error_message_.message)
         raise error_dict_get(msg=error_message_.message)
@@ -75,8 +77,9 @@ class AsyncHttp:
         async with self.session.get(
             url=api_url, params=params, timeout=self.timeout, headers=headers
         ) as resp:
-            _handle_response(api_url, resp)
-            return resp
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
     async def post(self, api_url, request=None, params=None):
         headers = {
@@ -94,8 +97,9 @@ class AsyncHttp:
             timeout=self.timeout,
             headers=headers,
         ) as resp:
-            _handle_response(api_url, resp)
-            return resp
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
     async def delete(self, api_url, request=None, params=None):
         headers = {
@@ -110,8 +114,9 @@ class AsyncHttp:
             timeout=self.timeout,
             headers=headers,
         ) as resp:
-            _handle_response(api_url, resp)
-            return resp
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
     async def put(self, api_url, request=None, params=None):
         headers = {
@@ -129,8 +134,9 @@ class AsyncHttp:
             timeout=self.timeout,
             headers=headers,
         ) as resp:
-            _handle_response(api_url, resp)
-            return resp
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
     async def patch(self, api_url, request=None, params=None):
         headers = {
@@ -148,5 +154,6 @@ class AsyncHttp:
             timeout=self.timeout,
             headers=headers,
         ) as resp:
-            _handle_response(api_url, resp)
-            return resp
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
