@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import threading
+import traceback
 
 import websocket
 
@@ -81,6 +82,7 @@ class Client:
 
         def on_error(ws, exception=Exception):
             logger.error("on_error: %s" % exception)
+            logger.error(traceback.format_exc())
 
         def on_open(ws):
             logger.info("on_open: %s" % ws)
