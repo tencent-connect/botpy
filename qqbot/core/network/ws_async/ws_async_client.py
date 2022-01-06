@@ -90,7 +90,7 @@ class Client:
                     # async for msg in ws_conn:
                     msg: WSMessage
                     msg = await ws_conn.receive()
-                    asyncio.ensure_future(self.dispatch(msg, ws_conn))
+                    await self.dispatch(msg, ws_conn)
 
     async def dispatch(self, msg, ws_conn):
         """

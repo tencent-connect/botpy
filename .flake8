@@ -3,9 +3,7 @@ ignore =
     ;W503 line break before binary operator
     W503,
     ;E203 whitespace before ':'
-    E203,
-    F401,
-    F403
+    E203
 
 ; exclude file
 exclude =
