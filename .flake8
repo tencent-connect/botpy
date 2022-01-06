@@ -9,6 +9,7 @@ ignore =
 exclude =
     .tox,
     .git,
+    __init__.py,
     __pycache__,
     build,
     dist,
