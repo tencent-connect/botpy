@@ -4,23 +4,17 @@ import asyncio
 import unittest
 
 import qqbot
-from qqbot import CreateDirectMessageRequest, MessageSendRequest, CreateChannelRequest
 from qqbot.core.exception.error import (
     AuthenticationFailedError,
     SequenceNumberError,
     ServerError,
 )
 from qqbot.core.util import logging
-from qqbot.model.audio import AudioControl, STATUS
-from qqbot.model.channel import ChannelType, ChannelSubType, PatchChannelRequest
-from qqbot.model.channel_permissions import ChannelPermissionsUpdateRequest
-from qqbot.model.guild_member import QueryParams
-from qqbot.model.token import Token
 from tests import test_config
 
 logger = logging.getLogger(__name__)
 
-token = Token(test_config["token"]["appid"], test_config["token"]["token"])
+token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
 test_params_ = test_config["test_params"]
 GUILD_ID = test_params_["guild_id"]
 GUILD_OWNER_ID = test_params_["guild_owner_id"]
@@ -98,7 +92,7 @@ class GuildMemberAPITestCase(unittest.TestCase):
         self.assertEqual(GUILD_OWNER_NAME, member.user.username)
 
     def test_guild_members(self):
-        query_params = QueryParams("0", 1)
+        query_params = qqbot.QueryParams("0", 1)
         try:
             members = self.loop.run_until_complete(
                 self.api.get_guild_members(GUILD_ID, query_params)
@@ -122,10 +116,10 @@ class ChannelAPITestCase(unittest.TestCase):
 
     def test_create_update_delete_channel(self):
         # create
-        request = CreateChannelRequest(
+        request = qqbot.CreateChannelRequest(
             "channel_test",
-            ChannelType.TEXT_CHANNEL,
-            ChannelSubType.TALK,
+            qqbot.ChannelType.TEXT_CHANNEL,
+            qqbot.ChannelSubType.TALK,
             99,
             CHANNEL_PARENT_ID,
         )
@@ -133,8 +127,8 @@ class ChannelAPITestCase(unittest.TestCase):
             self.api.create_channel(GUILD_ID, request)
         )
         # patch
-        patch_channel = PatchChannelRequest(
-            "update_channel", ChannelType.TEXT_CHANNEL, 99, CHANNEL_PARENT_ID
+        patch_channel = qqbot.PatchChannelRequest(
+            "update_channel", qqbot.ChannelType.TEXT_CHANNEL, 99, CHANNEL_PARENT_ID
         )
         api_patch_channel = self.loop.run_until_complete(
             self.api.update_channel(channel.id, patch_channel)
@@ -158,7 +152,7 @@ class ChannelPermissionsTestCase(unittest.TestCase):
         self.assertEqual("6", channel_permissions.permissions)
 
     def test_channel_permissions_update(self):
-        request = ChannelPermissionsUpdateRequest("0x0000000002", "")
+        request = qqbot.ChannelPermissionsUpdateRequest("0x0000000002", "")
         result = self.loop.run_until_complete(
             self.api.update_channel_permissions(
                 CHANNEL_ID, GUILD_TEST_MEMBER_ID, request
@@ -185,7 +179,7 @@ class AudioTestCase(unittest.TestCase):
     loop = asyncio.get_event_loop()
 
     def test_post_audio(self):
-        audio = AudioControl("", "Test", STATUS.START)
+        audio = qqbot.AudioControl("", "Test", qqbot.STATUS.START)
         try:
             result = self.loop.run_until_complete(
                 self.api.post_audio(CHANNEL_ID, audio)
@@ -202,11 +196,11 @@ class MessageTestCase(unittest.TestCase):
     def test_create_and_send_dms(self):
         try:
             # 私信接口需要链接ws，单元测试无法测试可以在run_websocket测试
-            request = CreateDirectMessageRequest(GUILD_ID, GUILD_OWNER_ID)
+            request = qqbot.CreateDirectMessageRequest(GUILD_ID, GUILD_OWNER_ID)
             direct_message_guild = self.loop.run_until_complete(
                 self.api.create_direct_message(request)
             )
-            send_msg = MessageSendRequest("test")
+            send_msg = qqbot.MessageSendRequest("test")
             message = self.loop.run_until_complete(
                 self.api.post_direct_message(direct_message_guild.guild_id, send_msg)
             )
