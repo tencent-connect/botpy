@@ -82,7 +82,7 @@ class Client:
 
         def on_error(ws, exception=Exception):
             logger.error("on_error: %s" % exception)
-            logger.error(traceback.format_exc())
+            logger.error(traceback.print_exc())
 
         def on_open(ws):
             logger.info("on_open: %s" % ws)

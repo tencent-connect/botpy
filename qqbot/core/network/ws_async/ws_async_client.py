@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import json
+import traceback
 
 import aiohttp
 from aiohttp import WSMessage
@@ -32,6 +33,7 @@ class Client:
             "websocket on_error with connection: %s, exception : %s"
             % (self.ws_conn, exception)
         )
+        logger.error(traceback.print_exc())
 
     async def on_close(self, ws, close_status_code, close_msg):
         logger.info(
@@ -51,7 +53,7 @@ class Client:
             self.session.last_seq = 0
         # 断连后启动一个新的链接并透传当前的session，不使用内部重连的方式，避免死循环
         self.session_manager.session_pool.add(self.session)
-        self.session_manager.start_session()
+        asyncio.ensure_future(self.session_manager.session_pool.run())
 
     async def on_message(self, ws, message):
         logger.info("on_message: %s" % message)
@@ -86,10 +88,8 @@ class Client:
 
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(self.session.url) as ws_conn:
-                while True:
-                    # async for msg in ws_conn:
+                async for msg in ws_conn:
                     msg: WSMessage
-                    msg = await ws_conn.receive()
                     await self.dispatch(msg, ws_conn)
 
     async def dispatch(self, msg, ws_conn):
@@ -98,10 +98,13 @@ class Client:
         """
         if msg.type == aiohttp.WSMsgType.TEXT:
             await self.on_message(ws_conn, msg.data)
-        elif msg.type == aiohttp.WSMsgType.CLOSE and msg.data is not None:
-            await self.on_close(ws_conn, msg.data, msg.extra)
         elif msg.type == aiohttp.WSMsgType.ERROR:
             await self.on_error(ws_conn.exception())
+        elif msg.type == aiohttp.WSMsgType.CLOSE and msg.data is not None:
+            await self.on_close(ws_conn, msg.data, msg.extra)
+        elif msg.type == aiohttp.WSMsgType.CLOSED:
+            ws_conn.close()
+            logger.info("ws on_closed with msg type: %s", msg.type)
 
     async def identify(self):
         """
