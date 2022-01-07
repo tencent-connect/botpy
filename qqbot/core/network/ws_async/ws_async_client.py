@@ -4,10 +4,9 @@ import json
 import traceback
 
 import aiohttp
-from aiohttp import WSMessage
+from aiohttp import WSMessage, ClientWebSocketResponse
 
 from qqbot.core.exception.error import WebsocketError
-from qqbot.core.network.ws_async.ws_async_handler import parse_and_handle
 from qqbot.core.network.ws.dto.enum_intents import Intents
 from qqbot.core.network.ws.dto.enum_opcode import OpCode
 from qqbot.core.network.ws.dto.ws_payload import (
@@ -15,6 +14,7 @@ from qqbot.core.network.ws.dto.ws_payload import (
     WsIdentifyData,
     WSResumeData,
 )
+from qqbot.core.network.ws_async.ws_async_handler import parse_and_handle
 from qqbot.core.util import logging
 
 logger = logging.getLogger(__name__)
@@ -30,10 +30,10 @@ class Client:
 
     async def on_error(self, exception: BaseException):
         logger.error(
-            "websocket on_error with connection: %s, exception : %s"
+            "on_error: websocket connection: %s, exception : %s"
             % (self.ws_conn, exception)
         )
-        logger.error(traceback.print_exc())
+        traceback.print_exc()
 
     async def on_close(self, ws, close_status_code, close_msg):
         logger.info(
@@ -41,8 +41,6 @@ class Client:
             + ", code: %s" % close_status_code
             + ", msg: %s" % close_msg
         )
-        # 关闭心跳包线程
-        self.ws_conn = None
         # 这种不能重新链接
         if (
             close_status_code == WebsocketError.CodeConnCloseErr
@@ -70,7 +68,7 @@ class Client:
             await parse_and_handle(message_event, message)
 
     async def on_connected(self, ws):
-        logger.info("ws connected ok")
+        logger.info("ws client connected ok")
         self.ws_conn = ws
         await self.connected_callback(self)
         # 心跳检查
@@ -81,16 +79,20 @@ class Client:
         websocket向服务器端发起链接，并定时发送心跳
         """
 
-        logger.info("client start connect")
+        logger.info("ws client start connect")
         ws_url = self.session.url
         if ws_url == "":
             raise Exception("session url is none")
 
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(self.session.url) as ws_conn:
-                async for msg in ws_conn:
+                while True:
                     msg: WSMessage
+                    msg = await ws_conn.receive()
                     await self.dispatch(msg, ws_conn)
+                    if ws_conn.closed:
+                        logger.info("ws is closed, stop circle receive msg")
+                        break
 
     async def dispatch(self, msg, ws_conn):
         """
@@ -100,11 +102,10 @@ class Client:
             await self.on_message(ws_conn, msg.data)
         elif msg.type == aiohttp.WSMsgType.ERROR:
             await self.on_error(ws_conn.exception())
-        elif msg.type == aiohttp.WSMsgType.CLOSE and msg.data is not None:
-            await self.on_close(ws_conn, msg.data, msg.extra)
-        elif msg.type == aiohttp.WSMsgType.CLOSED:
-            ws_conn.close()
-            logger.info("ws on_closed with msg type: %s", msg.type)
+        elif (
+            msg.type == aiohttp.WSMsgType.CLOSED or msg.type == aiohttp.WSMsgType.CLOSE
+        ):
+            await self.on_close(ws_conn, ws_conn.close_code, msg.extra)
 
     async def identify(self):
         """
@@ -135,10 +136,11 @@ class Client:
         """
         send_msg = event_json
         logger.info("send_msg: %s" % send_msg)
-        if self.ws_conn is None:
-            logger.error("send_msg: websocket connection has closed")
-        else:
-            await self.ws_conn.send_str(data=send_msg)
+        if isinstance(self.ws_conn, ClientWebSocketResponse):
+            if self.ws_conn.closed:
+                logger.error("send_msg: websocket connection has closed")
+            else:
+                await self.ws_conn.send_str(data=send_msg)
 
     async def reconnect(self):
         """
@@ -191,6 +193,7 @@ class Client:
         心跳包
         :param interval: 间隔时间
         """
+        logger.info("start send heartbeat")
         while True:
             heartbeat_event = json.dumps(
                 WSPayload(
@@ -198,7 +201,12 @@ class Client:
                 ).__dict__
             )
             if self.ws_conn is None:
-                break
+                logger.error("ws is None")
+                return
             else:
-                await asyncio.sleep(interval)
-                await self.send_msg(heartbeat_event)
+                if self.ws_conn.closed:
+                    logger.info("ws is closed, stop circle heartbeat")
+                    return
+                else:
+                    await asyncio.sleep(interval)
+                    await self.send_msg(heartbeat_event)

@@ -33,7 +33,4 @@ if __name__ == "__main__":
     qqbot_handler = qqbot.Handler(
         qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler
     )
-    # qqbot_dms_handler = qqbot.Handler(
-    #     qqbot.HandlerType.DIRECT_MESSAGE_EVENT_HANDLER, _direct_message_handler
-    # )
     qqbot.async_listen_events(t_token, False, qqbot_handler)
