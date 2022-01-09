@@ -3,12 +3,13 @@ ignore =
     ;W503 line break before binary operator
     W503,
     ;E203 whitespace before ':'
-    E203,
+    E203
 
 ; exclude file
 exclude =
     .tox,
     .git,
+    __init__.py,
     __pycache__,
     build,
     dist,

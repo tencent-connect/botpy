@@ -2,10 +2,10 @@
 
 import asyncio
 
-from qqbot.core.network.websocket.dto.enum_intents import Intents
-from qqbot.core.network.websocket.ws_client import Client
-from qqbot.core.network.websocket.ws_session import Session, ShardConfig
-from qqbot.core.network.websocket.ws_session_pool import SessionPool
+from qqbot.core.network.ws_sync.ws_client import Client
+from qqbot.core.network.ws_sync.ws_session_pool import SessionPool
+from qqbot.core.network.ws.dto.enum_intents import Intents
+from qqbot.core.network.ws.ws_session import Session, ShardConfig
 from qqbot.core.util import logging
 from qqbot.model.token import Token
 
@@ -77,7 +77,6 @@ class SessionManager:
             max_async=websocket_ap["session_start_limit"]["max_concurrency"],
             session_manager=self,
             loop=asyncio.get_event_loop(),
-            session_count=shards_count,
         )
         for i in range(shards_count):
             session = Session(
