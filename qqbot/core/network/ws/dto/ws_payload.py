@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from qqbot.core.network.websocket.dto.enum_intents import Intents
+from qqbot.core.network.ws.dto.enum_intents import Intents
 from qqbot.model.token import Token
 
 

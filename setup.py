@@ -3,7 +3,6 @@ import os
 
 from setuptools import setup, find_packages
 
-
 setup(
     name="qq-bot",
     version=os.getenv("VERSION_NAME"),
@@ -18,7 +17,7 @@ setup(
     # 执照
     license="Tencent",
     # 安装依赖
-    install_requires=["requests", "websocket-client"],
+    install_requires=["requests", "websocket-client", "aiohttp>=3.6.0,<3.8.0"],
     # 分类
     classifiers=[
         # 发展时期,常见的如下

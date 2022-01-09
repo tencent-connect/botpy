@@ -2,7 +2,8 @@
 
 import json
 
-from qqbot.core.network.websocket.ws_event import WsEvent
+from qqbot.core.network.ws.ws_event import WsEvent
+from qqbot.core.network.ws.ws_handler import DefaultHandler
 from qqbot.core.util import logging
 from qqbot.model.audio import AudioAction
 from qqbot.model.channel import Channel
@@ -11,21 +12,6 @@ from qqbot.model.guild_member import GuildMember
 from qqbot.model.message import Message
 
 logger = logging.getLogger(__name__)
-
-
-class DefaultHandler:
-    """
-    持有handler的实例
-    """
-
-    plain = None
-    guild = None
-    guild_member = None
-    channel = None
-    message = None
-    at_message = None
-    direct_message = None
-    audio = None
 
 
 def parse_and_handle(message_event, message):
