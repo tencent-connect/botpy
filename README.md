@@ -38,8 +38,24 @@ import qqbot
 import qqbot
 
 token = qqbot.Token("{appid}","{token}")
-api = qqbot.UserAPITestCase(token, False)
+api = qqbot.UserAPI(token, False)
+
 user = api.me()
+
+print(user.username)  # 打印机器人名字
+```
+
+async 示例：
+
+``` py
+import qqbot
+
+token = qqbot.Token("{appid}","{token}")
+api = qqbot.AsyncUserAPI(token, False)
+
+# 获取loop
+loop = asyncio.get_event_loop()
+user = loop.run_until_complete(api.me())
 
 print(user.username)  # 打印机器人名字
 ```
@@ -78,7 +94,34 @@ print(user.username)  # 打印机器人名字
       msg_api.post_message(message.channel_id, send)
   ```
 
-  注：当前支持事件及回调数据对象为：
+- async 示例:
+
+  ``` py
+  # async的异步接口的使用示例
+  t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
+  qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler)
+  qqbot.async_listen_events(t_token, False, qqbot_handler)
+  ```
+  ``` py
+  async def _message_handler(event, message: qqbot.Message):
+    """
+    定义事件回调的处理
+
+    :param event: 事件类型
+    :param message: 事件对象（如监听消息是Message对象）
+    """
+    msg_api = qqbot.AsyncMessageAPI(t_token, False)
+    # 打印返回信息
+    qqbot.logger.info("event %s" % event + ",receive message %s" % message.content)
+    for i in range(5):
+        await asyncio.sleep(5)
+        # 构造消息发送请求数据对象
+        send = qqbot.MessageSendRequest("<@%s>谢谢你，加油 " % message.author.id, message.id)
+        # 通过api发送回复消息
+        await msg_api.post_message(message.channel_id, send)
+
+  ```
+- 注：当前支持事件及回调数据对象为：
 
   ``` py
   class HandlerType(Enum):
