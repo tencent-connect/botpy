@@ -144,4 +144,4 @@ qqbot.log.*
 temp/
 
 # idea config
-.idea
+.idea.vscode

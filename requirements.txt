@@ -3,3 +3,5 @@ websocket-client
 pre-commit
 PyYAML
 aiohttp>=3.6.0,<3.8.0
+mistune==0.8.4
+m2r>=0.2.0
