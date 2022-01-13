@@ -380,6 +380,45 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         )
         return response == ""
 
+    async def get_channel_role_permissions(
+        self, channel_id: str, role_id: str
+    ) -> ChannelPermissions:
+        """
+        获取指定子频道的权限
+
+        :param channel_id:子频道ID
+        :param role_id:身份组ID
+        :return:ChannelPermissions对象
+        """
+        url = get_url(APIConstant.channelRolePermissionsURI, self.is_sandbox).format(
+            channel_id=channel_id, role_id=role_id
+        )
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=ChannelPermissions)
+
+    async def update_channel_role_permissions(
+        self, channel_id: str, role_id: str, request: ChannelPermissionsUpdateRequest
+    ) -> bool:
+        """
+        修改指定子频道的权限
+
+        :param channel_id:子频道ID
+        :param role_id:身份组ID
+        :param request:ChannelPermissionsUpdateRequest数据对象（构造可以查看具体的对象注释）
+        :return:
+        """
+        url = get_url(APIConstant.channelRolePermissionsURI, self.is_sandbox).format(
+            channel_id=channel_id, role_id=role_id
+        )
+        if request.add != "":
+            request.add = str(int(request.add, 16))
+        if request.remove != "":
+            request.remove = str(int(request.remove, 16))
+        response = await self.http_async.put(
+            url, request=JsonUtil.obj2json_serialize(request)
+        )
+        return response == ""
+
 
 class AsyncMessageAPI(AsyncAPIBase):
     """消息"""
