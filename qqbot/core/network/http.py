@@ -36,7 +36,7 @@ class HttpErrorMessage:
 
 class HttpStatus:
     OK = 200
-    ACCEPTED = 200
+    ACCEPTED = 202
     NO_CONTENT = 204
 
 
@@ -72,14 +72,18 @@ class Http:
         self.token = token
         self.scheme = type
 
-    def get(self, api_url, params=None):
+    def get(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
         response = requests.get(
-            url=api_url, params=params, timeout=self.timeout, headers=headers
+            url=api_url,
+            params=params,
+            json=request,
+            timeout=self.timeout,
+            headers=headers,
         )
         _handle_response(api_url, response)
         return response
