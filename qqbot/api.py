@@ -36,6 +36,7 @@ from qqbot.model.message import (
     MessagesPager,
 )
 from qqbot.model.token import Token
+from qqbot.model.user import ReqOption
 
 
 def listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
@@ -161,7 +162,7 @@ class GuildRoleAPI(APIBase):
             guild_id=guild_id, role_id=role_id
         )
         response = self.http.delete(url)
-        return response.status_code == HttpStatus.ACTION_OK
+        return response.status_code == HttpStatus.NO_CONTENT
 
     def create_guild_role_member(
         self,
@@ -185,7 +186,7 @@ class GuildRoleAPI(APIBase):
             guild_id=guild_id, role_id=role_id, user_id=user_id
         )
         response = self.http.put(url, request=JsonUtil.obj2json_serialize(role_req))
-        return response.status_code == HttpStatus.ACTION_OK
+        return response.status_code == HttpStatus.NO_CONTENT
 
     def delete_guild_role_member(
         self,
@@ -209,7 +210,7 @@ class GuildRoleAPI(APIBase):
             guild_id=guild_id, role_id=role_id, user_id=user_id
         )
         response = self.http.delete(url, request=JsonUtil.obj2json_serialize(role_req))
-        return response.status_code == HttpStatus.ACTION_OK
+        return response.status_code == HttpStatus.NO_CONTENT
 
 
 class GuildMemberAPI(APIBase):
@@ -363,7 +364,7 @@ class ChannelPermissionsAPI(APIBase):
         if request.remove != "":
             request.remove = str(int(request.remove, 16))
         response = self.http.put(url, request=JsonUtil.obj2json_serialize(request))
-        return response.status_code == HttpStatus.ACTION_OK
+        return response.status_code == HttpStatus.NO_CONTENT
 
 
 class MessageAPI(APIBase):
@@ -474,7 +475,7 @@ class AudioAPI(APIBase):
         )
         request_json = JsonUtil.obj2json_serialize(audio_control)
         response = self.http.post(url, request=request_json)
-        return response.status_code == HttpStatus.ACTION_OK
+        return response.status_code == HttpStatus.NO_CONTENT
 
 
 class UserAPI(APIBase):
@@ -488,14 +489,16 @@ class UserAPI(APIBase):
         response = self.http.get(url)
         return json.loads(response.content, object_hook=User)
 
-    def me_guilds(self) -> List[Guild]:
+    def me_guilds(self, option: ReqOption = None) -> List[Guild]:
         """
         当前用户所加入的 Guild 对象列表
 
+        :param option: ReqOption对象
         :return:Guild对象列表
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-        response = self.http.get(url)
+        request_json = JsonUtil.obj2json_serialize(option)
+        response = self.http.get(url, request=request_json)
         return json.loads(response.content, object_hook=Guild)
 
 

@@ -145,6 +145,10 @@ class UserAPITestCase(unittest.TestCase):
         guilds = self.api.me_guilds()
         self.assertNotEqual(0, len(guilds))
 
+        option = qqbot.ReqOption("", GUILD_ID, "1")
+        guilds = self.api.me_guilds(option)
+        self.assertEqual(1, len(guilds))
+
 
 class AudioTestCase(unittest.TestCase):
     api = qqbot.AudioAPI(token, IS_SANDBOX)

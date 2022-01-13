@@ -7,3 +7,4 @@ from .guild_member import QueryParams
 from .guild_role import RoleUpdateInfo
 from .message import CreateDirectMessageRequest, MessageSendRequest, Message
 from .token import Token
+from .user import ReqOption

@@ -41,6 +41,7 @@ from qqbot.model.message import (
     MessagesPager,
 )
 from qqbot.model.token import Token
+from qqbot.model.user import ReqOption
 
 
 def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
@@ -504,14 +505,16 @@ class AsyncUserAPI(AsyncAPIBase):
         response = await self.http_async.get(url)
         return json.loads(response, object_hook=User)
 
-    async def me_guilds(self) -> List[Guild]:
+    async def me_guilds(self, option: ReqOption = None) -> List[Guild]:
         """
         当前用户所加入的 Guild 对象列表
 
+        :param option: ReqOption对象
         :return:Guild对象列表
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-        response = await self.http_async.get(url)
+        request_json = JsonUtil.obj2json_serialize(option)
+        response = await self.http_async.get(url, request=request_json)
         return json.loads(response, object_hook=Guild)
 
 

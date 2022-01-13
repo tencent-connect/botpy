@@ -69,14 +69,18 @@ class AsyncHttp:
         self.scheme = type
         self.session = session
 
-    async def get(self, api_url, params=None):
+    async def get(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
         async with self.session.get(
-            url=api_url, params=params, timeout=self.timeout, headers=headers
+            url=api_url,
+            params=params,
+            json=request,
+            timeout=self.timeout,
+            headers=headers,
         ) as resp:
             content = await resp.text()
             _handle_response(api_url, resp, content)
