@@ -36,6 +36,8 @@ class APIConstant:
     audioControlURI = "/channels/{channel_id}/audio"
     dmsURI = "/dms/{guild_id}/messages"
 
+    guildMuteURI = "/guilds/{guild_id}/mute"
+
 
 def get_url(url_format, is_sandbox):
     d = BaseConstant.domain

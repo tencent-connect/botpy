@@ -40,6 +40,7 @@ from qqbot.model.message import (
     DirectMessageGuild,
     MessagesPager,
 )
+from qqbot.model.mute import MuteOption
 from qqbot.model.token import Token
 from qqbot.model.user import ReqOption
 
@@ -565,3 +566,21 @@ class AsyncWebsocketAPI(AsyncAPIBase):
         response = await self.http_async.get(url)
         websocket_ap = json.loads(response)
         return websocket_ap
+
+
+class AsyncMuteAPI(AsyncAPIBase):
+    """禁言接口"""
+
+    async def mute_all(self, guild_id: str, options: MuteOption):
+        """
+        禁言全员
+
+        :param guild_id: 频道ID
+        :param options: MuteOptions对象
+        """
+        url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(
+            guild_id=guild_id
+        )
+        request_json = JsonUtil.obj2json_serialize(options)
+        response = await self.http_async.patch(url, request=request_json)
+        return response == ""

@@ -235,5 +235,15 @@ class WebsocketTestCase(unittest.TestCase):
         self.assertEqual(ws["url"], "wss://api.sgroup.qq.com/websocket")
 
 
+class MuteTestCase(unittest.TestCase):
+    api = qqbot.AsyncMuteAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_mute_all(self):
+        option = qqbot.MuteOption("", "120")
+        result = self.loop.run_until_complete(self.api.mute_all(GUILD_ID, option))
+        self.assertEqual(True, result)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -6,5 +6,6 @@ from .channel_permissions import ChannelPermissionsUpdateRequest
 from .guild_member import QueryParams
 from .guild_role import RoleUpdateInfo
 from .message import CreateDirectMessageRequest, MessageSendRequest, Message
+from .mute import MuteOption
 from .token import Token
 from .user import ReqOption
