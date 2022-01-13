@@ -11,6 +11,7 @@ from .api import (
     AudioAPI,
     MessageAPI,
     WebsocketAPI,
+    MuteAPI,
 )
 
 from .async_api import (
@@ -24,6 +25,7 @@ from .async_api import (
     AsyncAudioAPI,
     AsyncMessageAPI,
     AsyncWebsocketAPI,
+    AsyncMuteAPI,
 )
 from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging
