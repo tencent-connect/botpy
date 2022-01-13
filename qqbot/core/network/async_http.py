@@ -71,7 +71,7 @@ class AsyncHttp:
     async def get(self, api_url, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
         async with self.session.get(
@@ -84,7 +84,7 @@ class AsyncHttp:
     async def post(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
             "http post headers: %s, api_url: %s, request: %s"
@@ -104,7 +104,7 @@ class AsyncHttp:
     async def delete(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
         async with self.session.delete(
@@ -121,7 +121,7 @@ class AsyncHttp:
     async def put(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
             "http put headers: %s, api_url: %s, request: %s"
@@ -141,7 +141,7 @@ class AsyncHttp:
     async def patch(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
             "http patch headers: %s, api_url: %s, request: %s"
