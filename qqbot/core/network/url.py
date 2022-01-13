@@ -21,6 +21,7 @@ class APIConstant:
     channelsURI = "/guilds/{guild_id}/channels"
     channelURI = "/channels/{channel_id}"
     channelPermissionsURI = "/channels/{channel_id}/members/{user_id}/permissions"
+    channelRolePermissionsURI = "/channels/{channel_id}/roles/{role_id}/permissions"
 
     messagesURI = "/channels/{channel_id}/messages"
     messageURI = "/channels/{channel_id}/messages/{message_id}"

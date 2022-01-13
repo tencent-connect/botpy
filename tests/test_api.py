@@ -133,6 +133,19 @@ class ChannelPermissionsTestCase(unittest.TestCase):
         )
         self.assertEqual(True, result)
 
+    def test_channel_role_permissions(self):
+        channel_permissions = self.api.get_channel_role_permissions(
+            CHANNEL_ID, GUILD_TEST_ROLE_ID
+        )
+        self.assertEqual("0", channel_permissions.permissions)
+
+    def test_channel_role_permissions_update(self):
+        request = qqbot.ChannelPermissionsUpdateRequest("0x0000000002", "")
+        result = self.api.update_channel_permissions(
+            CHANNEL_ID, GUILD_TEST_ROLE_ID, request
+        )
+        self.assertEqual(True, result)
+
 
 class UserAPITestCase(unittest.TestCase):
     api = qqbot.UserAPI(token, IS_SANDBOX)
