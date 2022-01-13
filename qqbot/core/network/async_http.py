@@ -36,11 +36,12 @@ class HttpErrorMessage:
 
 class HttpStatus:
     OK = 200
-    ACTION_OK = 204
+    ACCEPTED = 200
+    NO_CONTENT = 204
 
 
 def _handle_response(api_url, response: ClientResponse, content: str):
-    if response.status in (HttpStatus.ACTION_OK, HttpStatus.OK):
+    if response.status in (HttpStatus.NO_CONTENT, HttpStatus.OK, HttpStatus.ACCEPTED):
         return
     else:
         logger.error(
