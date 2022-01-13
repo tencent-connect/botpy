@@ -70,7 +70,7 @@ class Http:
     def get(self, api_url, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
         response = requests.get(
@@ -82,7 +82,7 @@ class Http:
     def post(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
             "http post headers: %s, api_url: %s, request: %s"
@@ -101,7 +101,7 @@ class Http:
     def delete(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
         response = requests.delete(
@@ -117,7 +117,7 @@ class Http:
     def put(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
             "http put headers: %s, api_url: %s, request: %s"
@@ -136,7 +136,7 @@ class Http:
     def patch(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "botpy",
+            "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
             "http patch headers: %s, api_url: %s, request: %s"
