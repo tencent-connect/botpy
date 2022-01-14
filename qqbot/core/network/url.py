@@ -37,6 +37,7 @@ class APIConstant:
     dmsURI = "/dms/{guild_id}/messages"
 
     guildMuteURI = "/guilds/{guild_id}/mute"
+    guildMemberMuteURI = "/guilds/{guild_id}/members/{user_id}/mute"
 
 
 def get_url(url_format, is_sandbox):
