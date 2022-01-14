@@ -21,7 +21,7 @@ from qqbot.model.channel import (
 )
 from qqbot.model.channel_permissions import (
     ChannelPermissions,
-    ChannelPermissionsUpdateRequest,
+    UpdatePermission,
 )
 from qqbot.model.guild import Guild
 from qqbot.model.guild_member import QueryParams
@@ -359,7 +359,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         return json.loads(response, object_hook=ChannelPermissions)
 
     async def update_channel_permissions(
-        self, channel_id, user_id, request: ChannelPermissionsUpdateRequest
+        self, channel_id, user_id, request: UpdatePermission
     ) -> bool:
         """
         修改指定子频道的权限
@@ -398,7 +398,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         return json.loads(response, object_hook=ChannelPermissions)
 
     async def update_channel_role_permissions(
-        self, channel_id: str, role_id: str, request: ChannelPermissionsUpdateRequest
+        self, channel_id: str, role_id: str, request: UpdatePermission
     ) -> bool:
         """
         修改指定子频道的权限

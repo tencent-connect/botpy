@@ -16,7 +16,7 @@ from qqbot.model.channel import (
 )
 from qqbot.model.channel_permissions import (
     ChannelPermissions,
-    ChannelPermissionsUpdateRequest,
+    UpdatePermission,
 )
 from qqbot.model.guild import Guild
 from qqbot.model.guild_member import QueryParams
@@ -347,23 +347,19 @@ class ChannelPermissionsAPI(APIBase):
         return json.loads(response.content, object_hook=ChannelPermissions)
 
     def update_channel_permissions(
-        self, channel_id, user_id, request: ChannelPermissionsUpdateRequest
+        self, channel_id, user_id, request: UpdatePermission
     ) -> bool:
         """
         修改指定子频道的权限
 
         :param channel_id:子频道ID
         :param user_id:用户ID
-        :param request:ChannelPermissionsUpdateRequest数据对象（构造可以查看具体的对象注释）
+        :param request:UpdatePermission数据对象（构造可以查看具体的对象注释）
         :return:
         """
         url = get_url(APIConstant.channelPermissionsURI, self.is_sandbox).format(
             channel_id=channel_id, user_id=user_id
         )
-        if request.add != "":
-            request.add = str(int(request.add, 16))
-        if request.remove != "":
-            request.remove = str(int(request.remove, 16))
         response = self.http.put(url, request=JsonUtil.obj2json_serialize(request))
         return response.status_code == HttpStatus.NO_CONTENT
 
@@ -384,23 +380,20 @@ class ChannelPermissionsAPI(APIBase):
         return json.loads(response.content, object_hook=ChannelPermissions)
 
     def update_channel_role_permissions(
-        self, channel_id: str, role_id: str, request: ChannelPermissionsUpdateRequest
+        self, channel_id: str, role_id: str, request: UpdatePermission
     ) -> bool:
         """
         修改指定子频道的权限
 
         :param channel_id:子频道ID
         :param role_id:身份组ID
-        :param request:ChannelPermissionsUpdateRequest数据对象（构造可以查看具体的对象注释）
+        :param request:UpdatePermission数据对象（构造可以查看具体的对象注释）
         :return:
         """
         url = get_url(APIConstant.channelRolePermissionsURI, self.is_sandbox).format(
             channel_id=channel_id, role_id=role_id
         )
-        if request.add != "":
-            request.add = str(int(request.add, 16))
-        if request.remove != "":
-            request.remove = str(int(request.remove, 16))
+
         response = self.http.put(url, request=JsonUtil.obj2json_serialize(request))
         return response.status_code == HttpStatus.NO_CONTENT
 
