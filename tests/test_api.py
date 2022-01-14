@@ -127,7 +127,7 @@ class ChannelPermissionsTestCase(unittest.TestCase):
         self.assertEqual("6", channel_permissions.permissions)
 
     def test_channel_permissions_update(self):
-        request = qqbot.ChannelPermissionsUpdateRequest("0x0000000002", "")
+        request = qqbot.UpdatePermission(add="4")
         result = self.api.update_channel_permissions(
             CHANNEL_ID, GUILD_TEST_MEMBER_ID, request
         )
@@ -140,7 +140,7 @@ class ChannelPermissionsTestCase(unittest.TestCase):
         self.assertEqual("0", channel_permissions.permissions)
 
     def test_channel_role_permissions_update(self):
-        request = qqbot.ChannelPermissionsUpdateRequest("0x0000000002", "")
+        request = qqbot.UpdatePermission(add="0")
         result = self.api.update_channel_permissions(
             CHANNEL_ID, GUILD_TEST_ROLE_ID, request
         )
@@ -216,12 +216,12 @@ class MuteTestCase(unittest.TestCase):
     api = qqbot.MuteAPI(token, IS_SANDBOX)
 
     def test_mute_all(self):
-        option = qqbot.MuteOption("", "120")
+        option = qqbot.MuteOption(mute_seconds="120")
         result = self.api.mute_all(GUILD_ID, option)
         self.assertEqual(True, result)
 
     def test_mute_member(self):
-        option = qqbot.MuteOption("", "120")
+        option = qqbot.MuteOption(mute_seconds="120")
         result = self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         self.assertEqual(True, result)
 
