@@ -584,3 +584,18 @@ class AsyncMuteAPI(AsyncAPIBase):
         request_json = JsonUtil.obj2json_serialize(options)
         response = await self.http_async.patch(url, request=request_json)
         return response == ""
+
+    async def mute_member(self, guild_id: str, user_id: str, options: MuteOption):
+        """
+        禁言指定成员
+
+        :param guild_id: 频道ID
+        :param user_id: 用户ID
+        :param options: MuteOptions对象
+        """
+        url = get_url(APIConstant.guildMemberMuteURI, self.is_sandbox).format(
+            guild_id=guild_id, user_id=user_id
+        )
+        request_json = JsonUtil.obj2json_serialize(options)
+        response = await self.http_async.patch(url, request=request_json)
+        return response == ""

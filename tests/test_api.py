@@ -220,6 +220,11 @@ class MuteTestCase(unittest.TestCase):
         result = self.api.mute_all(GUILD_ID, option)
         self.assertEqual(True, result)
 
+    def test_mute_member(self):
+        option = qqbot.MuteOption("", "120")
+        result = self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
+        self.assertEqual(True, result)
+
 
 if __name__ == "__main__":
     unittest.main()
