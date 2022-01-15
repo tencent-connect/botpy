@@ -70,15 +70,15 @@ print(user.username)  # 打印机器人名字
 
 比如下面这个例子：需要监听机器人被@后消息并进行相应的回复。
 
-- 先初始化需要用的 `token` 对象
+- 先初始化需要用的 `token` 对象（ `appid`和`token`参数从机器人管理端获取 ）
 - 通过 `qqbot.listen_events` 注册需要监听的事件
 - 通过 `qqbot.HandlerType` 定义需要监听的事件（部分事件可能需要权限申请）
 
   ``` py
-  t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
+  token = qqbot.Token("{appid}","{token}")
   # 注册事件类型和回调，可以注册多个
   qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler)
-  qqbot.listen_events(t_token, False, qqbot_handler)
+  qqbot.listen_events(token, False, qqbot_handler)
   ```
 
 - 最后定义注册事件回调执行函数,如 `_message_handler` 。
@@ -98,9 +98,9 @@ print(user.username)  # 打印机器人名字
 
   ``` py
   # async的异步接口的使用示例
-  t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
+  token = qqbot.Token("{appid}","{token}")
   qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler)
-  qqbot.async_listen_events(t_token, False, qqbot_handler)
+  qqbot.async_listen_events(token, False, qqbot_handler)
   ```
   ``` py
   async def _message_handler(event, message: qqbot.Message):
