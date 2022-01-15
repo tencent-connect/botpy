@@ -85,7 +85,7 @@ print(user.username)  # 打印机器人名字
 
   ``` py
   def _message_handler(event, message: Message):
-      msg_api = qqbot.MessageAPI(t_token, False)
+      msg_api = qqbot.MessageAPI(token, False)
       # 打印返回信息
       qqbot.logger.info("event %s" % event + ",receive message %s" % message.content)
       # 构造消息发送请求数据对象
@@ -110,7 +110,7 @@ print(user.username)  # 打印机器人名字
     :param event: 事件类型
     :param message: 事件对象（如监听消息是Message对象）
     """
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
+    msg_api = qqbot.AsyncMessageAPI(token, False)
     # 打印返回信息
     qqbot.logger.info("event %s" % event + ",receive message %s" % message.content)
     for i in range(5):
