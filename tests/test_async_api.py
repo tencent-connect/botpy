@@ -247,7 +247,7 @@ class MuteTestCase(unittest.TestCase):
     def test_mute_member(self):
         option = qqbot.MuteOption(mute_seconds="120")
         result = self.loop.run_until_complete(
-            self.api.mute_member(GUILD_ID, GUILD_OWNER_ID, option)
+            self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         )
         self.assertEqual(True, result)
 
