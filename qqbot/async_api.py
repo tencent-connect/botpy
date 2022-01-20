@@ -575,7 +575,12 @@ class AsyncUserAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
         request_json = JsonUtil.obj2json_serialize(option)
-        response = await self.http_async.get(url, request=request_json)
+
+        query = {}
+        if option is not None and option.limit is not None:
+            query["limit"] = option.limit
+
+        response = await self.http_async.get(url, request=request_json, params=query)
         return json.loads(response, object_hook=Guild)
 
 
