@@ -2,7 +2,7 @@
 
 
 class ReqOption:
-    def __init__(self, before: str = None, after: str = None, limit: str = None):
+    def __init__(self, before: str = None, after: str = None, limit: int = None):
         """
         获取频道列表的请求
 
@@ -10,9 +10,9 @@ class ReqOption:
         :param after: 读取此 guild id 之后的数据
         :param limit: 每次拉取多少条数据，最大不超过 100，默认 100
         """
-        self.before = before
-        self.after = after
+        if before is not None:
+            self.before = before
+        if after is not None:
+            self.after = after
         if limit is not None:
-            self.limit = int(limit)
-        else:
-            self.limit = None
+            self.limit = limit

@@ -549,13 +549,13 @@ class UserAPI(APIBase):
         :return:Guild对象列表
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-        request_json = JsonUtil.obj2json_serialize(option)
 
-        query = {}
-        if option is not None and option.limit is not None:
-            query["limit"] = option.limit
+        if option is None:
+            query = {}
+        else:
+            query = option.__dict__
 
-        response = self.http.get(url, request=request_json, params=query)
+        response = self.http.get(url, params=query)
         return json.loads(response.content, object_hook=Guild)
 
 

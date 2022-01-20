@@ -186,7 +186,7 @@ class UserAPITestCase(unittest.TestCase):
         guilds = self.loop.run_until_complete(self.api.me_guilds())
         self.assertNotEqual(0, len(guilds))
 
-        option = qqbot.ReqOption(after=GUILD_ID, limit="1")
+        option = qqbot.ReqOption(limit=1)
         guilds = self.loop.run_until_complete(self.api.me_guilds(option))
         self.assertEqual(1, len(guilds))
 

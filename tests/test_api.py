@@ -160,7 +160,7 @@ class UserAPITestCase(unittest.TestCase):
 
         option = qqbot.ReqOption(after=GUILD_ID)
         guilds = self.api.me_guilds(option)
-        self.assertEqual(1, len(guilds))
+        self.assertEqual(0, len(guilds))
 
 
 class AudioTestCase(unittest.TestCase):
