@@ -33,4 +33,4 @@ from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging
 from .model import *
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()

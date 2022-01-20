@@ -14,7 +14,7 @@ from qqbot.core.util import logging
 
 X_TPS_TRACE_ID = "X-Tps-trace-Id"
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 HttpErrorDict = {
     401: AuthenticationFailedError,

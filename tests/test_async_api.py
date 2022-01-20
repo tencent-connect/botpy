@@ -12,7 +12,7 @@ from qqbot.core.exception.error import (
 from qqbot.core.util import logging
 from tests import test_config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
 test_params_ = test_config["test_params"]
