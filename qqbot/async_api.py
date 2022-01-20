@@ -12,6 +12,11 @@ from qqbot.core.network.url import get_url, APIConstant
 from qqbot.core.network.ws.ws_intents_handler import Handler, register_handlers
 from qqbot.core.network.ws_async.ws_async_manager import SessionManager
 from qqbot.core.util.json_util import JsonUtil
+from qqbot.model.announce import (
+    CreateAnnounceRequest,
+    Announce,
+    CreateChannelAnnounceRequest,
+)
 from qqbot.model.audio import AudioControl
 from qqbot.model.channel import (
     Channel,
@@ -485,6 +490,22 @@ class AsyncMessageAPI(AsyncAPIBase):
         response = await self.http_async.post(url, request_json)
         return json.loads(response, object_hook=Message)
 
+    async def recall_message(self, channel_id: str, message_id: str):
+        """
+        撤回消息
+
+        管理员可以撤回普通成员的消息
+        频道主可以撤回所有人的消息
+
+        :param channel_id: 子频道ID
+        :param message_id: 消息ID
+        """
+        url = get_url(APIConstant.messageURI, self.is_sandbox).format(
+            channel_id=channel_id, message_id=message_id
+        )
+        response = await self.http_async.delete(url)
+        return response.status_code == ""
+
     async def create_direct_message(
         self, create_direct_message: CreateDirectMessageRequest
     ) -> DirectMessageGuild:
@@ -598,4 +619,68 @@ class AsyncMuteAPI(AsyncAPIBase):
         )
         request_json = JsonUtil.obj2json_serialize(options)
         response = await self.http_async.patch(url, request=request_json)
+        return response == ""
+
+
+class AsyncAnnouncesAPI(AsyncAPIBase):
+    """公告接口"""
+
+    async def create_announce(
+        self, guild_id: str, request: CreateAnnounceRequest
+    ) -> Announce:
+        """
+        创建频道全局公告
+
+        :param guild_id: 频道ID
+        :param request: CreateAnnounceRequest对象
+        """
+        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(
+            guild_id=guild_id
+        )
+        request_json = JsonUtil.obj2json_serialize(request)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=Announce)
+
+    async def delete_announce(self, guild_id: str, message_id: str):
+        """
+        删除频道全局公告
+        message_id 有值时，会校验 message_id 合法性，若不校验校验 message_id，请将 message_id 设置为 all
+
+        :param guild_id: 频道ID
+        :param message_id: 消息ID
+        """
+        url = get_url(APIConstant.deleteGuildAnnounceURI, self.is_sandbox).format(
+            guild_id=guild_id, message_id=message_id
+        )
+        response = await self.http_async.delete(url)
+        return response == ""
+
+    async def create_channel_announce(
+        self, channel_id: str, request: CreateChannelAnnounceRequest
+    ) -> Announce:
+        """
+        设置消息为指定子频道公告
+
+        :param channel_id: 频道ID
+        :param request: CreateChannelAnnounceRequest对象
+        """
+        url = get_url(APIConstant.channelAnnounceURI, self.is_sandbox).format(
+            channel_id=channel_id
+        )
+        request_json = JsonUtil.obj2json_serialize(request)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=Announce)
+
+    async def delete_channel_announce(self, channel_id: str, message_id: str):
+        """
+        删除子频道公告
+        message_id 有值时，会校验 message_id 合法性，若不校验校验 message_id，请将 message_id 设置为 all
+
+        :param channel_id: 频道ID
+        :param message_id: 消息ID
+        """
+        url = get_url(APIConstant.deleteChannelAnnounceURI, self.is_sandbox).format(
+            channel_id=channel_id, message_id=message_id
+        )
+        response = await self.http_async.delete(url)
         return response == ""
