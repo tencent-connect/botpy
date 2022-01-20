@@ -16,7 +16,7 @@ from qqbot.core.network.ws.dto.ws_payload import (
 from qqbot.core.network.ws_sync.ws_event_handler import parse_and_handle
 from qqbot.core.util import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def _loop_exception_handler(loop, context):

@@ -11,7 +11,7 @@ from qqbot.model.guild import Guild
 from qqbot.model.guild_member import GuildMember
 from qqbot.model.message import Message
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def parse_and_handle(message_event, message):
