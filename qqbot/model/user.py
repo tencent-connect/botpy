@@ -13,4 +13,4 @@ class ReqOption:
 
         self.before = before
         self.after = after
-        self.limit = limit
+        self.limit = int(limit)
