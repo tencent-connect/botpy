@@ -39,6 +39,14 @@ class APIConstant:
     guildMuteURI = "/guilds/{guild_id}/mute"
     guildMemberMuteURI = "/guilds/{guild_id}/members/{user_id}/mute"
 
+    guildAnnounceURI = "/guilds/{guild_id}/announces"
+    deleteGuildAnnounceURI = "/guilds/{guild_id}/announces/{message_id}"
+    channelAnnounceURI = "/channels/{channel_id}/announces"
+    deleteChannelAnnounceURI = "/channels/{channel_id}/announces/{message_id}"
+
+    channelSchedulesURI = "/channels/{channel_id}/schedules"
+    channelSchedulesIdURI = "/channels/{channel_id}/schedules/{schedule_id}"
+
 
 def get_url(url_format, is_sandbox):
     d = BaseConstant.domain
