@@ -206,8 +206,8 @@ class AudioTestCase(unittest.TestCase):
             print(e)
 
 
-class MessageTestCase(unittest.TestCase):
-    api = qqbot.AsyncMessageAPI(token, IS_SANDBOX)
+class DmsTestCase(unittest.TestCase):
+    api = qqbot.AsyncDmsAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_create_and_send_dms(self):

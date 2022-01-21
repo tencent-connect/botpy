@@ -506,6 +506,10 @@ class AsyncMessageAPI(AsyncAPIBase):
         response = await self.http_async.delete(url)
         return response.status_code == ""
 
+
+class AsyncDmsAPI(AsyncAPIBase):
+    """私信消息"""
+
     async def create_direct_message(
         self, create_direct_message: CreateDirectMessageRequest
     ) -> DirectMessageGuild:

@@ -175,20 +175,8 @@ class AudioTestCase(unittest.TestCase):
             print(e)
 
 
-class MessageTestCase(unittest.TestCase):
-    api = qqbot.MessageAPI(token, IS_SANDBOX)
-
-    def test_get_messages(self):
-        """
-        # TODO: this
-        :return:
-        """
-
-    def test_get_message(self):
-        """
-        # TODO: this
-        :return:
-        """
+class DmsTestCase(unittest.TestCase):
+    api = qqbot.DmsAPI(token, IS_SANDBOX)
 
     def test_create_and_send_dms(self):
         try:

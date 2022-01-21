@@ -481,6 +481,10 @@ class MessageAPI(APIBase):
         response = self.http.delete(url)
         return response.status_code == HttpStatus.OK
 
+
+class DmsAPI(APIBase):
+    """私信消息"""
+
     def create_direct_message(
         self, create_direct_message: CreateDirectMessageRequest
     ) -> DirectMessageGuild:
