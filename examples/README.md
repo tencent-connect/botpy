@@ -6,7 +6,11 @@
 examples/
  ┣ README.md
  ┣ config.example.yaml  # 示例配置文件
- ┗ run_websocket.py  # 机器人被动回复示例
+ ┣ demo_announce  # 机器人公告API使用示例
+ ┣ demo_at_reply_async  # 机器人at被动回复async示例
+ ┣ demo_at_reply  # 机器人at被动回复sync示例
+ ┣ demo_direct_message_reply  # 机器人私信被动回复示例
+ ┗ demo_recall  # 消息撤回示例
 ```
 
 ## 环境安装
@@ -27,5 +31,5 @@ pip install qq-bot
 3. 运行机器人。例如：
 
     ``` bash
-    python3 run_websocket.py
+    python3 demo_at_reply.py
     ```

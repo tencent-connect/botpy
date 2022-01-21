@@ -506,6 +506,10 @@ class AsyncMessageAPI(AsyncAPIBase):
         response = await self.http_async.delete(url)
         return response.status_code == ""
 
+
+class AsyncDmsAPI(AsyncAPIBase):
+    """私信消息"""
+
     async def create_direct_message(
         self, create_direct_message: CreateDirectMessageRequest
     ) -> DirectMessageGuild:
@@ -574,13 +578,12 @@ class AsyncUserAPI(AsyncAPIBase):
         :return:Guild对象列表
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-        request_json = JsonUtil.obj2json_serialize(option)
+        if option is None:
+            query = {}
+        else:
+            query = option.__dict__
 
-        query = {}
-        if option is not None and option.limit is not None:
-            query["limit"] = option.limit
-
-        response = await self.http_async.get(url, request=request_json, params=query)
+        response = await self.http_async.get(url, params=query)
         return json.loads(response, object_hook=Guild)
 
 

@@ -13,6 +13,7 @@ from .api import (
     WebsocketAPI,
     MuteAPI,
     AnnouncesAPI,
+    DmsAPI,
 )
 
 from .async_api import (
@@ -28,6 +29,7 @@ from .async_api import (
     AsyncWebsocketAPI,
     AsyncMuteAPI,
     AsyncAnnouncesAPI,
+    AsyncDmsAPI,
 )
 from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging
