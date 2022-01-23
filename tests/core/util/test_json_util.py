@@ -4,7 +4,7 @@
 import json
 import unittest
 
-from qqbot import JsonUtil
+from qqbot.core.util.json_util import JsonUtil
 
 
 class JsonUtilTestCase(unittest.TestCase):
