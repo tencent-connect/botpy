@@ -690,7 +690,7 @@ class APIPermissionAPI(APIBase):
         )
         response = self.http.get(url)
         apis = json.loads(response.content, object_hook=APIs)
-        return apis.__dict__["apis"]
+        return apis.apis
 
     def post_permission_demand(
         self, guild_id: str, request: PermissionDemandToCreate

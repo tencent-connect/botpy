@@ -714,7 +714,7 @@ class AsyncAPIPermissionAPI(AsyncAPIBase):
         )
         response = await self.http_async.get(url)
         apis = json.loads(response, object_hook=APIs)
-        return apis.__dict__["apis"]
+        return apis.apis
 
     async def post_permission_demand(
         self, guild_id: str, request: PermissionDemandToCreate
