@@ -17,7 +17,7 @@ from qqbot.core.network.ws.dto.ws_payload import (
 from qqbot.core.network.ws_async.ws_async_handler import parse_and_handle
 from qqbot.core.util import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 class Client:

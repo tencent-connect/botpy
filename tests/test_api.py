@@ -12,7 +12,7 @@ from qqbot.core.exception.error import (
 from qqbot.core.util import logging
 from tests import test_config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
 test_params_ = test_config["test_params"]
@@ -158,9 +158,9 @@ class UserAPITestCase(unittest.TestCase):
         guilds = self.api.me_guilds()
         self.assertNotEqual(0, len(guilds))
 
-        option = qqbot.ReqOption("", GUILD_ID, "1")
+        option = qqbot.ReqOption(after=GUILD_ID)
         guilds = self.api.me_guilds(option)
-        self.assertEqual(1, len(guilds))
+        self.assertEqual(0, len(guilds))
 
 
 class AudioTestCase(unittest.TestCase):
@@ -175,20 +175,8 @@ class AudioTestCase(unittest.TestCase):
             print(e)
 
 
-class MessageTestCase(unittest.TestCase):
-    api = qqbot.MessageAPI(token, IS_SANDBOX)
-
-    def test_get_messages(self):
-        """
-        # TODO: this
-        :return:
-        """
-
-    def test_get_message(self):
-        """
-        # TODO: this
-        :return:
-        """
+class DmsTestCase(unittest.TestCase):
+    api = qqbot.DmsAPI(token, IS_SANDBOX)
 
     def test_create_and_send_dms(self):
         try:

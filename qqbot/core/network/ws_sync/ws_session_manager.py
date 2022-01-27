@@ -9,7 +9,7 @@ from qqbot.core.network.ws.ws_session import Session, ShardConfig
 from qqbot.core.util import logging
 from qqbot.model.token import Token
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def _loop_exception_handler(loop, context):

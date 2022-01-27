@@ -481,6 +481,10 @@ class MessageAPI(APIBase):
         response = self.http.delete(url)
         return response.status_code == HttpStatus.OK
 
+
+class DmsAPI(APIBase):
+    """私信消息"""
+
     def create_direct_message(
         self, create_direct_message: CreateDirectMessageRequest
     ) -> DirectMessageGuild:
@@ -549,8 +553,13 @@ class UserAPI(APIBase):
         :return:Guild对象列表
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-        request_json = JsonUtil.obj2json_serialize(option)
-        response = self.http.get(url, request=request_json)
+
+        if option is None:
+            query = {}
+        else:
+            query = option.__dict__
+
+        response = self.http.get(url, params=query)
         return json.loads(response.content, object_hook=Guild)
 
 

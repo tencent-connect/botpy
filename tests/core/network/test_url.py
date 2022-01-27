@@ -6,7 +6,7 @@ import unittest
 from qqbot.core.util import logging
 from qqbot.core.network.url import get_url, APIConstant
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 class MyTestCase(unittest.TestCase):

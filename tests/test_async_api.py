@@ -12,7 +12,7 @@ from qqbot.core.exception.error import (
 from qqbot.core.util import logging
 from tests import test_config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
 test_params_ = test_config["test_params"]
@@ -186,7 +186,7 @@ class UserAPITestCase(unittest.TestCase):
         guilds = self.loop.run_until_complete(self.api.me_guilds())
         self.assertNotEqual(0, len(guilds))
 
-        option = qqbot.ReqOption("", GUILD_ID, "1")
+        option = qqbot.ReqOption(limit=1)
         guilds = self.loop.run_until_complete(self.api.me_guilds(option))
         self.assertEqual(1, len(guilds))
 
@@ -206,8 +206,8 @@ class AudioTestCase(unittest.TestCase):
             print(e)
 
 
-class MessageTestCase(unittest.TestCase):
-    api = qqbot.AsyncMessageAPI(token, IS_SANDBOX)
+class DmsTestCase(unittest.TestCase):
+    api = qqbot.AsyncDmsAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_create_and_send_dms(self):
@@ -247,7 +247,7 @@ class MuteTestCase(unittest.TestCase):
     def test_mute_member(self):
         option = qqbot.MuteOption(mute_seconds="120")
         result = self.loop.run_until_complete(
-            self.api.mute_member(GUILD_ID, GUILD_OWNER_ID, option)
+            self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         )
         self.assertEqual(True, result)
 

@@ -162,8 +162,10 @@ print(user.username)  # 打印机器人名字
 ``` py
 from core.util import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 ```
+
+或者通过`qqbot.logger`也可以获取logger对象
 
 然后就可以愉快地使用 logger 进行打印。例如：
 
