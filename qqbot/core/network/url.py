@@ -47,6 +47,9 @@ class APIConstant:
     channelSchedulesURI = "/channels/{channel_id}/schedules"
     channelSchedulesIdURI = "/channels/{channel_id}/schedules/{schedule_id}"
 
+    guildAPIPermissionURL = "/guilds/{guild_id}/api_permission"
+    guildAPIPermissionDemandURL = "/guilds/{guild_id}/api_permission/demand"
+
 
 def get_url(url_format, is_sandbox):
     d = BaseConstant.domain

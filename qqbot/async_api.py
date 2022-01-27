@@ -17,6 +17,12 @@ from qqbot.model.announce import (
     Announce,
     CreateChannelAnnounceRequest,
 )
+from qqbot.model.api_permission import (
+    APIPermission,
+    PermissionDemandToCreate,
+    APIPermissionDemand,
+    APIs,
+)
 from qqbot.model.audio import AudioControl
 from qqbot.model.channel import (
     Channel,
@@ -692,3 +698,37 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         )
         response = await self.http_async.delete(url)
         return response == ""
+
+
+class AsyncAPIPermissionAPI(AsyncAPIBase):
+    """接口权限接口"""
+
+    async def get_permissions(self, guild_id: str) -> List[APIPermission]:
+        """
+        获取机器人在频道 guild_id 内可以使用的权限列表
+
+        :param guild_id: 频道ID
+        """
+        url = get_url(APIConstant.guildAPIPermissionURL, self.is_sandbox).format(
+            guild_id=guild_id
+        )
+        response = await self.http_async.get(url)
+        apis = json.loads(response, object_hook=APIs)
+        return apis.__dict__["apis"]
+
+    async def post_permission_demand(
+        self, guild_id: str, request: PermissionDemandToCreate
+    ) -> APIPermissionDemand:
+        """
+        用于创建 API 接口权限授权链接，该链接指向guild_id对应的频道 。
+        每天只能在一个频道内发 3 条（默认值）频道权限授权链接，如需调整，请联系平台申请权限。
+
+        :param guild_id: 频道ID
+        :param request: PermissionDemandToCreate对象
+        """
+        url = get_url(APIConstant.guildAPIPermissionDemandURL, self.is_sandbox).format(
+            guild_id=guild_id
+        )
+        request_json = JsonUtil.obj2json_serialize(request)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=APIPermissionDemand)

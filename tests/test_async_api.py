@@ -10,6 +10,10 @@ from qqbot.core.exception.error import (
     ServerError,
 )
 from qqbot.core.util import logging
+from qqbot.model.api_permission import (
+    APIPermissionDemandIdentify,
+    PermissionDemandToCreate,
+)
 from tests import test_config
 
 logger = logging.getLogger()
@@ -250,6 +254,27 @@ class MuteTestCase(unittest.TestCase):
             self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         )
         self.assertEqual(True, result)
+
+
+class APIPermissionTestCase(unittest.TestCase):
+    api = qqbot.AsyncAPIPermissionAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_get_permissions(self):
+        result = self.loop.run_until_complete(self.api.get_permissions(GUILD_ID))
+        self.assertNotEqual(0, len(result))
+
+    def test_post_permissions_demand(self):
+        demand_identity = APIPermissionDemandIdentify(
+            "/guilds/{guild_id}/members/{user_id}", "GET"
+        )
+        permission_demand_to_create = PermissionDemandToCreate(
+            CHANNEL_ID, demand_identity
+        )
+        result = self.loop.run_until_complete(
+            self.api.post_permission_demand(GUILD_ID, permission_demand_to_create)
+        )
+        print(result.title)
 
 
 if __name__ == "__main__":

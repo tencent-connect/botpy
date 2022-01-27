@@ -14,6 +14,7 @@ from .api import (
     MuteAPI,
     AnnouncesAPI,
     DmsAPI,
+    APIPermissionAPI,
 )
 
 from .async_api import (
@@ -30,6 +31,7 @@ from .async_api import (
     AsyncMuteAPI,
     AsyncAnnouncesAPI,
     AsyncDmsAPI,
+    AsyncAPIPermissionAPI,
 )
 from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging
