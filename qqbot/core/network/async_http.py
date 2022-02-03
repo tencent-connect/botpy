@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-import requests
+from aiohttp import ClientResponse
 
 from qqbot.core.exception.error import (
     AuthenticationFailedError,
@@ -14,7 +14,7 @@ from qqbot.core.util import logging
 
 X_TPS_TRACE_ID = "X-Tps-trace-Id"
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 HttpErrorDict = {
     401: AuthenticationFailedError,
@@ -36,59 +36,57 @@ class HttpErrorMessage:
 
 class HttpStatus:
     OK = 200
-    ACCEPTED = 202
+    ACCEPTED = 200
     NO_CONTENT = 204
 
 
-def _handle_response(api_url, response):
-    if response.status_code in (
-        HttpStatus.NO_CONTENT,
-        HttpStatus.OK,
-        HttpStatus.ACCEPTED,
-    ):
+def _handle_response(api_url, response: ClientResponse, content: str):
+    if response.status in (HttpStatus.NO_CONTENT, HttpStatus.OK, HttpStatus.ACCEPTED):
         return
     else:
         logger.error(
             "http request error with api_url:%s, error: %s, content: %s, trace_id:%s"
             % (
                 api_url,
-                response.status_code,
-                response.content,
+                response.status,
+                content,
                 response.headers.get(X_TPS_TRACE_ID),
             )  # trace_id 用于定位接口问题
         )
         error_message_: HttpErrorMessage = json.loads(
-            response.content, object_hook=HttpErrorMessage
+            content, object_hook=HttpErrorMessage
         )
-        error_dict_get = HttpErrorDict.get(response.status_code)
+        error_dict_get = HttpErrorDict.get(response.status)
         if error_dict_get is None:
             raise ServerError(error_message_.message)
         raise error_dict_get(msg=error_message_.message)
 
 
-class Http:
-    def __init__(self, time_out, token, type):
+class AsyncHttp:
+    def __init__(self, session, time_out, token, type):
         self.timeout = time_out
         self.token = token
         self.scheme = type
+        self.session = session
 
-    def get(self, api_url, request=None, params=None):
+    async def get(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
-        response = requests.get(
+        async with self.session.get(
             url=api_url,
             params=params,
             json=request,
             timeout=self.timeout,
             headers=headers,
-        )
-        _handle_response(api_url, response)
-        return response
+        ) as resp:
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
-    def post(self, api_url, request=None, params=None):
+    async def post(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
@@ -97,33 +95,35 @@ class Http:
             "http post headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
-        response = requests.post(
+        async with self.session.post(
             url=api_url,
             params=params,
             json=request,
             timeout=self.timeout,
             headers=headers,
-        )
-        _handle_response(api_url, response)
-        return response
+        ) as resp:
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
-    def delete(self, api_url, request=None, params=None):
+    async def delete(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
-        response = requests.delete(
+        async with self.session.delete(
             url=api_url,
             params=params,
             json=request,
             timeout=self.timeout,
             headers=headers,
-        )
-        _handle_response(api_url, response)
-        return response
+        ) as resp:
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
-    def put(self, api_url, request=None, params=None):
+    async def put(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
@@ -132,17 +132,18 @@ class Http:
             "http put headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
-        response = requests.put(
+        async with self.session.put(
             url=api_url,
             params=params,
             json=request,
             timeout=self.timeout,
             headers=headers,
-        )
-        _handle_response(api_url, response)
-        return response
+        ) as resp:
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content
 
-    def patch(self, api_url, request=None, params=None):
+    async def patch(self, api_url, request=None, params=None):
         headers = {
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
@@ -151,12 +152,13 @@ class Http:
             "http patch headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
-        response = requests.patch(
+        async with self.session.patch(
             url=api_url,
             params=params,
             json=request,
             timeout=self.timeout,
             headers=headers,
-        )
-        _handle_response(api_url, response)
-        return response
+        ) as resp:
+            content = await resp.text()
+            _handle_response(api_url, resp, content)
+            return content

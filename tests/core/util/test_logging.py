@@ -6,7 +6,7 @@ import unittest
 
 from qqbot.core.util import logging as new_logging
 
-logger = new_logging.getLogger(__name__)
+logger = new_logging.getLogger()
 
 
 class MyTestCase(unittest.TestCase):
