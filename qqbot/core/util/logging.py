@@ -75,7 +75,7 @@ def getLogger(name=None):
                 backupCount=7,
             )
         else:
-            file_handler = FileHandler(log_file)
+            file_handler = FileHandler(log_file, encoding="utf-8")
         logger.debug(
             "qqbot: dumping log file to {path}".format(path=os.path.realpath(log_file))
         )
