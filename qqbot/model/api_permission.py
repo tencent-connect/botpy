@@ -20,11 +20,11 @@ class APIPermissionDemandIdentify:
 
 class APIPermissionDemand:
     def __init__(self, data=None):
-        self.guild_id: str
-        self.channel_id: str
-        self.api_identify: APIPermissionDemandIdentify
-        self.title: str
-        self.desc: str
+        self.guild_id: str = ""
+        self.channel_id: str = ""
+        self.api_identify: APIPermissionDemandIdentify = APIPermissionDemandIdentify()
+        self.title: str = ""
+        self.desc: str = ""
         if data:
             self.__dict__ = data
 
