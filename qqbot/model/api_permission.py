@@ -19,12 +19,25 @@ class APIPermissionDemandIdentify:
 
 
 class APIPermissionDemand:
-    def __init__(self, data=None):
-        self.guild_id: str = ""
-        self.channel_id: str = ""
-        self.api_identify: APIPermissionDemandIdentify = APIPermissionDemandIdentify()
-        self.title: str = ""
-        self.desc: str = ""
+    def __init__(
+        self,
+        data=None,
+        guild_id: str = None,
+        channel_id: str = None,
+        api_identify: APIPermissionDemandIdentify = None,
+        title: str = None,
+        desc: str = None,
+    ):
+        if guild_id:
+            self.guild_id = guild_id
+        if channel_id:
+            self.channel_id = channel_id
+        if api_identify:
+            self.api_identify = api_identify
+        if title:
+            self.title = title
+        if desc:
+            self.desc = desc
         if data:
             self.__dict__ = data
 
