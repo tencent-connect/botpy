@@ -28,6 +28,7 @@ GUILD_TEST_ROLE_ID = test_params_["guild_test_role_id"]
 CHANNEL_ID = test_params_["channel_id"]
 CHANNEL_NAME = test_params_["channel_name"]
 CHANNEL_PARENT_ID = test_params_["channel_parent_id"]
+CHANNEL_SCHEDULE_ID = test_params_["channel_schedule_id"]
 ROBOT_NAME = test_params_["robot_name"]
 IS_SANDBOX = test_params_["is_sandbox"]
 
@@ -275,6 +276,17 @@ class APIPermissionTestCase(unittest.TestCase):
             self.api.post_permission_demand(GUILD_ID, permission_demand_to_create)
         )
         print(result.title)
+
+
+class APIScheduleTestCase(unittest.TestCase):
+    api = qqbot.AsyncScheduleAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_get_schedules(self):
+        schedules = self.loop.run_until_complete(
+            self.api.get_schedules(CHANNEL_SCHEDULE_ID)
+        )
+        self.assertNotEqual(0, len(schedules))
 
 
 if __name__ == "__main__":

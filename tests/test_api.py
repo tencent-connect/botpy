@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import unittest
 
 import qqbot
@@ -28,6 +27,7 @@ GUILD_TEST_ROLE_ID = test_params_["guild_test_role_id"]
 CHANNEL_ID = test_params_["channel_id"]
 CHANNEL_NAME = test_params_["channel_name"]
 CHANNEL_PARENT_ID = test_params_["channel_parent_id"]
+CHANNEL_SCHEDULE_ID = test_params_["channel_schedule_id"]
 ROBOT_NAME = test_params_["robot_name"]
 IS_SANDBOX = test_params_["is_sandbox"]
 
@@ -234,6 +234,14 @@ class APIPermissionTestCase(unittest.TestCase):
         )
         result = self.api.post_permission_demand(GUILD_ID, permission_demand_to_create)
         print(result.title)
+
+
+class APIScheduleTestCase(unittest.TestCase):
+    api = qqbot.ScheduleAPI(token, IS_SANDBOX)
+
+    def test_get_schedules(self):
+        schedules = self.api.get_schedules(CHANNEL_SCHEDULE_ID)
+        self.assertNotEqual(0, len(schedules))
 
 
 if __name__ == "__main__":

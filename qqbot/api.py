@@ -47,6 +47,12 @@ from qqbot.model.message import (
     MessagesPager,
 )
 from qqbot.model.mute import MuteOption
+from qqbot.model.schedule import (
+    Schedule,
+    GetSchedulesRequest,
+    ScheduleToCreate,
+    ScheduleToPatch,
+)
 from qqbot.model.token import Token
 from qqbot.model.user import ReqOption
 
@@ -708,3 +714,91 @@ class APIPermissionAPI(APIBase):
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=APIPermissionDemand)
+
+
+class ScheduleAPI(APIBase):
+    """日程接口"""
+
+    def get_schedules(self, channel_id: str, since: str = "") -> List[Schedule]:
+        """
+        获取某个日程子频道里中当天的日程列表。
+        若带了参数 since，则返回结束时间在 since 之后的日程列表；若未带参数 since，则默认返回当天的日程列表。
+
+        :param channel_id: 子频道ID
+        :param since: 起始时间戳(ms)
+        """
+        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(
+            channel_id=channel_id
+        )
+        if since == "":
+            request = None
+        else:
+            request = GetSchedulesRequest(int(since))
+        request_json = JsonUtil.obj2json_serialize(request)
+        response = self.http.get(url, request_json)
+        return json.loads(response.content, object_hook=Schedule)
+
+    def get_schedule(self, channel_id: str, schedule_id: str) -> Schedule:
+        """
+        获取日程子频道的某个日程详情
+
+        :param channel_id: 子频道ID
+        :param schedule_id: 日程ID
+        """
+        url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
+            channel_id=channel_id, schedule_id=schedule_id
+        )
+        response = self.http.get(url)
+        return json.loads(response.content, object_hook=Schedule)
+
+    def create_schedule(
+        self, channel_id: str, schedule_to_create: ScheduleToCreate
+    ) -> Schedule:
+        """
+        用于在日程子频道创建一个日程。
+        要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+        创建成功后，返回创建成功的日程对象。
+        创建操作频次限制
+        单个管理员每天限10次
+        单个频道每天100次
+
+        :param channel_id: 子频道ID
+        :param schedule_to_create: 没有ID的日程对象
+        """
+        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(
+            channel_id=channel_id
+        )
+        request_json = JsonUtil.obj2json_serialize(schedule_to_create)
+        response = self.http.post(url, request_json)
+        return json.loads(response.content, object_hook=Schedule)
+
+    def update_schedule(
+        self, channel_id: str, schedule_id: str, schedule_to_patch: ScheduleToPatch
+    ) -> Schedule:
+        """
+        要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+        修改成功后，返回修改后的日程对象。
+
+        :param channel_id: 子频道ID
+        :param schedule_id: 日程ID
+        :param schedule_to_patch: 修改前的日程对象
+        """
+        url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
+            channel_id=channel_id, schedule_id=schedule_id
+        )
+        request_json = JsonUtil.obj2json_serialize(schedule_to_patch)
+        response = self.http.patch(url, request_json)
+        return json.loads(response.content, object_hook=Schedule)
+
+    def delete_schedule(self, channel_id: str, schedule_id: str):
+        """
+        要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+
+        :param channel_id: 子频道ID
+        :param schedule_id: 日程ID
+        """
+        url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
+            channel_id=channel_id, schedule_id=schedule_id
+        )
+        response = self.http.delete(url)
+        return response.status_code == HttpStatus.NO_CONTENT
