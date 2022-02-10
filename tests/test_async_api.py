@@ -286,7 +286,7 @@ class APIScheduleTestCase(unittest.TestCase):
         schedules = self.loop.run_until_complete(
             self.api.get_schedules(CHANNEL_SCHEDULE_ID)
         )
-        self.assertNotEqual(None, schedules)
+        self.assertEqual(None, schedules)
 
 
 if __name__ == "__main__":
