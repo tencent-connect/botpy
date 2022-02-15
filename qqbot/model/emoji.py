@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
 
 
 class Emoji:
@@ -10,6 +9,6 @@ class Emoji:
             self.__dict__ = data
 
 
-class EmojiType(Enum):
+class EmojiType:
     system = 1
     emoji = 2
