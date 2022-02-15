@@ -11,3 +11,4 @@ class DefaultHandler:
     at_message = None
     direct_message = None
     audio = None
+    message_reaction = None
