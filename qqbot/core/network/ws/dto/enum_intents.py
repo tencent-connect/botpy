@@ -19,6 +19,10 @@ class Intents(Enum):
 
     INTENT_GUILD_MESSAGES = 1 << 9
 
+    INTENT_MESSAGE_REACTION = 1 << 10
+    # - MESSAGE_REACTION_ADD    // 为消息添加表情表态
+    # - MESSAGE_REACTION_REMOVE // 为消息删除表情表态
+
     INTENT_DIRECT_MESSAGE = 1 << 12
     # - DIRECT_MESSAGE_CREATE // 当收到用户发给机器人的私信消息时
 
