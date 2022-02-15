@@ -1,5 +1,3 @@
-from enum import Enum
-
 from qqbot.model.emoji import Emoji
 
 
@@ -17,12 +15,12 @@ class Reaction:
 class ReactionTarget:
     def __init__(self, data=None):
         self.id: str = ""
-        self.type: ReactionTargetType = ReactionTargetType()
+        self.type: int = 0
         if data:
             self.__dict__ = data
 
 
-class ReactionTargetType(Enum):
+class ReactionTargetType:
     message = 0
     feed = 1
     comment = 2
