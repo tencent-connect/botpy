@@ -82,7 +82,6 @@ def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
 
 class AsyncAPIBase:
     timeout = 3
-    client_session = aiohttp.ClientSession()
 
     def __init__(self, token: Token, is_sandbox: bool):
         """
@@ -94,7 +93,7 @@ class AsyncAPIBase:
         self.is_sandbox = is_sandbox
         self.token = token
         self.http_async = AsyncHttp(
-            self.client_session, self.timeout, token.get_string(), token.get_type()
+            aiohttp.ClientSession(), self.timeout, token.get_string(), token.get_type()
         )
 
     def with_timeout(self, timeout):
