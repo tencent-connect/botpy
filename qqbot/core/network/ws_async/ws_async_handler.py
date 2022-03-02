@@ -10,8 +10,9 @@ from qqbot.model.channel import Channel
 from qqbot.model.guild import Guild
 from qqbot.model.guild_member import GuildMember
 from qqbot.model.message import Message
+from qqbot.model.reaction import Reaction
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 async def parse_and_handle(message_event, message):
@@ -88,6 +89,14 @@ async def _handle_event_audio(message_event, message):
     await callback(message_event, audio_action)
 
 
+async def _handle_event_message_reaction(message_event, message):
+    callback = DefaultHandler.message_reaction
+    if callback is None:
+        return
+    reaction: Reaction = json.loads(_parse_data(message), object_hook=Reaction)
+    await callback(message_event, reaction)
+
+
 event_handler_dict = {
     WsEvent.EventGuildCreate: _handle_event_guild,
     WsEvent.EventGuildUpdate: _handle_event_guild,
@@ -105,6 +114,8 @@ event_handler_dict = {
     WsEvent.EventAudioFinish: _handle_event_audio,
     WsEvent.EventAudioOnMic: _handle_event_audio,
     WsEvent.EventAudioOffMic: _handle_event_audio,
+    WsEvent.EventMessageReactionAdd: _handle_event_message_reaction,
+    WsEvent.EventMessageReactionRemove: _handle_event_message_reaction,
 }
 
 

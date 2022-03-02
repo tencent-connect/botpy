@@ -10,9 +10,13 @@ from qqbot.core.exception.error import (
     ServerError,
 )
 from qqbot.core.util import logging
+from qqbot.model.api_permission import (
+    APIPermissionDemandIdentify,
+    PermissionDemandToCreate,
+)
 from tests import test_config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
 test_params_ = test_config["test_params"]
@@ -24,6 +28,7 @@ GUILD_TEST_ROLE_ID = test_params_["guild_test_role_id"]
 CHANNEL_ID = test_params_["channel_id"]
 CHANNEL_NAME = test_params_["channel_name"]
 CHANNEL_PARENT_ID = test_params_["channel_parent_id"]
+CHANNEL_SCHEDULE_ID = test_params_["channel_schedule_id"]
 ROBOT_NAME = test_params_["robot_name"]
 IS_SANDBOX = test_params_["is_sandbox"]
 
@@ -186,7 +191,7 @@ class UserAPITestCase(unittest.TestCase):
         guilds = self.loop.run_until_complete(self.api.me_guilds())
         self.assertNotEqual(0, len(guilds))
 
-        option = qqbot.ReqOption("", GUILD_ID, "1")
+        option = qqbot.ReqOption(limit=1)
         guilds = self.loop.run_until_complete(self.api.me_guilds(option))
         self.assertEqual(1, len(guilds))
 
@@ -206,8 +211,8 @@ class AudioTestCase(unittest.TestCase):
             print(e)
 
 
-class MessageTestCase(unittest.TestCase):
-    api = qqbot.AsyncMessageAPI(token, IS_SANDBOX)
+class DmsTestCase(unittest.TestCase):
+    api = qqbot.AsyncDmsAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_create_and_send_dms(self):
@@ -247,9 +252,41 @@ class MuteTestCase(unittest.TestCase):
     def test_mute_member(self):
         option = qqbot.MuteOption(mute_seconds="120")
         result = self.loop.run_until_complete(
-            self.api.mute_member(GUILD_ID, GUILD_OWNER_ID, option)
+            self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         )
         self.assertEqual(True, result)
+
+
+class APIPermissionTestCase(unittest.TestCase):
+    api = qqbot.AsyncAPIPermissionAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_get_permissions(self):
+        result = self.loop.run_until_complete(self.api.get_permissions(GUILD_ID))
+        self.assertNotEqual(0, len(result))
+
+    def test_post_permissions_demand(self):
+        demand_identity = APIPermissionDemandIdentify(
+            "/guilds/{guild_id}/members/{user_id}", "GET"
+        )
+        permission_demand_to_create = PermissionDemandToCreate(
+            CHANNEL_ID, demand_identity
+        )
+        result = self.loop.run_until_complete(
+            self.api.post_permission_demand(GUILD_ID, permission_demand_to_create)
+        )
+        print(result.title)
+
+
+class APIScheduleTestCase(unittest.TestCase):
+    api = qqbot.AsyncScheduleAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_get_schedules(self):
+        schedules = self.loop.run_until_complete(
+            self.api.get_schedules(CHANNEL_SCHEDULE_ID)
+        )
+        self.assertEqual(None, schedules)
 
 
 if __name__ == "__main__":

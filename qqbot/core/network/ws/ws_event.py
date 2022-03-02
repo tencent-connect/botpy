@@ -24,6 +24,9 @@ class WsEvent:
     EventAudioOnMic = "AUDIO_ON_MIC"
     EventAudioOffMic = "AUDIO_OFF_MIC"
 
+    EventMessageReactionAdd = "MESSAGE_REACTION_ADD"
+    EventMessageReactionRemove = "MESSAGE_REACTION_REMOVE"
+
     # 事件map
     event_dirt = {
         EventGuildCreate: Intents.INTENT_GUILDS,
@@ -42,6 +45,8 @@ class WsEvent:
         EventAudioFinish: Intents.INTENT_AUDIO,
         EventAudioOnMic: Intents.INTENT_AUDIO,
         EventAudioOffMic: Intents.INTENT_AUDIO,
+        EventMessageReactionAdd: Intents.INTENT_MESSAGE_REACTION,
+        EventMessageReactionRemove: Intents.INTENT_MESSAGE_REACTION,
     }
 
     @staticmethod

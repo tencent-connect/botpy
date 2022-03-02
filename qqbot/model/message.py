@@ -67,7 +67,7 @@ class MessageEmbedThumbnail:
 
 class MessageEmbedField:
     def __init__(self, data=None):
-        self.key: str = ""
+        self.name: str = ""
         self.value: str = ""
         if data:
             self.__dict__ = data

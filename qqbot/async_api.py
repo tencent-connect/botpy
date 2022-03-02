@@ -17,6 +17,12 @@ from qqbot.model.announce import (
     Announce,
     CreateChannelAnnounceRequest,
 )
+from qqbot.model.api_permission import (
+    APIPermission,
+    PermissionDemandToCreate,
+    APIPermissionDemand,
+    APIs,
+)
 from qqbot.model.audio import AudioControl
 from qqbot.model.channel import (
     Channel,
@@ -46,6 +52,12 @@ from qqbot.model.message import (
     MessagesPager,
 )
 from qqbot.model.mute import MuteOption
+from qqbot.model.schedule import (
+    Schedule,
+    GetSchedulesRequest,
+    ScheduleToCreate,
+    ScheduleToPatch,
+)
 from qqbot.model.token import Token
 from qqbot.model.user import ReqOption
 
@@ -70,7 +82,6 @@ def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
 
 class AsyncAPIBase:
     timeout = 3
-    client_session = aiohttp.ClientSession()
 
     def __init__(self, token: Token, is_sandbox: bool):
         """
@@ -82,7 +93,7 @@ class AsyncAPIBase:
         self.is_sandbox = is_sandbox
         self.token = token
         self.http_async = AsyncHttp(
-            self.client_session, self.timeout, token.get_string(), token.get_type()
+            aiohttp.ClientSession(), self.timeout, token.get_string(), token.get_type()
         )
 
     def with_timeout(self, timeout):
@@ -506,6 +517,10 @@ class AsyncMessageAPI(AsyncAPIBase):
         response = await self.http_async.delete(url)
         return response.status_code == ""
 
+
+class AsyncDmsAPI(AsyncAPIBase):
+    """私信消息"""
+
     async def create_direct_message(
         self, create_direct_message: CreateDirectMessageRequest
     ) -> DirectMessageGuild:
@@ -574,8 +589,12 @@ class AsyncUserAPI(AsyncAPIBase):
         :return:Guild对象列表
         """
         url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-        request_json = JsonUtil.obj2json_serialize(option)
-        response = await self.http_async.get(url, request=request_json)
+        if option is None:
+            query = {}
+        else:
+            query = option.__dict__
+
+        response = await self.http_async.get(url, params=query)
         return json.loads(response, object_hook=Guild)
 
 
@@ -681,6 +700,128 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.deleteChannelAnnounceURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
+        )
+        response = await self.http_async.delete(url)
+        return response == ""
+
+
+class AsyncAPIPermissionAPI(AsyncAPIBase):
+    """接口权限接口"""
+
+    async def get_permissions(self, guild_id: str) -> List[APIPermission]:
+        """
+        获取机器人在频道 guild_id 内可以使用的权限列表
+
+        :param guild_id: 频道ID
+        """
+        url = get_url(APIConstant.guildAPIPermissionURL, self.is_sandbox).format(
+            guild_id=guild_id
+        )
+        response = await self.http_async.get(url)
+        apis = json.loads(response, object_hook=APIs)
+        return apis.apis
+
+    async def post_permission_demand(
+        self, guild_id: str, request: PermissionDemandToCreate
+    ) -> APIPermissionDemand:
+        """
+        用于创建 API 接口权限授权链接，该链接指向guild_id对应的频道 。
+        每天只能在一个频道内发 3 条（默认值）频道权限授权链接，如需调整，请联系平台申请权限。
+
+        :param guild_id: 频道ID
+        :param request: PermissionDemandToCreate对象
+        """
+        url = get_url(APIConstant.guildAPIPermissionDemandURL, self.is_sandbox).format(
+            guild_id=guild_id
+        )
+        request_json = JsonUtil.obj2json_serialize(request)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=APIPermissionDemand)
+
+
+class AsyncScheduleAPI(AsyncAPIBase):
+    """日程接口"""
+
+    async def get_schedules(self, channel_id: str, since: str = "") -> List[Schedule]:
+        """
+        获取某个日程子频道里中当天的日程列表。
+        若带了参数 since，则返回结束时间在 since 之后的日程列表；若未带参数 since，则默认返回当天的日程列表。
+
+        :param channel_id: 子频道ID
+        :param since: 起始时间戳(ms)
+        """
+        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(
+            channel_id=channel_id
+        )
+        if since == "":
+            request = None
+        else:
+            request = GetSchedulesRequest(int(since))
+        request_json = JsonUtil.obj2json_serialize(request)
+        response = await self.http_async.get(url, request_json)
+        return json.loads(response, object_hook=Schedule)
+
+    async def get_schedule(self, channel_id: str, schedule_id: str) -> Schedule:
+        """
+        获取日程子频道的某个日程详情
+
+        :param channel_id: 子频道ID
+        :param schedule_id: 日程ID
+        """
+        url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
+            channel_id=channel_id, schedule_id=schedule_id
+        )
+        response = await self.http_async.get(url)
+        return json.loads(response, object_hook=Schedule)
+
+    async def create_schedule(
+        self, channel_id: str, schedule_to_create: ScheduleToCreate
+    ) -> Schedule:
+        """
+        用于在日程子频道创建一个日程。
+        要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+        创建成功后，返回创建成功的日程对象。
+        创建操作频次限制
+        单个管理员每天限10次
+        单个频道每天100次
+
+        :param channel_id: 子频道ID
+        :param schedule_to_create: 没有ID的日程对象
+        """
+        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(
+            channel_id=channel_id
+        )
+        request_json = JsonUtil.obj2json_serialize(schedule_to_create)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=Schedule)
+
+    async def update_schedule(
+        self, channel_id: str, schedule_id: str, schedule_to_patch: ScheduleToPatch
+    ) -> Schedule:
+        """
+        要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+        修改成功后，返回修改后的日程对象。
+
+        :param channel_id: 子频道ID
+        :param schedule_id: 日程ID
+        :param schedule_to_patch: 修改前的日程对象
+        """
+        url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
+            channel_id=channel_id, schedule_id=schedule_id
+        )
+        request_json = JsonUtil.obj2json_serialize(schedule_to_patch)
+        response = await self.http_async.patch(url, request_json)
+        return json.loads(response, object_hook=Schedule)
+
+    async def delete_schedule(self, channel_id: str, schedule_id: str):
+        """
+        要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+
+        :param channel_id: 子频道ID
+        :param schedule_id: 日程ID
+        """
+        url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
+            channel_id=channel_id, schedule_id=schedule_id
         )
         response = await self.http_async.delete(url)
         return response == ""

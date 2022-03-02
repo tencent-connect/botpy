@@ -17,7 +17,7 @@ from qqbot.core.network.ws.dto.ws_payload import (
 from qqbot.core.network.ws_async.ws_async_handler import parse_and_handle
 from qqbot.core.util import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 class Client:
@@ -54,7 +54,7 @@ class Client:
         asyncio.ensure_future(self.session_manager.session_pool.run())
 
     async def on_message(self, ws, message):
-        logger.info("on_message: %s" % message)
+        logger.debug("on_message: %s" % message)
         message_event = json.loads(message)
         if await self._is_system_event(message_event, ws):
             return
@@ -135,7 +135,7 @@ class Client:
         :param event_json:
         """
         send_msg = event_json
-        logger.info("send_msg: %s" % send_msg)
+        logger.debug("send_msg: %s" % send_msg)
         if isinstance(self.ws_conn, ClientWebSocketResponse):
             if self.ws_conn.closed:
                 logger.error("send_msg: websocket connection has closed")

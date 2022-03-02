@@ -16,7 +16,7 @@ from qqbot.core.network.ws.dto.ws_payload import (
 from qqbot.core.network.ws_sync.ws_event_handler import parse_and_handle
 from qqbot.core.util import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 
 def _loop_exception_handler(loop, context):
@@ -67,7 +67,7 @@ class Client:
             self.session_manager.start_session()
 
         def on_message(ws, message):
-            logger.info("on_message: %s" % message)
+            logger.debug("on_message: %s" % message)
             message_event = json.loads(message)
             if self._is_system_event(message_event, ws, connected_callback):
                 return
@@ -81,7 +81,6 @@ class Client:
                 parse_and_handle(message_event, message)
 
         def on_error(ws, exception=Exception):
-            logger.error("on_error: %s" % exception)
             traceback.print_exc()
 
         def on_open(ws):
@@ -131,7 +130,7 @@ class Client:
         :param event_json:
         """
         send_msg = event_json
-        logger.info("send_msg: %s" % send_msg)
+        logger.debug("send_msg: %s" % send_msg)
         self.ws_conn.send(data=send_msg)
 
     def reconnect(self):

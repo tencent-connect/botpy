@@ -87,6 +87,15 @@ def direct_message_event_handler(callback, intent):
     return intent
 
 
+def message_reactions_event_handler(callback, intent):
+    DefaultHandler.message_reaction = callback
+    intent = intent | WsEvent.event_to_intent(
+        WsEvent.EventMessageReactionAdd,
+        WsEvent.EventMessageReactionRemove,
+    )
+    return intent
+
+
 class HandlerType(Enum):
     PLAIN_EVENT_HANDLER = 0
     GUILD_EVENT_HANDLER = 1
@@ -96,6 +105,7 @@ class HandlerType(Enum):
     AT_MESSAGE_EVENT_HANDLER = 5
     DIRECT_MESSAGE_EVENT_HANDLER = 6
     AUDIO_EVENT_HANDLER = 7
+    MESSAGE_REACTIONS_EVENT_HANDLER = 8
 
 
 intent_handler_dict = {
@@ -107,4 +117,5 @@ intent_handler_dict = {
     HandlerType.AT_MESSAGE_EVENT_HANDLER.value: at_message_event_handler,
     HandlerType.DIRECT_MESSAGE_EVENT_HANDLER.value: direct_message_event_handler,
     HandlerType.AUDIO_EVENT_HANDLER.value: audio_event_handler,
+    HandlerType.MESSAGE_REACTIONS_EVENT_HANDLER.value: message_reactions_event_handler,
 }

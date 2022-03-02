@@ -13,6 +13,9 @@ from .api import (
     WebsocketAPI,
     MuteAPI,
     AnnouncesAPI,
+    DmsAPI,
+    APIPermissionAPI,
+    ScheduleAPI,
 )
 
 from .async_api import (
@@ -28,9 +31,12 @@ from .async_api import (
     AsyncWebsocketAPI,
     AsyncMuteAPI,
     AsyncAnnouncesAPI,
+    AsyncDmsAPI,
+    AsyncAPIPermissionAPI,
+    AsyncScheduleAPI,
 )
 from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging
 from .model import *
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
