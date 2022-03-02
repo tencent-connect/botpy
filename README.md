@@ -208,8 +208,6 @@ export QQBOT_DISABLE_LOG=1  # 1表示禁用日志
 pip install -r requirements.txt   # 安装依赖的pip包
 
 pre-commit install                 # 安装格式化代码的钩子
-
-python3 setup.py sdist bdist_wheel # 打包SDK
 ```
 
 ## 单元测试
