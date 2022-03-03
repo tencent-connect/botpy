@@ -257,5 +257,21 @@ class APIReactionTestCase(unittest.TestCase):
         self.assertEqual(True, result)
 
 
+class APIPinstestCase(unittest.TestCase):
+    api = qqbot.PinsAPI(token, IS_SANDBOX)
+
+    def test_put_pin(self):
+        result = self.api.put_pin(CHANNEL_ID, MESSAGE_ID)
+        self.assertTrue(MESSAGE_ID in result.message_ids)
+
+    def test_delete_pin(self):
+        result = self.api.delete_pin(CHANNEL_ID, MESSAGE_ID)
+        self.assertEqual(True, result)
+
+    def test_get_pins(self):
+        result = self.api.get_pins(CHANNEL_ID)
+        self.assertTrue(len(result.message_ids) >= 0)
+
+
 if __name__ == "__main__":
     unittest.main()
