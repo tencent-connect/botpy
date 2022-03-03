@@ -826,7 +826,7 @@ class AsyncScheduleAPI(AsyncAPIBase):
 class AsyncReactionAPI(AsyncAPIBase):
     """异步表情表态接口"""
 
-    async def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str) -> List[Schedule]:
+    async def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
         """
         对一条消息进行表情表态
 
@@ -841,7 +841,7 @@ class AsyncReactionAPI(AsyncAPIBase):
         response = await self.http_async.put(url, url)
         return response == ""
 
-    async def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str) -> List[Schedule]:
+    async def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
         """
         删除自己对消息的进行表情表态
 
