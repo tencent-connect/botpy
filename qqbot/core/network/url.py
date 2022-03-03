@@ -50,6 +50,8 @@ class APIConstant:
     guildAPIPermissionURL = "/guilds/{guild_id}/api_permission"
     guildAPIPermissionDemandURL = "/guilds/{guild_id}/api_permission/demand"
 
+    reactionURI = "/channels/{channel_id}/messages/{message_id}/reactions/{type}/{id}"
+
 
 def get_url(url_format, is_sandbox):
     d = BaseConstant.domain

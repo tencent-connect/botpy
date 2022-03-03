@@ -13,6 +13,7 @@ from qqbot.model.api_permission import (
     PermissionDemandToCreate,
     APIPermissionDemandIdentify,
 )
+from qqbot.model.emoji import EmojiType
 from tests import test_config
 
 logger = logging.getLogger()
@@ -30,7 +31,7 @@ CHANNEL_PARENT_ID = test_params_["channel_parent_id"]
 CHANNEL_SCHEDULE_ID = test_params_["channel_schedule_id"]
 ROBOT_NAME = test_params_["robot_name"]
 IS_SANDBOX = test_params_["is_sandbox"]
-
+MESSAGE_ID = test_params_["message_id"]
 
 class GuildAPITestCase(unittest.TestCase):
     api = qqbot.GuildAPI(token, IS_SANDBOX)
@@ -242,6 +243,18 @@ class APIScheduleTestCase(unittest.TestCase):
     def test_get_schedules(self):
         schedules = self.api.get_schedules(CHANNEL_SCHEDULE_ID)
         self.assertEqual(None, schedules)
+
+
+class APIReactionTestCase(unittest.TestCase):
+    api = qqbot.ReactionAPI(token, IS_SANDBOX)
+
+    def test_put_reaction(self):
+        result = self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+        self.assertEqual(True, result)
+
+    def test_delete_reaction(self):
+        result = self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+        self.assertEqual(True, result)
 
 
 if __name__ == "__main__":

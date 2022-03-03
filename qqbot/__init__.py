@@ -16,6 +16,7 @@ from .api import (
     DmsAPI,
     APIPermissionAPI,
     ScheduleAPI,
+    ReactionAPI,
 )
 
 from .async_api import (
@@ -34,6 +35,7 @@ from .async_api import (
     AsyncDmsAPI,
     AsyncAPIPermissionAPI,
     AsyncScheduleAPI,
+    AsyncReactionAPI,
 )
 from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging
