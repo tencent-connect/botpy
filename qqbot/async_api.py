@@ -821,3 +821,37 @@ class AsyncScheduleAPI(AsyncAPIBase):
         )
         response = await self.http_async.delete(url)
         return response == ""
+
+
+class AsyncReactionAPI(AsyncAPIBase):
+    """异步表情表态接口"""
+
+    async def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str) -> List[Schedule]:
+        """
+        对一条消息进行表情表态
+
+        :param channel_id: 子频道ID
+        :param message_id: 该条消息对应的id
+        :param emo_type: 表情类型
+        :param emo_id: 表情ID
+        """
+        url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
+            channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
+        )
+        response = await self.http_async.put(url, url)
+        return response == ""
+
+    async def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str) -> List[Schedule]:
+        """
+        删除自己对消息的进行表情表态
+
+        :param channel_id: 子频道ID
+        :param message_id: 该条消息对应的id
+        :param emo_type: 表情类型
+        :param emo_id: 表情ID
+        """
+        url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
+            channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
+        )
+        response = await self.http_async.delete(url, url)
+        return response == ""
