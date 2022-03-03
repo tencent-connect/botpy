@@ -22,6 +22,7 @@ async def _api_permission_handler(event, message: qqbot.Message):
     message_to_send = qqbot.MessageSendRequest("command received: %s" % message.content)
     await msg_api.post_message(message.channel_id, message_to_send)
 
+    # 输入/xxx后的处理
     if "/权限列表" in message.content:
         apis = await api_permission_api.get_permissions(message.guild_id)
         for api in apis:
@@ -43,6 +44,6 @@ async def _api_permission_handler(event, message: qqbot.Message):
 if __name__ == "__main__":
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
     qqbot_handler = qqbot.Handler(
-        qqbot.HandlerType.MESSAGE_EVENT_HANDLER, _api_permission_handler
+        qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _api_permission_handler
     )
     qqbot.async_listen_events(t_token, False, qqbot_handler)

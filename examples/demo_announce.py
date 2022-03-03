@@ -19,6 +19,7 @@ async def _announce_handler(event, message: qqbot.Message):
     message_to_send = qqbot.MessageSendRequest("command received: %s" % message.content)
     await msg_api.post_message(message.channel_id, message_to_send)
 
+    # 输入/xxx后的处理
     message_id = "088de19cbeb883e7e97110a2e39c0138d401"
     if "/建公告" in message.content:
         create_announce_request = CreateAnnounceRequest(message.channel_id, message_id)
@@ -39,7 +40,8 @@ async def _announce_handler(event, message: qqbot.Message):
 
 if __name__ == "__main__":
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
+    # 注册机器人被@后的事件
     qqbot_handler = qqbot.Handler(
-        qqbot.HandlerType.MESSAGE_EVENT_HANDLER, _announce_handler
+        qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _announce_handler
     )
     qqbot.async_listen_events(t_token, False, qqbot_handler)
