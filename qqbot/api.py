@@ -807,7 +807,7 @@ class ScheduleAPI(APIBase):
 class ReactionAPI(APIBase):
     """表情表态接口"""
 
-    def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str) -> List[Schedule]:
+    def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
         """
         对一条消息进行表情表态
 
@@ -822,7 +822,7 @@ class ReactionAPI(APIBase):
         response = self.http.put(url, url)
         return response.status_code == HttpStatus.NO_CONTENT
 
-    def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str) -> List[Schedule]:
+    def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
         """
         删除自己对消息的进行表情表态
 
