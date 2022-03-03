@@ -11,5 +11,7 @@ test_params:
   channel_id: "123"
   channel_name: "channel"
   channel_parent_id: "123"
+  channel_schedule_id: "123"
   robot_name: "veehou's robot"
   is_sandbox: False
+  message_id: "123"

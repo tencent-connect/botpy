@@ -14,6 +14,7 @@ from qqbot.model.api_permission import (
     APIPermissionDemandIdentify,
     PermissionDemandToCreate,
 )
+from qqbot.model.emoji import EmojiType
 from tests import test_config
 
 logger = logging.getLogger()
@@ -31,7 +32,7 @@ CHANNEL_PARENT_ID = test_params_["channel_parent_id"]
 CHANNEL_SCHEDULE_ID = test_params_["channel_schedule_id"]
 ROBOT_NAME = test_params_["robot_name"]
 IS_SANDBOX = test_params_["is_sandbox"]
-
+MESSAGE_ID = test_params_["message_id"]
 
 class GuildAPITestCase(unittest.TestCase):
     api = qqbot.AsyncGuildAPI(token, IS_SANDBOX)
@@ -288,6 +289,22 @@ class APIScheduleTestCase(unittest.TestCase):
         )
         self.assertEqual(None, schedules)
 
+
+class APIReactionTestCase(unittest.TestCase):
+    api = qqbot.AsyncReactionAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_put_reaction(self):
+        result = self.loop.run_until_complete(
+            self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+        )
+        self.assertEqual(True, result)
+
+    def test_delete_reaction(self):
+        result = self.loop.run_until_complete(
+            self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+        )
+        self.assertEqual(True, result)
 
 if __name__ == "__main__":
     unittest.main()
