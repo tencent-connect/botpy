@@ -257,7 +257,7 @@ class APIReactionTestCase(unittest.TestCase):
         self.assertEqual(True, result)
 
 
-class APIPinstestCase(unittest.TestCase):
+class APIPinsTestCase(unittest.TestCase):
     api = qqbot.PinsAPI(token, IS_SANDBOX)
 
     def test_put_pin(self):
