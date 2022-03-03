@@ -27,6 +27,7 @@ async def _schedule_handler(event, message: qqbot.Message):
     start_time = int(round(time.time() * 1000)) + delay
     end_time = start_time + delay
 
+    # 判断用户@后输出的指令
     if "/创建日程" in message.content:
         schedule = await schedule_api.create_schedule(
             CHANNEL_SCHEDULE_ID,
@@ -61,6 +62,6 @@ async def _schedule_handler(event, message: qqbot.Message):
 if __name__ == "__main__":
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
     qqbot_handler = qqbot.Handler(
-        qqbot.HandlerType.MESSAGE_EVENT_HANDLER, _schedule_handler
+        qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _schedule_handler
     )
     qqbot.async_listen_events(t_token, False, qqbot_handler)
