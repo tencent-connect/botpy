@@ -306,5 +306,29 @@ class APIReactionTestCase(unittest.TestCase):
         )
         self.assertEqual(True, result)
 
+
+class APIPinsTestCase(unittest.TestCase):
+    api = qqbot.AsyncPinsAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_put_pin(self):
+        result = self.loop.run_until_complete(
+            self.api.put_pin(CHANNEL_ID, MESSAGE_ID)
+        )
+        self.assertTrue(MESSAGE_ID in result.message_ids)
+
+    def test_delete_pin(self):
+        result = self.loop.run_until_complete(
+            self.api.delete_pin(CHANNEL_ID, MESSAGE_ID)
+        )
+        self.assertEqual(True, result)
+
+    def test_get_pins(self):
+        result = self.loop.run_until_complete(
+            self.api.get_pins(CHANNEL_ID)
+        )
+        self.assertTrue(len(result.message_ids) >= 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -52,6 +52,9 @@ class APIConstant:
 
     reactionURI = "/channels/{channel_id}/messages/{message_id}/reactions/{type}/{id}"
 
+    changePinsURI = "/channels/{channel_id}/pins/{message_id}"
+    getPinsURI = "/channels/{channel_id}/pins"
+
 
 def get_url(url_format, is_sandbox):
     d = BaseConstant.domain
