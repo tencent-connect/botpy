@@ -19,6 +19,18 @@ class ChannelSubType:
     BLACK = 3  # 开黑
 
 
+class PrivateType:
+    PUBLIC = 0  # 公开频道
+    ADMIN = 1  # 管理员和群主可见
+    SPECIFIED_USER = 2  # 群主管理员+指定成员，可使用 修改子频道权限接口 指定成员
+
+
+class SpeakPermission:
+    INVALID = 0  # 无效类型
+    EVERYONE = 1  # 所有人
+    ADMIN = 2  # 群主管理员+指定成员，可使用 修改子频道权限接口 指定成员
+
+
 class Channel:
     def __init__(self, data=None):
         self.id: str = ""
@@ -29,6 +41,9 @@ class Channel:
         self.position: int = 0
         self.parent_id: str = ""
         self.owner_id: str = ""
+        self.private_type: int = 0
+        self.speak_permission: int = 0
+        self.application_id: str = ""
         if data is not None:
             self.__dict__ = data
 
