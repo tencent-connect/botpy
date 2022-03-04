@@ -843,7 +843,7 @@ class AsyncReactionAPI(AsyncAPIBase):
         url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
         )
-        response = await self.http_async.put(url, url)
+        response = await self.http_async.put(url)
         return response == ""
 
     async def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
@@ -858,49 +858,6 @@ class AsyncReactionAPI(AsyncAPIBase):
         url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
         )
-        response = await self.http_async.delete(url, url)
+        response = await self.http_async.delete(url)
         return response == ""
-
-
-class AsyncPinsAPI(AsyncAPIBase):
-    """精华消息API"""
-
-    async def put_pin(self, channel_id: str, message_id: str) -> PinsMessage:
-        """
-        在子频道内添加一条精华消息，
-        每个子频道最多20条精华消息
-        只有可见的消息才能被设置为精华消息
-        返回对象中 message_ids 为当前请求后子频道内所有精华消息数组
-
-        :param channel_id: 子频道ID
-        :param message_id: 该条消息对应的id
-        """
-        url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(
-            channel_id=channel_id, message_id=message_id
-        )
-        response = await self.http_async.put(url, url)
-        return json.loads(response, object_hook=PinsMessage)
-
-    async def delete_pin(self, channel_id: str, message_id: str):
-        """
-        用于移除子频道下的一条精华消息
-
-        :param channel_id: 子频道ID
-        :param message_id: 该条消息对应的id
-        """
-        url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(
-            channel_id=channel_id, message_id=message_id
-        )
-        response = await self.http_async.delete(url, url)
-        return response.status_code == ""
-
-    async def get_pins(self, channel_id: str) -> PinsMessage:
-        """
-        用于获取子频道内的所有精华消息
-        成功后返回 PinsMessage 对象
-        :param channel_id: 子频道ID
-        """
-        url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
-        response = await self.http_async.get(url, url)
-        return json.loads(response, object_hook=PinsMessage)
 

@@ -820,7 +820,7 @@ class ReactionAPI(APIBase):
         url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
         )
-        response = self.http.put(url, url)
+        response = self.http.put(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
     def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
@@ -835,7 +835,7 @@ class ReactionAPI(APIBase):
         url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
         )
-        response = self.http.delete(url, url)
+        response = self.http.delete(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
 
@@ -855,7 +855,7 @@ class PinsAPI(APIBase):
         url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
         )
-        response = self.http.put(url, url)
+        response = self.http.put(url)
         return json.loads(response.content, object_hook=PinsMessage)
 
     def delete_pin(self, channel_id: str, message_id: str):
@@ -868,7 +868,7 @@ class PinsAPI(APIBase):
         url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
         )
-        response = self.http.delete(url, url)
+        response = self.http.delete(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
     def get_pins(self, channel_id: str) -> PinsMessage:
@@ -878,5 +878,5 @@ class PinsAPI(APIBase):
         :param channel_id: 子频道ID
         """
         url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
-        response = self.http.get(url, url)
+        response = self.http.get(url)
         return json.loads(response.content, object_hook=PinsMessage)
