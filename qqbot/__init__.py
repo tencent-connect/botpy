@@ -37,7 +37,6 @@ from .async_api import (
     AsyncAPIPermissionAPI,
     AsyncScheduleAPI,
     AsyncReactionAPI,
-    AsyncPinsAPI,
 )
 from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging
