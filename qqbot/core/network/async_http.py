@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
+import aiohttp
 from aiohttp import ClientResponse
 
 from qqbot.core.exception.error import (
@@ -63,11 +64,10 @@ def _handle_response(api_url, response: ClientResponse, content: str):
 
 
 class AsyncHttp:
-    def __init__(self, session, time_out, token, type):
+    def __init__(self, time_out, token, type):
         self.timeout = time_out
         self.token = token
         self.scheme = type
-        self.session = session
 
     async def get(self, api_url, request=None, params=None):
         headers = {
@@ -75,16 +75,17 @@ class AsyncHttp:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
-        async with self.session.get(
-            url=api_url,
-            params=params,
-            json=request,
-            timeout=self.timeout,
-            headers=headers,
-        ) as resp:
-            content = await resp.text()
-            _handle_response(api_url, resp, content)
-            return content
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url=api_url,
+                params=params,
+                json=request,
+                timeout=self.timeout,
+                headers=headers,
+            ) as resp:
+                content = await resp.text()
+                _handle_response(api_url, resp, content)
+                return content
 
     async def post(self, api_url, request=None, params=None):
         headers = {
@@ -95,16 +96,17 @@ class AsyncHttp:
             "http post headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
-        async with self.session.post(
-            url=api_url,
-            params=params,
-            json=request,
-            timeout=self.timeout,
-            headers=headers,
-        ) as resp:
-            content = await resp.text()
-            _handle_response(api_url, resp, content)
-            return content
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url=api_url,
+                params=params,
+                json=request,
+                timeout=self.timeout,
+                headers=headers,
+            ) as resp:
+                content = await resp.text()
+                _handle_response(api_url, resp, content)
+                return content
 
     async def delete(self, api_url, request=None, params=None):
         headers = {
@@ -112,16 +114,17 @@ class AsyncHttp:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
-        async with self.session.delete(
-            url=api_url,
-            params=params,
-            json=request,
-            timeout=self.timeout,
-            headers=headers,
-        ) as resp:
-            content = await resp.text()
-            _handle_response(api_url, resp, content)
-            return content
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(
+                url=api_url,
+                params=params,
+                json=request,
+                timeout=self.timeout,
+                headers=headers,
+            ) as resp:
+                content = await resp.text()
+                _handle_response(api_url, resp, content)
+                return content
 
     async def put(self, api_url, request=None, params=None):
         headers = {
@@ -132,16 +135,17 @@ class AsyncHttp:
             "http put headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
-        async with self.session.put(
-            url=api_url,
-            params=params,
-            json=request,
-            timeout=self.timeout,
-            headers=headers,
-        ) as resp:
-            content = await resp.text()
-            _handle_response(api_url, resp, content)
-            return content
+        async with aiohttp.ClientSession() as session:
+            async with session.put(
+                url=api_url,
+                params=params,
+                json=request,
+                timeout=self.timeout,
+                headers=headers,
+            ) as resp:
+                content = await resp.text()
+                _handle_response(api_url, resp, content)
+                return content
 
     async def patch(self, api_url, request=None, params=None):
         headers = {
@@ -152,13 +156,14 @@ class AsyncHttp:
             "http patch headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
-        async with self.session.patch(
-            url=api_url,
-            params=params,
-            json=request,
-            timeout=self.timeout,
-            headers=headers,
-        ) as resp:
-            content = await resp.text()
-            _handle_response(api_url, resp, content)
-            return content
+        async with aiohttp.ClientSession() as session:
+            async with session.patch(
+                url=api_url,
+                params=params,
+                json=request,
+                timeout=self.timeout,
+                headers=headers,
+            ) as resp:
+                content = await resp.text()
+                _handle_response(api_url, resp, content)
+                return content

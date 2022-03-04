@@ -4,8 +4,6 @@
 import json
 from typing import List
 
-import aiohttp
-
 from qqbot import WebsocketAPI
 from qqbot.core.network.async_http import AsyncHttp
 from qqbot.core.network.url import get_url, APIConstant
@@ -92,9 +90,7 @@ class AsyncAPIBase:
         """
         self.is_sandbox = is_sandbox
         self.token = token
-        self.http_async = AsyncHttp(
-            aiohttp.ClientSession(), self.timeout, token.get_string(), token.get_type()
-        )
+        self.http_async = AsyncHttp(self.timeout, token.get_string(), token.get_type())
 
     def with_timeout(self, timeout):
         self.timeout = timeout
