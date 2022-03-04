@@ -108,7 +108,7 @@ class MessageArkObjKv:
 class MessageSendRequest:
     def __init__(
         self,
-        content: str,
+        content: str = "",
         msg_id: str = None,
         embed: MessageEmbed = None,
         ark: MessageArk = None,

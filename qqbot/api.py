@@ -455,7 +455,7 @@ class MessageAPI(APIBase):
         return json.loads(response.content, object_hook=Message)
 
     def post_message(
-        self, channel_id: str, message_send: MessageSendRequest = ""
+        self, channel_id: str, message_send: MessageSendRequest
     ) -> Message:
         """
         发送消息
