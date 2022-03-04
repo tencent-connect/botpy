@@ -33,6 +33,7 @@ ROBOT_NAME = test_params_["robot_name"]
 IS_SANDBOX = test_params_["is_sandbox"]
 MESSAGE_ID = test_params_["message_id"]
 
+
 class GuildAPITestCase(unittest.TestCase):
     api = qqbot.GuildAPI(token, IS_SANDBOX)
 
