@@ -44,6 +44,7 @@ class Channel:
         self.private_type: int = 0
         self.speak_permission: int = 0
         self.application_id: str = ""
+        self.permissions: str = ""
         if data is not None:
             self.__dict__ = data
 
