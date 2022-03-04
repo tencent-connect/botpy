@@ -475,7 +475,7 @@ class AsyncMessageAPI(AsyncAPIBase):
         return json.loads(response, object_hook=Message)
 
     async def post_message(
-        self, channel_id: str, message_send: MessageSendRequest = ""
+        self, channel_id: str, message_send: MessageSendRequest
     ) -> Message:
         """
         发送消息
