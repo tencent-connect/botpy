@@ -9,6 +9,10 @@ from qqbot.core.exception.error import (
     ServerError,
 )
 from qqbot.core.util import logging
+from qqbot.model.announce import (
+    RecommendChannel,
+    RecommendChannelRequest
+)
 from qqbot.model.api_permission import (
     PermissionDemandToCreate,
     APIPermissionDemandIdentify,
@@ -218,6 +222,16 @@ class MuteTestCase(unittest.TestCase):
         option = qqbot.MuteOption(mute_seconds="120")
         result = self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         self.assertEqual(True, result)
+
+
+class AnnounceTestCase(unittest.TestCase):
+    api = qqbot.AnnouncesAPI(token, IS_SANDBOX)
+
+    def test_post_recommend_channel(self):
+        channel_list = [RecommendChannel(CHANNEL_ID, "introduce")]
+        request = RecommendChannelRequest(0, channel_list)
+        result = self.api.post_recommended_channels(GUILD_ID, request)
+        self.assertEqual(len(channel_list), len(result.recommend_channels))
 
 
 class APIPermissionTestCase(unittest.TestCase):
