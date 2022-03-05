@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import time
 import unittest
 
 import qqbot
@@ -261,30 +262,39 @@ class APIScheduleTestCase(unittest.TestCase):
 
 
 class APIReactionTestCase(unittest.TestCase):
+    # 流水线上的机器人没有开通表情表态权限，所以暂用另一个机器人
+    channel_id = "2568610"
+    message_id = "088de19cbeb883e7e97110a2e39c0138c70448b6a0839106"
+    token = qqbot.Token("101989567", "BDwn6fEcIpjdDArVmwmU2QHkhQ3AuKTg")
     api = qqbot.ReactionAPI(token, IS_SANDBOX)
 
-    def test_put_reaction(self):
-        result = self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+    def test_put_and_delete_reaction(self):
+        result = self.api.put_reaction(self.channel_id, self.message_id, EmojiType.system, "5")
         self.assertEqual(True, result)
 
-    def test_delete_reaction(self):
-        result = self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+        time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
+
+        result = self.api.delete_reaction(self.channel_id, self.message_id, EmojiType.system, "5")
         self.assertEqual(True, result)
 
 
 class APIPinsTestCase(unittest.TestCase):
+    # 流水线上的机器人没有开通精华消息权限，所以暂用另一个机器人
+    channel_id = "2568610"
+    message_id = "088de19cbeb883e7e97110a2e39c0138c70448b6a0839106"
+    token = qqbot.Token("101989567", "BDwn6fEcIpjdDArVmwmU2QHkhQ3AuKTg")
     api = qqbot.PinsAPI(token, IS_SANDBOX)
 
     def test_put_pin(self):
-        result = self.api.put_pin(CHANNEL_ID, MESSAGE_ID)
-        self.assertTrue(MESSAGE_ID in result.message_ids)
+        result = self.api.put_pin(self.channel_id, self.message_id)
+        self.assertTrue(self.message_id in result.message_ids)
 
     def test_delete_pin(self):
-        result = self.api.delete_pin(CHANNEL_ID, MESSAGE_ID)
+        result = self.api.delete_pin(self.channel_id, self.message_id)
         self.assertEqual(True, result)
 
     def test_get_pins(self):
-        result = self.api.get_pins(CHANNEL_ID)
+        result = self.api.get_pins(self.channel_id)
         self.assertTrue(len(result.message_ids) >= 0)
 
 
