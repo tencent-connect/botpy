@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import asyncio
+import time
 import unittest
 
 import qqbot
@@ -251,12 +252,12 @@ class MuteTestCase(unittest.TestCase):
     loop = asyncio.get_event_loop()
 
     def test_mute_all(self):
-        option = qqbot.MuteOption(mute_seconds="120")
+        option = qqbot.MuteOption(mute_seconds="20")
         result = self.loop.run_until_complete(self.api.mute_all(GUILD_ID, option))
         self.assertEqual(True, result)
 
     def test_mute_member(self):
-        option = qqbot.MuteOption(mute_seconds="120")
+        option = qqbot.MuteOption(mute_seconds="20")
         result = self.loop.run_until_complete(
             self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         )
@@ -307,18 +308,23 @@ class APIScheduleTestCase(unittest.TestCase):
 
 
 class APIReactionTestCase(unittest.TestCase):
+    # 流水线上的机器人没有开通表情表态权限，所以暂用另一个机器人
+    channel_id = "2568610"
+    message_id = "088de19cbeb883e7e97110a2e39c0138c70448b6a0839106"
+    token = qqbot.Token("101989567", "BDwn6fEcIpjdDArVmwmU2QHkhQ3AuKTg")
     api = qqbot.AsyncReactionAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
-    def test_put_reaction(self):
+    def test_delete_reaction(self):
         result = self.loop.run_until_complete(
-            self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+            self.api.put_reaction(self.channel_id, self.message_id, EmojiType.system, "4")
         )
         self.assertEqual(True, result)
 
-    def test_delete_reaction(self):
+        time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
+
         result = self.loop.run_until_complete(
-            self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
+            self.api.delete_reaction(self.channel_id, self.message_id, EmojiType.system, "4")
         )
         self.assertEqual(True, result)
 
