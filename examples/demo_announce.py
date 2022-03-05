@@ -42,9 +42,6 @@ async def _announce_handler(event, message: qqbot.Message):
     elif "/删子频道公告" in message.content:
         await announce_api.delete_channel_announce(message.channel_id, message_id)
 
-    elif "/建频道全局公告" in message.content:
-        await announce_api.po(message.channel_id, message_id)
-
     elif "/设置推荐子频道" in message.content:
         channel_list = [RecommendChannel(message.channel_id, "introduce")]
         request = RecommendChannelRequest(0, channel_list)
