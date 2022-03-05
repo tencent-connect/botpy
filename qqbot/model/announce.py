@@ -20,7 +20,7 @@ class RecommendChannel:
 
 
 class CreateAnnounceRequest:
-    def __init__(self, channel_id: str, message_id: str = "",):
+    def __init__(self, channel_id: str, message_id: str):
         self.channel_id = channel_id
         self.message_id = message_id
 
