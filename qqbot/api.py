@@ -684,10 +684,10 @@ class AnnouncesAPI(APIBase):
         return response.status_code == HttpStatus.NO_CONTENT
 
     def post_recommended_channels(
-            self, guild_id: str, request: RecommendChannelRequest
+        self, guild_id: str, request: RecommendChannelRequest
     ) -> Announce:
         """
-        创建频道公告推荐子频道
+        创建子频道类型的频道全局公告
 
         :param guild_id: 频道ID
         :param request: RecommendChannelRequest 对象

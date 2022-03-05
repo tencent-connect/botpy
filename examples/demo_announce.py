@@ -4,8 +4,12 @@ import os.path
 
 import qqbot
 from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.announce import RecommendChannel, CreateAnnounceRequest, RecommendChannelRequest, \
+from qqbot.model.announce import (
+    RecommendChannel,
+    CreateAnnounceRequest,
+    RecommendChannelRequest,
     CreateChannelAnnounceRequest
+)
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
