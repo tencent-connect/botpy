@@ -10,6 +10,10 @@ from qqbot.core.exception.error import (
     ServerError,
 )
 from qqbot.core.util import logging
+from qqbot.model.announce import (
+    RecommendChannel,
+    RecommendChannelRequest
+)
 from qqbot.model.api_permission import (
     APIPermissionDemandIdentify,
     PermissionDemandToCreate,
@@ -257,6 +261,17 @@ class MuteTestCase(unittest.TestCase):
             self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         )
         self.assertEqual(True, result)
+
+
+class AnnounceTestCase(unittest.TestCase):
+    api = qqbot.AsyncAnnouncesAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_post_recommend_channel(self):
+        channel_list = [RecommendChannel(CHANNEL_ID, "introduce")]
+        request = RecommendChannelRequest(0, channel_list)
+        result = self.loop.run_until_complete(self.api.post_recommended_channels(GUILD_ID, request))
+        self.assertEqual(len(channel_list), len(result.recommend_channels))
 
 
 class APIPermissionTestCase(unittest.TestCase):
