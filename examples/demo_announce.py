@@ -4,7 +4,12 @@ import os.path
 
 import qqbot
 from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.announce import CreateAnnounceRequest, CreateChannelAnnounceRequest
+from qqbot.model.announce import (
+    RecommendChannel,
+    CreateAnnounceRequest,
+    RecommendChannelRequest,
+    CreateChannelAnnounceRequest
+)
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
@@ -36,6 +41,11 @@ async def _announce_handler(event, message: qqbot.Message):
 
     elif "/删子频道公告" in message.content:
         await announce_api.delete_channel_announce(message.channel_id, message_id)
+
+    elif "/设置推荐子频道" in message.content:
+        channel_list = [RecommendChannel(message.channel_id, "introduce")]
+        request = RecommendChannelRequest(0, channel_list)
+        await announce_api.post_recommended_channels(message.guild_id, request)
 
 
 if __name__ == "__main__":

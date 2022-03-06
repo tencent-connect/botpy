@@ -14,6 +14,7 @@ from qqbot.model.announce import (
     CreateAnnounceRequest,
     Announce,
     CreateChannelAnnounceRequest,
+    RecommendChannelRequest
 )
 from qqbot.model.api_permission import (
     APIPermission,
@@ -700,6 +701,20 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         )
         response = await self.http_async.delete(url)
         return response == ""
+
+    async def post_recommended_channels(
+        self, guild_id: str, request: RecommendChannelRequest
+    ) -> Announce:
+        """
+        创建子频道类型的频道全局公告
+
+        :param guild_id: 频道ID
+        :param request: RecommendChannelRequest 对象
+        """
+        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
+        request_json = JsonUtil.obj2json_serialize(request)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=Announce)
 
 
 class AsyncAPIPermissionAPI(AsyncAPIBase):
