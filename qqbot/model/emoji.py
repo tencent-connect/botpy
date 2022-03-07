@@ -4,7 +4,7 @@
 class Emoji:
     def __init__(self, data=None):
         self.id: str = ""
-        self.type: EmojiType = EmojiType()
+        self.type: int = 0
         if data:
             self.__dict__ = data
 
