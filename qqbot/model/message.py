@@ -12,12 +12,16 @@ class Message:
         self.content: str = ""
         self.timestamp: str = ""
         self.edited_timestamp: str = ""
+        self.mention_everyone: str = ""
         self.author: User = User()
         self.attachments: List[MessageAttachment] = [MessageAttachment()]
         self.embeds: List[MessageEmbed] = [MessageEmbed()]
         self.mentions: List[User] = [User()]
         self.member: Member = Member()
         self.ark: MessageArk = MessageArk()
+        self.seq: int = 0
+        self.seq_in_channel = ""
+        self.message_reference = MessageReference()
         if data:
             self.__dict__ = data
 
@@ -111,6 +115,14 @@ class MessageArk:
             self.__dict__ = data
 
 
+class MessageReference:
+    def __init__(self, data=None):
+        self.message_id = ""
+        self.ignore_get_message_error = False
+        if data:
+            self.__dict__ = data
+
+
 class MessageSendRequest:
     def __init__(
         self,
@@ -119,6 +131,7 @@ class MessageSendRequest:
         embed: MessageEmbed = None,
         ark: MessageArk = None,
         image: str = "",
+        message_reference: MessageReference = None
     ):
         """
 
@@ -134,6 +147,7 @@ class MessageSendRequest:
         self.ark = ark
         self.image = image
         self.msg_id = msg_id
+        self.message_reference = message_reference
 
 
 class DirectMessageGuild:
