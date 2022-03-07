@@ -90,7 +90,11 @@ class MessageArkObj:
 
 class MessageArkKv:
     def __init__(
-        self, data=None, key: str = None, value: str = None, obj: MessageArkObj = None
+        self,
+        data=None,
+        key: str = None,
+        value: str = None,
+        obj: List[MessageArkObj] = None,
     ):
         self.key = key
         self.value = value
