@@ -29,21 +29,14 @@ async def handle_send_embed(time, channel_id, msg_id):
         embed = MessageEmbed()
         embed.title = "embed消息"
         embed.prompt = "消息透传显示"
+        embed.fields = [
+            MessageEmbedField(name="<@!1234>hello world", value="通知提醒"),
+            MessageEmbedField(name="<@!1234>hello world", value="标题"),
+        ]
 
-        embed_fields = []
-        field = MessageEmbedField()
-        field.name = "<@!1234>hello world"
-        field.value = "通知提醒"
-        embed_fields.append(field)
-
-        field2 = MessageEmbedField()
-        field2.name = "<@!1234>hello world"
-        field2.value = "标题"
-        embed_fields.append(field2)
-
-        embed.fields = embed_fields
-
-        send = qqbot.MessageSendRequest(embed=embed, msg_id=msg_id, content="<@!1234>hello world")
+        send = qqbot.MessageSendRequest(
+            embed=embed, msg_id=msg_id, content="<@!1234>hello world"
+        )
         # 通过api发送回复消息
         qqbot.logger.info("send text message : %s" % i)
         await msg_api.post_message(channel_id, send)
