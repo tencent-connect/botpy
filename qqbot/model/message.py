@@ -82,8 +82,8 @@ class MessageArkObjKv:
 
 
 class MessageArkObj:
-    def __init__(self, data=None):
-        self.obj_kv: List[MessageArkObjKv] = [MessageArkObjKv()]
+    def __init__(self, data=None, obj_kv: List[MessageArkObjKv] = None):
+        self.obj_kv = obj_kv
         if data:
             self.__dict__ = data
 
