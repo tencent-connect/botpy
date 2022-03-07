@@ -894,7 +894,7 @@ class AsyncPinsAPI(AsyncAPIBase):
             response = await self.http_async.put(url)
             return json.loads(response, object_hook=PinsMessage)
         except (Exception, JSONDecodeError) as e:
-            return PinsMessage
+            return PinsMessage()
 
     async def delete_pin(self, channel_id: str, message_id: str):
         """
