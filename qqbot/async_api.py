@@ -2,6 +2,7 @@
 
 # 异步api
 import json
+from json import JSONDecodeError
 from typing import List
 
 from qqbot import WebsocketAPI
@@ -889,8 +890,11 @@ class AsyncPinsAPI(AsyncAPIBase):
         url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
         )
-        response = await self.http_async.put(url)
-        return json.loads(response, object_hook=PinsMessage)
+        try:
+            response = await self.http_async.put(url)
+            return json.loads(response, object_hook=PinsMessage)
+        except (Exception, JSONDecodeError) as e:
+            return PinsMessage
 
     async def delete_pin(self, channel_id: str, message_id: str):
         """
