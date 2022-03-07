@@ -43,6 +43,22 @@ class MessageAttachment:
             self.__dict__ = data
 
 
+class MessageEmbedThumbnail:
+    def __init__(self, data=None):
+        # 图片地址
+        self.url: str = ""
+        if data is not None:
+            self.__dict__ = data
+
+
+class MessageEmbedField:
+    def __init__(self, data=None, name: str = None, value: str = None):
+        self.name = name
+        self.value = value
+        if data:
+            self.__dict__ = data
+
+
 class MessageEmbed:
     def __init__(self, data=None):
         # 标题
@@ -57,35 +73,10 @@ class MessageEmbed:
             self.__dict__ = data
 
 
-class MessageEmbedThumbnail:
-    def __init__(self, data=None):
-        # 图片地址
-        self.url: str = ""
-        if data is not None:
-            self.__dict__ = data
-
-
-class MessageEmbedField:
-    def __init__(self, data=None):
-        self.name: str = ""
-        self.value: str = ""
-        if data:
-            self.__dict__ = data
-
-
-class MessageArk:
-    def __init__(self, data=None):
-        self.template_id = 0
-        self.kv: List[MessageArkKv] = [MessageArkKv()]
-        if data:
-            self.__dict__ = data
-
-
-class MessageArkKv:
-    def __init__(self, data=None):
-        self.key: str = ""
-        self.value: str = ""
-        self.obj: List[MessageArkObj] = [MessageArkObj()]
+class MessageArkObjKv:
+    def __init__(self, data=None, key: str = None, value: str = None):
+        self.key = key
+        self.value = value
         if data:
             self.__dict__ = data
 
@@ -97,10 +88,21 @@ class MessageArkObj:
             self.__dict__ = data
 
 
-class MessageArkObjKv:
+class MessageArkKv:
+    def __init__(
+        self, data=None, key: str = None, value: str = None, obj: MessageArkObj = None
+    ):
+        self.key = key
+        self.value = value
+        self.obj = obj
+        if data:
+            self.__dict__ = data
+
+
+class MessageArk:
     def __init__(self, data=None):
-        self.key: str = ""
-        self.value: str = ""
+        self.template_id = 0
+        self.kv: List[MessageArkKv] = [MessageArkKv()]
         if data:
             self.__dict__ = data
 

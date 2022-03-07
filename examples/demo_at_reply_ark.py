@@ -29,33 +29,15 @@ async def handle_send_ark(time, channel_id, msg_id):
         ark = MessageArk()
         ark.template_id = 37
 
-        kv_list = []
-        kv1 = MessageArkKv()
-        kv1.key = "#PROMPT#"
-        kv1.value = "通知提醒"
-        kv_list.append(kv1)
-
-        kv2 = MessageArkKv()
-        kv2.key = "#METATITLE#"
-        kv2.value = "标题"
-        kv_list.append(kv2)
-
-        kv3 = MessageArkKv()
-        kv3.key = "#METASUBTITLE#"
-        kv3.value = "子标题"
-        kv_list.append(kv3)
-
-        kv4 = MessageArkKv()
-        kv4.key = "#METACOVER#"
-        kv4.value = "https://vfiles.gtimg.cn/vupload/20211029/bf0ed01635493790634.jpg"
-        kv_list.append(kv4)
-
-        # kv5 = MessageArkKv()
-        # kv5.key = "#METAURL#"
-        # kv5.value = "https://qq.com"
-        # kv_list.append(kv5)
-
-        ark.kv = kv_list
+        ark.kv = [
+            MessageArkKv(key="#PROMPT#", value="通知提醒"),
+            MessageArkKv(key="#METATITLE#", value="标题"),
+            MessageArkKv(key="#METASUBTITLE#", value="子标题"),
+            MessageArkKv(
+                key="#METACOVER#",
+                value="https://vfiles.gtimg.cn/vupload/20211029/bf0ed01635493790634.jpg",
+            ),
+        ]
 
         send = qqbot.MessageSendRequest(content="", ark=ark, msg_id=msg_id)
         # 通过api发送回复消息
