@@ -140,6 +140,7 @@ class MessageSendRequest:
         :param embed:embed 消息，一种特殊的 ark
         :param ark:ark 消息
         :param image:图片url地址
+        :param message_reference:引用消息
         """
 
         self.content = content
