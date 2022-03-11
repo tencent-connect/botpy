@@ -37,7 +37,7 @@ class HttpErrorMessage:
 
 class HttpStatus:
     OK = 200
-    ACCEPTED = 200
+    ACCEPTED = 202
     NO_CONTENT = 204
 
 
