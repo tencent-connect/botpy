@@ -479,7 +479,7 @@ class MessageAPI(APIBase):
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=Message)
 
-    def recall_message(self, channel_id: str, message_id: str):
+    def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False):
         """
         撤回消息
 
@@ -488,11 +488,12 @@ class MessageAPI(APIBase):
 
         :param channel_id: 子频道ID
         :param message_id: 消息ID
+        :param hide_tip: 是否隐藏撤回提示小灰条
         """
         url = get_url(APIConstant.messageURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
         )
-        response = self.http.delete(url)
+        response = self.http.delete(url, params={"hidetip": str(hide_tip)})
         return response.status_code == HttpStatus.OK
 
 
