@@ -500,7 +500,7 @@ class AsyncMessageAPI(AsyncAPIBase):
         response = await self.http_async.post(url, request_json)
         return json.loads(response, object_hook=Message)
 
-    async def recall_message(self, channel_id: str, message_id: str):
+    async def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False):
         """
         撤回消息
 
@@ -509,12 +509,13 @@ class AsyncMessageAPI(AsyncAPIBase):
 
         :param channel_id: 子频道ID
         :param message_id: 消息ID
+        :param hide_tip: 是否隐藏撤回提示小灰条
         """
         url = get_url(APIConstant.messageURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
         )
-        response = await self.http_async.delete(url)
-        return response.status_code == ""
+        response = await self.http_async.delete(url, params={"hidetip": str(hide_tip)})
+        return response == ""
 
 
 class AsyncDmsAPI(AsyncAPIBase):
@@ -893,7 +894,7 @@ class AsyncPinsAPI(AsyncAPIBase):
         try:
             response = await self.http_async.put(url)
             return json.loads(response, object_hook=PinsMessage)
-        except (Exception, JSONDecodeError) as e:
+        except (Exception, JSONDecodeError):
             return PinsMessage()
 
     async def delete_pin(self, channel_id: str, message_id: str):
