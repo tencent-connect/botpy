@@ -115,6 +115,28 @@ class MessageArk:
             self.__dict__ = data
 
 
+class MessageMarkdownParams:
+    def __init__(
+            self,
+            data=None,
+            key="",
+            values: List[str] = None
+    ):
+        self.key = key
+        self.values = values
+        if data:
+            self.__dict__ = data
+
+
+class MessageMarkdown:
+    def __init__(self, data=None):
+        self.template_id: int = 0
+        self.params = None
+        self.content: str = ""
+        if data:
+            self.__dict__ = data
+
+
 class MessageReference:
     def __init__(self, data=None):
         self.message_id = ""
@@ -131,7 +153,8 @@ class MessageSendRequest:
         embed: MessageEmbed = None,
         ark: MessageArk = None,
         image: str = "",
-        message_reference: MessageReference = None
+        message_reference: MessageReference = None,
+        markdown: MessageMarkdown = None
     ):
         """
 
@@ -149,6 +172,7 @@ class MessageSendRequest:
         self.image = image
         self.msg_id = msg_id
         self.message_reference = message_reference
+        self.markdown = markdown
 
 
 class DirectMessageGuild:
