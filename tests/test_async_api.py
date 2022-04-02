@@ -20,6 +20,7 @@ from qqbot.model.api_permission import (
     PermissionDemandToCreate,
 )
 from qqbot.model.emoji import EmojiType
+from qqbot.model.interaction import InteractionData
 from tests import test_config
 
 logger = logging.getLogger()
@@ -346,6 +347,20 @@ class APIPinsTestCase(unittest.TestCase):
             self.api.get_pins(CHANNEL_ID)
         )
         self.assertTrue(len(result.message_ids) >= 0)
+
+
+class APIInteractionTestCase(unittest.TestCase):
+    api = qqbot.AsyncInteractionAPI(token, IS_SANDBOX)
+    loop = asyncio.get_event_loop()
+
+    def test_put_Interaction(self):
+        data = InteractionData()
+        data.type = 2
+        data.resolved = "Test"
+        result = self.loop.run_until_complete(
+            self.api.put_interaction("e924431f-aaed-4e78-83\n75-9295b1f1e0ef", data)
+        )
+        self.assertTrue(result)
 
 
 if __name__ == "__main__":

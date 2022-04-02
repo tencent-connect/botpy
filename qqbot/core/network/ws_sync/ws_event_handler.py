@@ -11,6 +11,7 @@ from qqbot.model.guild import Guild
 from qqbot.model.guild_member import GuildMember
 from qqbot.model.message import Message, DeletedMessageInfo
 from qqbot.model.reaction import Reaction
+from qqbot.model.interaction import Interaction
 
 logger = logging.getLogger()
 
@@ -121,6 +122,13 @@ def _handle_event_message_reaction(message_event, message):
     callback(message_event, reaction)
 
 
+def _handle_event_interaction_create(message_event, message):
+    callback = DefaultHandler.interaction_create
+    if callback is None:
+        return
+    interaction: Interaction = json.loads(_parse_data(message), object_hook=Interaction)
+    callback(message_event, interaction)
+
 event_handler_dict = {
     WsEvent.EventGuildCreate: _handle_event_guild,
     WsEvent.EventGuildUpdate: _handle_event_guild,
@@ -143,6 +151,7 @@ event_handler_dict = {
     WsEvent.EventAudioOffMic: _handle_event_audio,
     WsEvent.EventMessageReactionAdd: _handle_event_message_reaction,
     WsEvent.EventMessageReactionRemove: _handle_event_message_reaction,
+    WsEvent.EventInteractionCreate: _handle_event_interaction_create,
 }
 
 

@@ -43,6 +43,7 @@ from qqbot.model.guild_role import (
     RoleUpdateFilter,
     RoleUpdateInfo,
 )
+from qqbot.model.interaction import Interaction, InteractionData
 from qqbot.model.member import User, Member
 from qqbot.model.message import (
     MessageSendRequest,
@@ -919,3 +920,16 @@ class AsyncPinsAPI(AsyncAPIBase):
         url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
         response = await self.http_async.get(url)
         return json.loads(response, object_hook=PinsMessage)
+
+
+class AsyncInteractionAPI(AsyncAPIBase):
+    """互动回调API"""
+
+    async def put_interaction(self, interaction_id: str, data: InteractionData):
+        """
+        对 interaction_id 进行互动回调数据异步回复更新
+        """
+        url = get_url(APIConstant.interactionURI, self.is_sandbox).format(interaction_id=interaction_id)
+        request_json = JsonUtil.obj2json_serialize(data)
+        response = await self.http_async.put(url, request=request_json)
+        return response == ""
