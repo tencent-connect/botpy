@@ -12,3 +12,4 @@ class DefaultHandler:
     direct_message = None
     audio = None
     message_reaction = None
+    interaction_create = None
