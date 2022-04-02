@@ -43,7 +43,6 @@ from qqbot.model.guild_role import (
     RoleUpdateFilter,
     RoleUpdateInfo,
 )
-from qqbot.model.interaction import InteractionData
 from qqbot.model.member import User, Member
 from qqbot.model.message import (
     MessageSendRequest,
