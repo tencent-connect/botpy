@@ -47,11 +47,7 @@ class SessionManager:
     session_pool: SessionPool
 
     def start(self, websocket_ap, token=Token, intent=Intents):
-        logger.info(
-            "session manager start with: %s" % websocket_ap
-            + ", token:%s" % token
-            + ", intent:%s" % intent
-        )
+        logger.info("[连接程序启动]...")
         # 每个机器人创建的连接数不能超过remaining剩余连接数
         if _check_session_limit(websocket_ap):
             raise Exception("session limit exceeded")
@@ -60,7 +56,7 @@ class SessionManager:
             websocket_ap["session_start_limit"]["max_concurrency"]
         )
         shards_count = websocket_ap["shards"]
-        logger.info(
+        logger.debug(
             "session_interval: %s, shards: %s" % (session_interval, shards_count)
         )
         # 根据限制建立分片的并发链接数
@@ -98,7 +94,7 @@ class SessionManager:
             loop.run_until_complete(pool.run(session_interval))
             loop.run_forever()
         except KeyboardInterrupt:
-            logger.info("ws pool is stopped by key board interrupt")
+            logger.info("[服务强行停止]!")
             # cancel all tasks lingering
 
     async def new_connect(self, session, time_interval):
@@ -110,8 +106,8 @@ class SessionManager:
 
         param session: session对象
         """
+        logger.info("[会话启动]等待中...")
         await asyncio.sleep(time_interval)
-        logger.info("_new_connect:%s" % session)
 
         client = Client(session, self, _on_connected)
         try:

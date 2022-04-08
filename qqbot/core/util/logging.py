@@ -37,12 +37,8 @@ def _getLevel():
 
 
 def getLogger(name=None):
-    print_format = (
-        "%(asctime)s - "
-        "\033[1;33m%(levelname)s: %(name)s - %(filename)s - %(funcName)s(line: %(lineno)s):\033[0m%(message)s"
-        ""
-    )
-    file_format = "%(asctime)s-%(name)s - %(filename)s - %(funcName)s - line %(lineno)s-%(levelname)s - %(message)s"
+    print_format = "\033[1;33m%(levelname)s [%(name)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m%(message)s"
+    file_format = "%(asctime)s %(levelname)s [%(name)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
 
     if name is None:
         logger = logging.getLogger("qqbot")
@@ -79,7 +75,7 @@ def getLogger(name=None):
         logger.debug(
             "qqbot: dumping log file to {path}".format(path=os.path.realpath(log_file))
         )
-        file_handler.setLevel(level=_getLevel())
+        file_handler.setLevel(level=logging.DEBUG)
         file_handler.setFormatter(formatter)
         if len(logger.handlers) == 0:
             logger.addHandler(file_handler)

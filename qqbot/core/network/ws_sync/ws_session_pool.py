@@ -30,7 +30,7 @@ class SessionPool:
         ]
         self.work_list.extend(works)
         await self._queue.join()
-        logger.info("all tasks done")
+        logger.debug("all tasks done")
 
     async def _work(self, session_interval):
 
@@ -39,7 +39,7 @@ class SessionPool:
                 # 后台有限制，一定时间后发起链接
                 time.sleep(session_interval)
                 session = await self._queue.get()
-                logger.info("get session: %s" % session)
+                logger.debug("get session: %s" % session)
                 # 这里开启线程添加websocket链接，不用等待
                 thread = threading.Thread(
                     target=self.session_manager.new_connect, args=(session,)
@@ -59,7 +59,3 @@ class SessionPool:
     @property
     def count(self):
         return self._queue.qsize()
-
-    def print_status(self):
-        for w in self.work_list:
-            logger.info(w.done())
