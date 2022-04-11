@@ -41,22 +41,27 @@ class MessagesPager:
 
 
 class MessageAttachment:
-    def __init__(self, data=None):
-        self.url: str = ""
+    def __init__(self, url: str = "", data=None):
+        self.url = url
         if data:
             self.__dict__ = data
 
 
 class MessageEmbedThumbnail:
-    def __init__(self, data=None):
+    def __init__(self, url: str = "", data=None):
         # 图片地址
-        self.url: str = ""
+        self.url = url
         if data is not None:
             self.__dict__ = data
 
 
 class MessageEmbedField:
-    def __init__(self, data=None, name: str = None, value: str = None):
+    def __init__(
+            self,
+            data=None,
+            name: str = None,
+            value: str = None
+    ):
         self.name = name
         self.value = value
         if data:
@@ -64,21 +69,33 @@ class MessageEmbedField:
 
 
 class MessageEmbed:
-    def __init__(self, data=None):
+    def __init__(
+            self,
+            title: str = "",
+            prompt: str = "",
+            thumbnail: MessageEmbedThumbnail = MessageEmbedThumbnail(),
+            fields: List[MessageEmbedField] = [MessageEmbedField()],
+            data=None
+    ):
         # 标题
-        self.title: str = ""
+        self.title = title
         # 消息弹窗内容
-        self.prompt: str = ""
+        self.prompt = prompt
         # 缩略图
-        self.thumbnail: MessageEmbedThumbnail = MessageEmbedThumbnail()
+        self.thumbnail = thumbnail
         # 消息创建时间
-        self.fields: List[MessageEmbedField] = [MessageEmbedField()]
+        self.fields = fields
         if data:
             self.__dict__ = data
 
 
 class MessageArkObjKv:
-    def __init__(self, data=None, key: str = None, value: str = None):
+    def __init__(
+            self,
+            data=None,
+            key: str = None,
+            value: str = None
+    ):
         self.key = key
         self.value = value
         if data:
@@ -86,7 +103,11 @@ class MessageArkObjKv:
 
 
 class MessageArkObj:
-    def __init__(self, data=None, obj_kv: List[MessageArkObjKv] = None):
+    def __init__(
+            self,
+            data=None,
+            obj_kv: List[MessageArkObjKv] = None
+    ):
         self.obj_kv = obj_kv
         if data:
             self.__dict__ = data
@@ -94,11 +115,11 @@ class MessageArkObj:
 
 class MessageArkKv:
     def __init__(
-        self,
-        data=None,
-        key: str = None,
-        value: str = None,
-        obj: List[MessageArkObj] = None,
+            self,
+            data=None,
+            key: str = None,
+            value: str = None,
+            obj: List[MessageArkObj] = None,
     ):
         self.key = key
         self.value = value
@@ -108,9 +129,14 @@ class MessageArkKv:
 
 
 class MessageArk:
-    def __init__(self, data=None):
-        self.template_id = 0
-        self.kv: List[MessageArkKv] = [MessageArkKv()]
+    def __init__(
+            self,
+            template_id: int = 0,
+            kv: List[MessageArkKv] = [MessageArkKv()],
+            data=None,
+    ):
+        self.template_id = template_id
+        self.kv = kv
         if data:
             self.__dict__ = data
 
@@ -129,41 +155,53 @@ class MessageMarkdownParams:
 
 
 class MessageMarkdown:
-    def __init__(self, data=None):
-        self.template_id: int = 0
-        self.params = None
-        self.content: str = ""
+    def __init__(
+            self,
+            data=None,
+            template_id: int = 0,
+            params=None,
+            content: str = ""
+    ):
+        self.template_id = template_id
+        self.params = params
+        self.content = content
         if data:
             self.__dict__ = data
 
 
 class MessageReference:
-    def __init__(self, data=None):
-        self.message_id = ""
-        self.ignore_get_message_error = False
+    def __init__(
+            self,
+            data=None,
+            message_id: str = "",
+            ignore_get_message_error: bool = False
+    ):
+        self.message_id = message_id
+        self.ignore_get_message_error = ignore_get_message_error
         if data:
             self.__dict__ = data
 
 
 class MessageSendRequest:
     def __init__(
-        self,
-        content: str = "",
-        msg_id: str = None,
-        embed: MessageEmbed = None,
-        ark: MessageArk = None,
-        image: str = "",
-        message_reference: MessageReference = None,
-        markdown: MessageMarkdown = None
+            self,
+            content: str = "",
+            msg_id: str = None,
+            embed: MessageEmbed = None,
+            ark: MessageArk = None,
+            image: str = "",
+            message_reference: MessageReference = None,
+            markdown: MessageMarkdown = None
     ):
         """
+        机器人发送消息时所传的数据对象
 
-        :param content:消息内容，文本内容，支持内嵌格式
-        :param msg_id:要回复的消息id(Message.id), 在 AT_CREATE_MESSAGE 事件中获取。带了 msg_id 视为被动回复消息，否则视为主动推送消息
-        :param embed:embed 消息，一种特殊的 ark
-        :param ark:ark 消息
-        :param image:图片url地址
-        :param message_reference:引用消息
+        :param content: 消息内容，文本内容，支持内嵌格式
+        :param msg_id: 要回复的消息id(Message.id), 在 AT_CREATE_MESSAGE 事件中获取。带了 msg_id 视为被动回复消息，否则视为主动推送消息
+        :param embed: embed 消息，一种特殊的 ark
+        :param ark: ark 消息
+        :param image: 图片url地址
+        :param message_reference: 引用消息
         """
 
         self.content = content
@@ -176,10 +214,16 @@ class MessageSendRequest:
 
 
 class DirectMessageGuild:
-    def __init__(self, data=None):
-        self.guild_id: str = ""
-        self.channel_id: str = ""
-        self.creat_time: str = ""
+    def __init__(
+            self,
+            data=None,
+            guild_id: str = "",
+            channel_id: str = "",
+            creat_time: str = ""
+    ):
+        self.guild_id: guild_id
+        self.channel_id: channel_id
+        self.creat_time: creat_time
         if data is not None:
             self.__dict__ = data
 
@@ -187,6 +231,8 @@ class DirectMessageGuild:
 class CreateDirectMessageRequest:
     def __init__(self, source_guild_id: str, user_id: str):
         """
+        机器人发送私信时所传的数据对象
+
         :param source_guild_id: 创建的私信频道ID
         :param user_id: 私信接收人用户ID
         """
