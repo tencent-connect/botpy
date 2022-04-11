@@ -41,14 +41,22 @@ class MessagesPager:
 
 
 class MessageAttachment:
-    def __init__(self, url: str = "", data=None):
+    def __init__(
+            self,
+            url: str = "",
+            data=None
+    ):
         self.url = url
         if data:
             self.__dict__ = data
 
 
 class MessageEmbedThumbnail:
-    def __init__(self, url: str = "", data=None):
+    def __init__(
+            self,
+            url: str = "",
+            data=None
+    ):
         # 图片地址
         self.url = url
         if data is not None:
