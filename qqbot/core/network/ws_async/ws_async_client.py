@@ -135,7 +135,7 @@ class Client:
         logger.debug("[ws连接]发送消息: %s" % send_msg)
         if isinstance(self.ws_conn, ClientWebSocketResponse):
             if self.ws_conn.closed:
-                logger.error("send_msg: websocket connection has closed")
+                logger.debug("[ws连接]ws连接已关闭! ws对象: %s" % self.ws_conn)
             else:
                 await self.ws_conn.send_str(data=send_msg)
 
@@ -198,11 +198,11 @@ class Client:
                 ).__dict__
             )
             if self.ws_conn is None:
-                logger.error("ws is None")
+                logger.debug("[ws连接]连接已关闭!")
                 return
             else:
                 if self.ws_conn.closed:
-                    logger.info("[ws连接]关闭, 心跳检测停止...")
+                    logger.debug("[ws连接]ws连接已关闭, 心跳检测停止，ws对象: %s" % self.ws_conn)
                     return
                 else:
                     await asyncio.sleep(interval)
