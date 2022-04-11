@@ -36,7 +36,7 @@ class Client:
         traceback.print_exc()
 
     async def on_close(self, ws, close_status_code, close_msg):
-        logger.info("[ws连接关闭], 返回码: %s" % close_status_code + ", 返回信息:%s" % close_msg)
+        logger.info("[ws连接]关闭, 返回码: %s" % close_status_code + ", 返回信息:%s" % close_msg)
         # 这种不能重新链接
         if (
             close_status_code == WebsocketError.CodeConnCloseErr
@@ -54,19 +54,18 @@ class Client:
         if await self._is_system_event(message_event, ws):
             return
         if "t" in message_event.keys() and message_event["t"] == "READY":
-            logger.info("[ws鉴权成功]！")
+            logger.info("[ws连接]鉴权成功")
             event_seq = message_event["s"]
             if event_seq > 0:
                 self.session.last_seq = event_seq
             await self._ready_handler(message_event)
-            logger.info("[连接程序启动成功]！")
+            logger.info("[ws连接]程序启动成功！")
             return
         if "t" in message_event.keys():
-            logger.debug("[ws接收消息]: %s" % message)
+            logger.info("[ws连接]接收消息: %s" % message)
             await parse_and_handle(message_event, message)
 
     async def on_connected(self, ws):
-        logger.info("[ws连接成功]！")
         self.ws_conn = ws
         await self.connected_callback(self)
         # 心跳检查
@@ -77,7 +76,7 @@ class Client:
         websocket向服务器端发起链接，并定时发送心跳
         """
 
-        logger.info("[ws连接启动]...")
+        logger.info("[ws连接]启动中...")
         ws_url = self.session.url
         if ws_url == "":
             raise Exception("session url is none")
@@ -111,7 +110,7 @@ class Client:
         """
         if self.session.intent == 0:
             self.session.intent = Intents.INTENT_GUILDS.value
-        logger.info("[ws连接鉴权]...")
+        logger.info("[ws连接]鉴权中...")
         identify_event = json.dumps(
             WSPayload(
                 WsIdentifyData(
@@ -133,7 +132,7 @@ class Client:
         :param event_json:
         """
         send_msg = event_json
-        logger.debug("[ws发送消息]: %s" % send_msg)
+        logger.debug("[ws连接]发送消息: %s" % send_msg)
         if isinstance(self.ws_conn, ClientWebSocketResponse):
             if self.ws_conn.closed:
                 logger.error("send_msg: websocket connection has closed")
@@ -144,7 +143,7 @@ class Client:
         """
         websocket重连
         """
-        logger.info("[ws重连启动]...")
+        logger.info("[ws连接]重连启动...")
         resume_event = json.dumps(
             WSPayload(
                 WSResumeData(
@@ -191,7 +190,7 @@ class Client:
         心跳包
         :param interval: 间隔时间
         """
-        logger.info("[ws心跳检测启动]...")
+        logger.info("[ws连接]心跳检测启动...")
         while True:
             heartbeat_event = json.dumps(
                 WSPayload(
@@ -203,7 +202,7 @@ class Client:
                 return
             else:
                 if self.ws_conn.closed:
-                    logger.info("[ws连接关闭, 心跳检测停止]...")
+                    logger.info("[ws连接]关闭, 心跳检测停止...")
                     return
                 else:
                     await asyncio.sleep(interval)
