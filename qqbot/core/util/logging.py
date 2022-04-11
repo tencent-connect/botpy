@@ -3,7 +3,6 @@
 import logging
 import os
 import platform
-import sys
 from logging import FileHandler
 from logging.handlers import TimedRotatingFileHandler
 
@@ -38,8 +37,8 @@ def _getLevel():
 
 
 def getLogger(name=None):
-    print_format = "\033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m%(message)s"
-    file_format = "%(asctime)s [%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
+    print_format = "\033[1;33m%(levelname)s [%(name)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m%(message)s"
+    file_format = "%(asctime)s %(levelname)s [%(name)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
 
     if name is None:
         logger = logging.getLogger("qqbot")
@@ -47,13 +46,7 @@ def getLogger(name=None):
         logger = logging.getLogger(name)
 
     logging.basicConfig(format=print_format)
-
-    # 从用户命令行接收是否打印debug日志
-    argv = sys.argv
-    if argv[1] in ["-d", "--debug"]:
-        logger.setLevel(level=logging.DEBUG)
-    else:
-        logger.setLevel(level=_getLevel())
+    logger.setLevel(level=_getLevel())
 
     # FileHandler
     no_log = os.getenv("QQBOT_DISABLE_LOG", "0")
@@ -79,9 +72,12 @@ def getLogger(name=None):
             )
         else:
             file_handler = FileHandler(log_file, encoding="utf-8")
+        logger.debug(
+            "qqbot: dumping log file to {path}".format(path=os.path.realpath(log_file))
+        )
+        file_handler.setLevel(level=logging.DEBUG)
+        file_handler.setFormatter(formatter)
         if len(logger.handlers) == 0:
-            file_handler.setLevel(level=logging.DEBUG)
-            file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
 
     return logger

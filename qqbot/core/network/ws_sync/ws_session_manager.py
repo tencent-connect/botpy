@@ -47,7 +47,7 @@ class SessionManager:
     session_pool: SessionPool
 
     def start(self, websocket_ap, token=Token, intent=Intents):
-        logger.info("[连接管理]程序启动中...")
+        logger.info("[连接程序启动]...")
         # 每个机器人创建的连接数不能超过remaining剩余连接数
         if _check_session_limit(websocket_ap):
             raise Exception("session limit exceeded")
@@ -102,7 +102,7 @@ class SessionManager:
 
         param session: session对象
         """
-        logger.info("[连接管理]会话启动中...")
+        logger.info("[会话启动]...")
 
         client = Client(session, self)
         client.connect(_on_connected)

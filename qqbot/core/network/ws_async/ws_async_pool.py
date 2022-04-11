@@ -35,7 +35,7 @@ class SessionPool:
             logger.debug("session list circle run")
             time_interval = session_interval * (index + 1)
             logger.info(
-                "[连接池]最大并发连接数: %s, 启动会话数: %s" % (self.max_async, len(session_list))
+                "[启动会话连接] 最大并发连接数: %s, 启动会话数: %s" % (self.max_async, len(session_list))
             )
             for i in range(self.max_async):
                 if len(session_list) == 0:

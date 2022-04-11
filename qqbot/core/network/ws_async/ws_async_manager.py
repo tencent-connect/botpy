@@ -47,7 +47,7 @@ class SessionManager:
     session_pool: SessionPool
 
     def start(self, websocket_ap, token=Token, intent=Intents):
-        logger.info("[连接管理]程序启动...")
+        logger.info("[连接程序启动]...")
         # 每个机器人创建的连接数不能超过remaining剩余连接数
         if _check_session_limit(websocket_ap):
             raise Exception("session limit exceeded")
@@ -94,7 +94,7 @@ class SessionManager:
             loop.run_until_complete(pool.run(session_interval))
             loop.run_forever()
         except KeyboardInterrupt:
-            logger.info("[连接管理]服务强行停止!")
+            logger.info("[服务强行停止]!")
             # cancel all tasks lingering
 
     async def new_connect(self, session, time_interval):
@@ -106,7 +106,7 @@ class SessionManager:
 
         param session: session对象
         """
-        logger.info("[连接管理]新会话启动中...")
+        logger.info("[会话启动]等待中...")
         await asyncio.sleep(time_interval)
 
         client = Client(session, self, _on_connected)

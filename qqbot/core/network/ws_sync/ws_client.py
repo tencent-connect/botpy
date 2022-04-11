@@ -48,7 +48,7 @@ class Client:
 
         def on_close(ws, close_status_code, close_msg):
             logger.info(
-                "[ws连接]关闭, 返回码: %s" % close_status_code + ", 返回信息:%s" % close_msg
+                "[ws连接关闭], 返回码: %s" % close_status_code + ", 返回信息:%s" % close_msg
             )
             # 关闭心跳包线程
             self.ws_conn = None
@@ -70,12 +70,12 @@ class Client:
             if self._is_system_event(message_event, ws, connected_callback):
                 return
             if "t" in message_event.keys() and message_event["t"] == "READY":
-                logger.info("[ws连接]鉴权成功")
+                logger.info("[ws鉴权成功]！")
                 event_seq = message_event["s"]
                 if event_seq > 0:
                     self.session.last_seq = event_seq
                 self._ready_handler(message_event)
-                logger.info("[ws连接]程序启动成功！")
+                logger.info("[连接程序启动成功]！")
                 return
             if "t" in message_event.keys():
                 parse_and_handle(message_event, message)
@@ -108,7 +108,7 @@ class Client:
         """
         if self.session.intent == 0:
             self.session.intent = Intents.INTENT_GUILDS.value
-        logger.info("[ws连接]鉴权中...")
+        logger.info("[ws连接鉴权]...")
         identify_event = json.dumps(
             WSPayload(
                 WsIdentifyData(
@@ -137,7 +137,7 @@ class Client:
         """
         websocket重连
         """
-        logger.info("[ws连接]重连启动中...")
+        logger.info("[ws重连启动]...")
         resume_event = json.dumps(
             WSPayload(
                 WSResumeData(
