@@ -49,7 +49,7 @@ def _handle_response(api_url, response):
         return
     else:
         logger.error(
-            "http request error with api_url:%s, error: %s, content: %s, trace_id:%s"
+            "[HTTP]接口请求异常，请求连接: %s, error: %s, 返回内容: %s, trace_id:%s"
             % (
                 api_url,
                 response.status_code,
@@ -77,7 +77,7 @@ class Http:
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
-        logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
+        logger.debug("[HTTP]http get headers: %s, api_url: %s" % (headers, api_url))
         response = requests.get(
             url=api_url,
             params=params,
@@ -94,7 +94,7 @@ class Http:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
-            "http post headers: %s, api_url: %s, request: %s"
+            "[HTTP]http post headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
         response = requests.post(
@@ -112,7 +112,7 @@ class Http:
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
-        logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
+        logger.debug("[HTTP]http delete headers: %s, api_url: %s" % (headers, api_url))
         response = requests.delete(
             url=api_url,
             params=params,
@@ -129,7 +129,7 @@ class Http:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
-            "http put headers: %s, api_url: %s, request: %s"
+            "[HTTP]http put headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
         response = requests.put(
@@ -148,7 +148,7 @@ class Http:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
-            "http patch headers: %s, api_url: %s, request: %s"
+            "[HTTP]http patch headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
         response = requests.patch(

@@ -174,7 +174,16 @@ logger.info("hello world!")
 ```
 
 ### 设置日志级别
+SDK默认的日志级别为`INFO`级别，需要修改请查看下面信息
+#### Debug日志
+命令行启动py后通过增加参数`-d` 或 `--debug`可以打开debug日志
 
+```bash
+python3 demo_at_reply.py -d
+```
+
+
+#### 其他级别日志
 通过 `export` 命令添加 `QQBOT_LOG_LEVEL` 环境变量可以设置日志级别。例如：
 
 ``` bash
