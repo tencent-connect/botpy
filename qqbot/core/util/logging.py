@@ -50,7 +50,7 @@ def getLogger(name=None):
 
     # 从用户命令行接收是否打印debug日志
     argv = sys.argv
-    if argv[1] in ["-d", "--debug"]:
+    if len(argv) > 1 and argv[1] in ["-d", "--debug"]:
         logger.setLevel(level=logging.DEBUG)
     else:
         logger.setLevel(level=_getLevel())
