@@ -43,10 +43,17 @@ class HttpStatus:
 
 def _handle_response(api_url, response: ClientResponse, content: str):
     if response.status in (HttpStatus.NO_CONTENT, HttpStatus.OK, HttpStatus.ACCEPTED):
+        logger.debug(
+            "[HTTP]请求成功, 请求连接: %s, 返回内容: %s"
+            % (
+                api_url,
+                content,
+            )
+        )
         return
     else:
         logger.error(
-            "http request error with api_url:%s, error: %s, content: %s, trace_id:%s"
+            "[HTTP]接口请求异常，请求连接: %s, error: %s, 返回内容: %s, trace_id:%s"
             % (
                 api_url,
                 response.status,
@@ -74,7 +81,7 @@ class AsyncHttp:
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
-        logger.debug("http get headers: %s, api_url: %s" % (headers, api_url))
+        logger.debug("[HTTP] get headers: %s, api_url: %s" % (headers, api_url))
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 url=api_url,
@@ -93,7 +100,7 @@ class AsyncHttp:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
-            "http post headers: %s, api_url: %s, request: %s"
+            "[HTTP] post headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
         async with aiohttp.ClientSession() as session:
@@ -113,7 +120,7 @@ class AsyncHttp:
             "Authorization": self.scheme + " " + self.token,
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
-        logger.debug("http delete headers: %s, api_url: %s" % (headers, api_url))
+        logger.debug("[HTTP] delete headers: %s, api_url: %s" % (headers, api_url))
         async with aiohttp.ClientSession() as session:
             async with session.delete(
                 url=api_url,
@@ -132,7 +139,7 @@ class AsyncHttp:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
-            "http put headers: %s, api_url: %s, request: %s"
+            "[HTTP] put headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
         async with aiohttp.ClientSession() as session:
@@ -153,7 +160,7 @@ class AsyncHttp:
             "User-Agent": "BotPythonSDK/v0.5.4",
         }
         logger.debug(
-            "http patch headers: %s, api_url: %s, request: %s"
+            "[HTTP] patch headers: %s, api_url: %s, request: %s"
             % (headers, api_url, request)
         )
         async with aiohttp.ClientSession() as session:
