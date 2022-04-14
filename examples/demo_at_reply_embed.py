@@ -5,19 +5,19 @@ import os.path
 
 import qqbot
 from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.message import MessageEmbedField, MessageEmbed, DeletedMessageInfo
+from qqbot.model.message import MessageEmbedField, MessageEmbed
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
-async def _message_handler(event, message: DeletedMessageInfo):
+async def _message_handler(event, message: qqbot.Message):
     """
     定义事件回调的处理
 
     :param event: 事件类型
     :param message: 事件对象（如监听消息是Message对象）
     """
-    await handle_send_embed(1, message.message.channel_id, message.message.id)
+    await handle_send_embed(1, message.channel_id, message.id)
 
 
 async def handle_send_embed(time, channel_id, msg_id):
@@ -35,7 +35,7 @@ async def handle_send_embed(time, channel_id, msg_id):
         ]
 
         send = qqbot.MessageSendRequest(
-            embed=embed, msg_id="088de19cbeb883e7e97110a2e39c0138c80948e7c2e09206", content="<@!1234>hello world"
+            embed=embed, msg_id=msg_id, content="<@!1234>hello world"
         )
         # 通过api发送回复消息
         qqbot.logger.info("send text message : %s" % i)
@@ -46,6 +46,6 @@ if __name__ == "__main__":
     # async的异步接口的使用示例
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
     qqbot_handler = qqbot.Handler(
-        qqbot.HandlerType.DIRECT_MESSAGE_DELETE_EVENT_HANDLER, _message_handler
+        qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler
     )
     qqbot.async_listen_events(t_token, False, qqbot_handler)
