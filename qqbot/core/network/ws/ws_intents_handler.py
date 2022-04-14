@@ -70,8 +70,14 @@ def channel_event_handler(callback, intent):
 
 
 def message_event_handler(callback, intent):
-    DefaultHandler.message = callback
+    DefaultHandler.message_create = callback
     intent = intent | WsEvent.event_to_intent(WsEvent.EventMessageCreate)
+    return intent
+
+
+def delete_message_event_handler(callback, intent):
+    DefaultHandler.message_delete = callback
+    intent = intent | WsEvent.event_to_intent(WsEvent.EventMessageDelete)
     return intent
 
 
@@ -81,9 +87,21 @@ def at_message_event_handler(callback, intent):
     return intent
 
 
+def public_message_delete_event_handler(callback, intent):
+    DefaultHandler.public_message_delete = callback
+    intent = intent | WsEvent.event_to_intent(WsEvent.EventPublicMessageDelete)
+    return intent
+
+
 def direct_message_event_handler(callback, intent):
-    DefaultHandler.direct_message = callback
+    DefaultHandler.direct_message_create = callback
     intent = intent | WsEvent.event_to_intent(WsEvent.EventDirectMessageCreate)
+    return intent
+
+
+def delete_direct_message_event_handler(callback, intent):
+    DefaultHandler.direct_message_delete = callback
+    intent = intent | WsEvent.event_to_intent(WsEvent.EventDirectMessageDelete)
     return intent
 
 
@@ -102,10 +120,13 @@ class HandlerType(Enum):
     GUILD_MEMBER_EVENT_HANDLER = 2
     CHANNEL_EVENT_HANDLER = 3
     MESSAGE_EVENT_HANDLER = 4
-    AT_MESSAGE_EVENT_HANDLER = 5
-    DIRECT_MESSAGE_EVENT_HANDLER = 6
-    AUDIO_EVENT_HANDLER = 7
-    MESSAGE_REACTIONS_EVENT_HANDLER = 8
+    MESSAGE_DELETE_EVENT_HANDLER = 5
+    AT_MESSAGE_EVENT_HANDLER = 6
+    DIRECT_MESSAGE_EVENT_HANDLER = 7
+    DIRECT_MESSAGE_DELETE_EVENT_HANDLER = 8
+    AUDIO_EVENT_HANDLER = 9
+    MESSAGE_REACTIONS_EVENT_HANDLER = 10
+    PUBLIC_MESSAGE_DELETE_EVENT_HANDLER = 11
 
 
 intent_handler_dict = {
@@ -114,8 +135,11 @@ intent_handler_dict = {
     HandlerType.GUILD_MEMBER_EVENT_HANDLER.value: guild_member_event_handler,
     HandlerType.CHANNEL_EVENT_HANDLER.value: channel_event_handler,
     HandlerType.MESSAGE_EVENT_HANDLER.value: message_event_handler,
+    HandlerType.MESSAGE_DELETE_EVENT_HANDLER.value: delete_message_event_handler,
     HandlerType.AT_MESSAGE_EVENT_HANDLER.value: at_message_event_handler,
+    HandlerType.PUBLIC_MESSAGE_DELETE_EVENT_HANDLER.value: public_message_delete_event_handler,
     HandlerType.DIRECT_MESSAGE_EVENT_HANDLER.value: direct_message_event_handler,
+    HandlerType.DIRECT_MESSAGE_DELETE_EVENT_HANDLER.value: delete_direct_message_event_handler,
     HandlerType.AUDIO_EVENT_HANDLER.value: audio_event_handler,
     HandlerType.MESSAGE_REACTIONS_EVENT_HANDLER.value: message_reactions_event_handler,
 }

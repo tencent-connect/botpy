@@ -9,7 +9,7 @@ from qqbot.model.audio import AudioAction
 from qqbot.model.channel import Channel
 from qqbot.model.guild import Guild
 from qqbot.model.guild_member import GuildMember
-from qqbot.model.message import Message
+from qqbot.model.message import Message, DeletedMessageInfo
 from qqbot.model.reaction import Reaction
 
 logger = logging.getLogger()
@@ -63,20 +63,44 @@ def _handle_event_at_message_create(message_event, message):
     callback(message_event, at_message)
 
 
+def _handle_event_public_message_delete(message_event, message):
+    callback = DefaultHandler.public_message_delete
+    if callback is None:
+        return
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
+    callback(message_event, message_deletion_info)
+
+
 def _handle_event_message_create(message_event, message):
-    callback = DefaultHandler.message
+    callback = DefaultHandler.message_create
     if callback is None:
         return
     msg: Message = json.loads(_parse_data(message), object_hook=Message)
     callback(message_event, msg)
+
+
+def _handle_event_message_delete(message_event, message):
+    callback = DefaultHandler.message_delete
+    if callback is None:
+        return
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
+    callback(message_event, message_deletion_info)
 
 
 def _handle_event_direct_message_create(message_event, message):
-    callback = DefaultHandler.direct_message
+    callback = DefaultHandler.direct_message_create
     if callback is None:
         return
     msg: Message = json.loads(_parse_data(message), object_hook=Message)
     callback(message_event, msg)
+
+
+def _handle_event_direct_message_delete(message_event, message):
+    callback = DefaultHandler.direct_message_delete
+    if callback is None:
+        return
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
+    callback(message_event, message_deletion_info)
 
 
 def _handle_event_audio(message_event, message):
@@ -108,8 +132,11 @@ event_handler_dict = {
     WsEvent.EventGuildMemberUpdate: _handle_event_guild_member,
     WsEvent.EventGuildMemberRemove: _handle_event_guild_member,
     WsEvent.EventAtMessageCreate: _handle_event_at_message_create,
+    WsEvent.EventPublicMessageDelete: _handle_event_public_message_delete,
     WsEvent.EventMessageCreate: _handle_event_message_create,
+    WsEvent.EventMessageDelete: _handle_event_message_delete,
     WsEvent.EventDirectMessageCreate: _handle_event_direct_message_create,
+    WsEvent.EventDirectMessageDelete: _handle_event_direct_message_delete,
     WsEvent.EventAudioStart: _handle_event_audio,
     WsEvent.EventAudioFinish: _handle_event_audio,
     WsEvent.EventAudioOnMic: _handle_event_audio,

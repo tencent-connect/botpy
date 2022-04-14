@@ -18,6 +18,8 @@ class Intents(Enum):
     # - GUILD_MEMBER_REMOVE // 当成员被移除时
 
     INTENT_GUILD_MESSAGES = 1 << 9
+    # - MESSAGE_CREATE         // 发送消息事件，代表频道内的全部消息，而不只是 at 机器人的消息。内容与 AT_MESSAGE_CREATE 相同
+    # - MESSAGE_DELETE         // 删除（撤回）消息事件
 
     INTENT_MESSAGE_REACTION = 1 << 10
     # - MESSAGE_REACTION_ADD    // 为消息添加表情表态
@@ -25,6 +27,7 @@ class Intents(Enum):
 
     INTENT_DIRECT_MESSAGE = 1 << 12
     # - DIRECT_MESSAGE_CREATE // 当收到用户发给机器人的私信消息时
+    # - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
 
     INTENT_AUDIO = 1 << 29
     # - AUDIO_START           // 音频开始播放时
@@ -32,5 +35,6 @@ class Intents(Enum):
     # - AUDIO_ON_MIC          // 上麦时
     # - AUDIO_OFF_MIC         // 下麦时
 
-    INTENT_GUILD_AT_MESSAGE = 1 << 30
+    INTENT_PUBLIC_GUILD_MESSAGES = 1 << 30
     # - AT_MESSAGE_CREATE // 当收到 @ 机器人的消息时
+    # - PUBLIC_MESSAGE_DELETE   // 当频道的消息被删除时

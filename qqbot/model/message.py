@@ -246,3 +246,37 @@ class CreateDirectMessageRequest:
         """
         self.recipient_id = user_id
         self.source_guild_id = source_guild_id
+
+
+class DeletedMessageOriginalAuthor:
+    def __init__(self, data=None):
+        self.id = ""
+        username = ""
+        bot = False
+        if data:
+            self.__dict__ = data
+
+
+class DeletedMessage:
+    def __init__(self, data=None):
+        self.guild_id = ""
+        self.channel_id = ""
+        self.id = ""
+        self.author = DeletedMessageOriginalAuthor()
+        if data:
+            self.__dict__ = data
+
+
+class DeletionOperator:
+    def __init__(self, data=None):
+        self.id = ""
+        if data:
+            self.__dict__ = data
+
+
+class DeletedMessageInfo:
+    def __init__(self, data=None):
+        self.message = DeletedMessage()
+        self.op_user = DeletionOperator()
+        if data:
+            self.__dict__ = data
