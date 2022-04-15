@@ -18,7 +18,7 @@ async def _message_handler(event, interaction: qqbot.Interaction):
     """
     # 发送回复消息通知
     msg_api = qqbot.AsyncMessageAPI(t_token, False)
-    send = qqbot.MessageSendRequest(content="收到了 markdown 交互事件，data_type: %d" % interaction.data.type,)
+    send = qqbot.MessageSendRequest(content="收到了 markdown 交互事件，data_type: %d" % interaction.data.type)
     await msg_api.post_message(interaction.channel_id, send)
 
     # 异步更新交互数据

@@ -32,9 +32,6 @@ class Intents(Enum):
     INTERACTION = 1 << 26
     # - INTERACTION_CREATE // 互动事件创建时
 
-    INTERACTION = 1 << 26
-    # - INTERACTION_CREATE // 互动事件创建时
-
     INTENT_AUDIO = 1 << 29
     # - AUDIO_START           // 音频开始播放时
     # - AUDIO_FINISH          // 音频播放结束时

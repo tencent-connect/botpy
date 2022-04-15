@@ -7,7 +7,6 @@ import unittest
 import qqbot
 from qqbot.core.exception.error import (
     AuthenticationFailedError,
-    SequenceNumberError,
     ServerError,
 )
 from qqbot.core.util import logging
@@ -20,7 +19,6 @@ from qqbot.model.api_permission import (
     PermissionDemandToCreate,
 )
 from qqbot.model.emoji import EmojiType
-from qqbot.model.interaction import InteractionData
 from tests import test_config
 
 logger = logging.getLogger()
