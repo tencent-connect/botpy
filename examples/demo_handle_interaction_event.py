@@ -9,7 +9,7 @@ from qqbot.core.util.yaml_util import YamlUtil
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
-async def _message_handler(event, interaction: qqbot.Interaction):
+async def _interaction_handler(event, interaction: qqbot.Interaction):
     """
     定义事件回调的处理
 
@@ -31,6 +31,6 @@ if __name__ == "__main__":
     # async的异步接口的使用示例
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
     qqbot_handler = qqbot.Handler(
-        qqbot.HandlerType.INTERACTION_CREATE_HANDLER, _message_handler
+        qqbot.HandlerType.INTERACTION_CREATE_HANDLER, _interaction_handler
     )
     qqbot.async_listen_events(t_token, False, qqbot_handler)
