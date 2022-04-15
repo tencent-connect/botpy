@@ -892,6 +892,7 @@ class PinsAPI(APIBase):
         """
         用于获取子频道内的所有精华消息
         成功后返回 PinsMessage 对象
+
         :param channel_id: 子频道ID
         """
         url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
