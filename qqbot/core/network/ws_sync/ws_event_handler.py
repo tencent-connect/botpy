@@ -129,6 +129,7 @@ def _handle_event_interaction_create(message_event, message):
     interaction: Interaction = json.loads(_parse_data(message), object_hook=Interaction)
     callback(message_event, interaction)
 
+
 event_handler_dict = {
     WsEvent.EventGuildCreate: _handle_event_guild,
     WsEvent.EventGuildUpdate: _handle_event_guild,

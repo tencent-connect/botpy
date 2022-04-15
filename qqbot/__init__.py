@@ -18,6 +18,7 @@ from .api import (
     ScheduleAPI,
     ReactionAPI,
     PinsAPI,
+    InteractionAPI
 )
 
 from .async_api import (
