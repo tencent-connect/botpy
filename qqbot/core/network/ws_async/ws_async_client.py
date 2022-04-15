@@ -62,7 +62,7 @@ class Client:
             logger.info("[ws连接]程序启动成功！")
             return
         if "t" in message_event.keys():
-            logger.info("[ws连接]接收消息: %s" % message)
+            logger.debug("[ws连接]接收消息: %s" % message)
             await parse_and_handle(message_event, message)
 
     async def on_connected(self, ws):
