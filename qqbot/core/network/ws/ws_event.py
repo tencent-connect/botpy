@@ -16,8 +16,13 @@ class WsEvent:
     EventGuildMemberRemove = "GUILD_MEMBER_REMOVE"
 
     EventMessageCreate = "MESSAGE_CREATE"
+    EventMessageDelete = "MESSAGE_DELETE"
+
     EventAtMessageCreate = "AT_MESSAGE_CREATE"
+    EventPublicMessageDelete = "PUBLIC_MESSAGE_DELETE"
+
     EventDirectMessageCreate = "DIRECT_MESSAGE_CREATE"
+    EventDirectMessageDelete = "DIRECT_MESSAGE_DELETE"
 
     EventAudioStart = "AUDIO_START"
     EventAudioFinish = "AUDIO_FINISH"
@@ -39,8 +44,11 @@ class WsEvent:
         EventGuildMemberUpdate: Intents.INTENT_GUILD_MEMBERS,
         EventGuildMemberRemove: Intents.INTENT_GUILD_MEMBERS,
         EventMessageCreate: Intents.INTENT_GUILD_MESSAGES,
-        EventAtMessageCreate: Intents.INTENT_GUILD_AT_MESSAGE,
+        EventMessageDelete: Intents.INTENT_GUILD_MESSAGES,
+        EventAtMessageCreate: Intents.INTENT_PUBLIC_GUILD_MESSAGES,
+        EventPublicMessageDelete: Intents.INTENT_PUBLIC_GUILD_MESSAGES,
         EventDirectMessageCreate: Intents.INTENT_DIRECT_MESSAGE,
+        EventDirectMessageDelete: Intents.INTENT_DIRECT_MESSAGE,
         EventAudioStart: Intents.INTENT_AUDIO,
         EventAudioFinish: Intents.INTENT_AUDIO,
         EventAudioOnMic: Intents.INTENT_AUDIO,
