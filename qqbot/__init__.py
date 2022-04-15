@@ -18,6 +18,7 @@ from .api import (
     ScheduleAPI,
     ReactionAPI,
     PinsAPI,
+    InteractionAPI
 )
 
 from .async_api import (
@@ -38,6 +39,7 @@ from .async_api import (
     AsyncScheduleAPI,
     AsyncReactionAPI,
     AsyncPinsAPI,
+    AsyncInteractionAPI
 )
 from .core.network.ws.ws_intents_handler import HandlerType, Handler
 from .core.util import logging

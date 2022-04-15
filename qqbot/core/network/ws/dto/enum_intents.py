@@ -29,6 +29,9 @@ class Intents(Enum):
     # - DIRECT_MESSAGE_CREATE // 当收到用户发给机器人的私信消息时
     # - DIRECT_MESSAGE_DELETE   // 删除（撤回）消息事件
 
+    INTERACTION = 1 << 26
+    # - INTERACTION_CREATE // 互动事件创建时
+
     INTENT_AUDIO = 1 << 29
     # - AUDIO_START           // 音频开始播放时
     # - AUDIO_FINISH          // 音频播放结束时

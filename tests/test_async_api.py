@@ -7,7 +7,6 @@ import unittest
 import qqbot
 from qqbot.core.exception.error import (
     AuthenticationFailedError,
-    SequenceNumberError,
     ServerError,
 )
 from qqbot.core.util import logging

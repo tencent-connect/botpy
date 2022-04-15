@@ -29,6 +29,8 @@ class WsEvent:
     EventAudioOnMic = "AUDIO_ON_MIC"
     EventAudioOffMic = "AUDIO_OFF_MIC"
 
+    EventInteractionCreate = "INTERACTION_CREATE"
+
     EventMessageReactionAdd = "MESSAGE_REACTION_ADD"
     EventMessageReactionRemove = "MESSAGE_REACTION_REMOVE"
 
@@ -53,6 +55,7 @@ class WsEvent:
         EventAudioFinish: Intents.INTENT_AUDIO,
         EventAudioOnMic: Intents.INTENT_AUDIO,
         EventAudioOffMic: Intents.INTENT_AUDIO,
+        EventInteractionCreate: Intents.INTERACTION,
         EventMessageReactionAdd: Intents.INTENT_MESSAGE_REACTION,
         EventMessageReactionRemove: Intents.INTENT_MESSAGE_REACTION,
     }

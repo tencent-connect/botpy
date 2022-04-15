@@ -55,6 +55,8 @@ class APIConstant:
     changePinsURI = "/channels/{channel_id}/pins/{message_id}"
     getPinsURI = "/channels/{channel_id}/pins"
 
+    interactionURI = "/interactions/{interaction_id}"
+
 
 def get_url(url_format, is_sandbox):
     d = BaseConstant.domain
