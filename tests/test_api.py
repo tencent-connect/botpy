@@ -132,7 +132,7 @@ class ChannelPermissionsTestCase(unittest.TestCase):
         channel_permissions = self.api.get_channel_permissions(
             CHANNEL_ID, GUILD_OWNER_ID
         )
-        self.assertEqual("6", channel_permissions.permissions)
+        self.assertNotEqual("0", channel_permissions.permissions)
 
     def test_channel_permissions_update(self):
         request = qqbot.UpdatePermission(add="4")
