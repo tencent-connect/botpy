@@ -3,7 +3,7 @@ class Interaction:
         self.id: str = ""
         self.application_id: int = 0
         self.type: int = 0
-        self.data: object = None
+        self.data: InteractionData = None
         self.guild_id: int = 0
         self.channel_id: int = 0
         self.version: int = 1
@@ -12,9 +12,14 @@ class Interaction:
 
 
 class InteractionData:
-    def __init__(self, data=None):
-        self.type: int = 0
-        self.resolved: object = None
+    def __init__(
+            self,
+            type: int = 0,
+            resolved: object = None,
+            data=None
+    ):
+        self.type = type
+        self.resolved = resolved
         if data:
             self.__dict__ = data
 

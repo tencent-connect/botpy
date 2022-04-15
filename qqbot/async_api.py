@@ -915,6 +915,7 @@ class AsyncPinsAPI(AsyncAPIBase):
         """
         用于获取子频道内的所有精华消息
         成功后返回 PinsMessage 对象
+
         :param channel_id: 子频道ID
         """
         url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
@@ -925,11 +926,14 @@ class AsyncPinsAPI(AsyncAPIBase):
 class AsyncInteractionAPI(AsyncAPIBase):
     """互动回调API"""
 
-    async def put_interaction(self, interaction_id: str, data: InteractionData):
+    async def put_interaction(self, interaction_id: str, interaction_data: InteractionData):
         """
         对 interaction_id 进行互动回调数据异步回复更新
+
+        :param interaction_id: 互动事件的ID
+        :param interaction_data: 互动事件数据体
         """
         url = get_url(APIConstant.interactionURI, self.is_sandbox).format(interaction_id=interaction_id)
-        request_json = JsonUtil.obj2json_serialize(data)
-        response = await self.http_async.put(url, request=request_json)
+        request_json = JsonUtil.obj2json_serialize(interaction_data)
+        response = await self.http_async.put(url, request_json)
         return response == ""
