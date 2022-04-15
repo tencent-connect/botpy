@@ -3,7 +3,7 @@
 import os.path
 
 import qqbot
-from qqbot import InteractionData
+from qqbot import InteractionData, InteractionDataType
 from qqbot.core.util.yaml_util import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
@@ -18,15 +18,12 @@ async def _message_handler(event, interaction: qqbot.Interaction):
     """
     # 发送回复消息通知
     msg_api = qqbot.AsyncMessageAPI(t_token, False)
-    send = qqbot.MessageSendRequest(
-        content="收到了 markdown 交互事件，data_type: %d" % interaction.data.type,
-        msg_id="088de19cbeb883e7e97110a2e39c01388107489d8bd99206"
-    )
+    send = qqbot.MessageSendRequest(content="收到了 markdown 交互事件，data_type: %d" % interaction.data.type,)
     await msg_api.post_message(interaction.channel_id, send)
 
     # 异步更新交互数据
     interaction_api = qqbot.AsyncInteractionAPI(t_token, False)
-    data = InteractionData(type=2, resolved="Test")
+    data = InteractionData(type=InteractionDataType.INLINE_KEYBOARD_BUTTON_CLICK, resolved="Test")
     await interaction_api.put_interaction(interaction.id, data)
 
 
