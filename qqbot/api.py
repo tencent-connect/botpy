@@ -46,6 +46,7 @@ from qqbot.model.message import (
     CreateDirectMessageRequest,
     DirectMessageGuild,
     MessagesPager,
+    MessageGet,
 )
 from qqbot.model.mute import MuteOption
 from qqbot.model.pins_message import PinsMessage
@@ -421,7 +422,7 @@ class ChannelPermissionsAPI(APIBase):
 class MessageAPI(APIBase):
     """消息"""
 
-    def get_message(self, channel_id: str, message_id: str) -> Message:
+    def get_message(self, channel_id: str, message_id: str) -> MessageGet:
         """
         获取指定消息
 
@@ -433,7 +434,7 @@ class MessageAPI(APIBase):
             channel_id=channel_id, message_id=message_id
         )
         response = self.http.get(url)
-        return json.loads(response.content, object_hook=Message)
+        return json.loads(response.content, object_hook=MessageGet)
 
     def get_messages(self, channel_id: str, pager: MessagesPager) -> List[Message]:
         """
@@ -694,7 +695,9 @@ class AnnouncesAPI(APIBase):
         :param guild_id: 频道ID
         :param request: RecommendChannelRequest 对象
         """
-        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
+        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(
+            guild_id=guild_id
+        )
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=Announce)
@@ -825,7 +828,9 @@ class ScheduleAPI(APIBase):
 class ReactionAPI(APIBase):
     """表情表态接口"""
 
-    def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
+    def put_reaction(
+        self, channel_id: str, message_id: str, emo_type: int, emo_id: str
+    ):
         """
         对一条消息进行表情表态
 
@@ -840,7 +845,9 @@ class ReactionAPI(APIBase):
         response = self.http.put(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
-    def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
+    def delete_reaction(
+        self, channel_id: str, message_id: str, emo_type: int, emo_id: str
+    ):
         """
         删除自己对消息的进行表情表态
 
@@ -895,7 +902,9 @@ class PinsAPI(APIBase):
 
         :param channel_id: 子频道ID
         """
-        url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
+        url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(
+            channel_id=channel_id
+        )
         response = self.http.get(url)
         return json.loads(response.content, object_hook=PinsMessage)
 
@@ -910,7 +919,9 @@ class InteractionAPI(APIBase):
         :param interaction_id: 互动事件的ID
         :param interaction_data: 互动事件数据体
         """
-        url = get_url(APIConstant.interactionURI, self.is_sandbox).format(interaction_id=interaction_id)
+        url = get_url(APIConstant.interactionURI, self.is_sandbox).format(
+            interaction_id=interaction_id
+        )
         request_json = JsonUtil.obj2json_serialize(interaction_data)
         response = self.http.put(url, request_json)
         return response.status_code == HttpStatus.NO_CONTENT

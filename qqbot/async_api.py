@@ -15,7 +15,7 @@ from qqbot.model.announce import (
     CreateAnnounceRequest,
     Announce,
     CreateChannelAnnounceRequest,
-    RecommendChannelRequest
+    RecommendChannelRequest,
 )
 from qqbot.model.api_permission import (
     APIPermission,
@@ -51,6 +51,7 @@ from qqbot.model.message import (
     CreateDirectMessageRequest,
     DirectMessageGuild,
     MessagesPager,
+    MessageGet,
 )
 from qqbot.model.mute import MuteOption
 from qqbot.model.pins_message import PinsMessage
@@ -440,7 +441,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
 class AsyncMessageAPI(AsyncAPIBase):
     """消息"""
 
-    async def get_message(self, channel_id: str, message_id: str) -> Message:
+    async def get_message(self, channel_id: str, message_id: str) -> MessageGet:
         """
         获取指定消息
 
@@ -452,7 +453,7 @@ class AsyncMessageAPI(AsyncAPIBase):
             channel_id=channel_id, message_id=message_id
         )
         response = await self.http_async.get(url)
-        return json.loads(response, object_hook=Message)
+        return json.loads(response, object_hook=MessageGet)
 
     async def get_messages(
         self, channel_id: str, pager: MessagesPager
@@ -501,7 +502,9 @@ class AsyncMessageAPI(AsyncAPIBase):
         response = await self.http_async.post(url, request_json)
         return json.loads(response, object_hook=Message)
 
-    async def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False):
+    async def recall_message(
+        self, channel_id: str, message_id: str, hide_tip: bool = False
+    ):
         """
         撤回消息
 
@@ -714,7 +717,9 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         :param guild_id: 频道ID
         :param request: RecommendChannelRequest 对象
         """
-        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
+        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(
+            guild_id=guild_id
+        )
         request_json = JsonUtil.obj2json_serialize(request)
         response = await self.http_async.post(url, request_json)
         return json.loads(response, object_hook=Announce)
@@ -845,7 +850,9 @@ class AsyncScheduleAPI(AsyncAPIBase):
 class AsyncReactionAPI(AsyncAPIBase):
     """异步表情表态接口"""
 
-    async def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
+    async def put_reaction(
+        self, channel_id: str, message_id: str, emo_type: int, emo_id: str
+    ):
         """
         对一条消息进行表情表态
 
@@ -860,7 +867,9 @@ class AsyncReactionAPI(AsyncAPIBase):
         response = await self.http_async.put(url)
         return response == ""
 
-    async def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
+    async def delete_reaction(
+        self, channel_id: str, message_id: str, emo_type: int, emo_id: str
+    ):
         """
         删除自己对消息的进行表情表态
 
@@ -918,7 +927,9 @@ class AsyncPinsAPI(AsyncAPIBase):
 
         :param channel_id: 子频道ID
         """
-        url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
+        url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(
+            channel_id=channel_id
+        )
         response = await self.http_async.get(url)
         return json.loads(response, object_hook=PinsMessage)
 
@@ -926,14 +937,18 @@ class AsyncPinsAPI(AsyncAPIBase):
 class AsyncInteractionAPI(AsyncAPIBase):
     """互动回调API"""
 
-    async def put_interaction(self, interaction_id: str, interaction_data: InteractionData):
+    async def put_interaction(
+        self, interaction_id: str, interaction_data: InteractionData
+    ):
         """
         对 interaction_id 进行互动回调数据异步回复更新
 
         :param interaction_id: 互动事件的ID
         :param interaction_data: 互动事件数据体
         """
-        url = get_url(APIConstant.interactionURI, self.is_sandbox).format(interaction_id=interaction_id)
+        url = get_url(APIConstant.interactionURI, self.is_sandbox).format(
+            interaction_id=interaction_id
+        )
         request_json = JsonUtil.obj2json_serialize(interaction_data)
         response = await self.http_async.put(url, request_json)
         return response == ""
