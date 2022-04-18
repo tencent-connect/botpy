@@ -4,6 +4,13 @@ from typing import List
 from qqbot.model.member import User, Member
 
 
+class MessageGet:
+    def __init__(self, data=None):
+        self.message: Message = Message()
+        if data:
+            self.__dict__ = data
+
+
 class Message:
     def __init__(self, data=None):
         self.id: str = ""
@@ -41,22 +48,14 @@ class MessagesPager:
 
 
 class MessageAttachment:
-    def __init__(
-            self,
-            url: str = "",
-            data=None
-    ):
+    def __init__(self, url: str = "", data=None):
         self.url = url
         if data:
             self.__dict__ = data
 
 
 class MessageEmbedThumbnail:
-    def __init__(
-            self,
-            url: str = "",
-            data=None
-    ):
+    def __init__(self, url: str = "", data=None):
         # 图片地址
         self.url = url
         if data is not None:
@@ -64,12 +63,7 @@ class MessageEmbedThumbnail:
 
 
 class MessageEmbedField:
-    def __init__(
-            self,
-            data=None,
-            name: str = None,
-            value: str = None
-    ):
+    def __init__(self, data=None, name: str = None, value: str = None):
         self.name = name
         self.value = value
         if data:
@@ -78,12 +72,12 @@ class MessageEmbedField:
 
 class MessageEmbed:
     def __init__(
-            self,
-            title: str = "",
-            prompt: str = "",
-            thumbnail: MessageEmbedThumbnail = MessageEmbedThumbnail(),
-            fields: List[MessageEmbedField] = [MessageEmbedField()],
-            data=None
+        self,
+        title: str = "",
+        prompt: str = "",
+        thumbnail: MessageEmbedThumbnail = MessageEmbedThumbnail(),
+        fields: List[MessageEmbedField] = [MessageEmbedField()],
+        data=None,
     ):
         # 标题
         self.title = title
@@ -98,12 +92,7 @@ class MessageEmbed:
 
 
 class MessageArkObjKv:
-    def __init__(
-            self,
-            data=None,
-            key: str = None,
-            value: str = None
-    ):
+    def __init__(self, data=None, key: str = None, value: str = None):
         self.key = key
         self.value = value
         if data:
@@ -111,11 +100,7 @@ class MessageArkObjKv:
 
 
 class MessageArkObj:
-    def __init__(
-            self,
-            data=None,
-            obj_kv: List[MessageArkObjKv] = None
-    ):
+    def __init__(self, data=None, obj_kv: List[MessageArkObjKv] = None):
         self.obj_kv = obj_kv
         if data:
             self.__dict__ = data
@@ -123,11 +108,11 @@ class MessageArkObj:
 
 class MessageArkKv:
     def __init__(
-            self,
-            data=None,
-            key: str = None,
-            value: str = None,
-            obj: List[MessageArkObj] = None,
+        self,
+        data=None,
+        key: str = None,
+        value: str = None,
+        obj: List[MessageArkObj] = None,
     ):
         self.key = key
         self.value = value
@@ -138,10 +123,10 @@ class MessageArkKv:
 
 class MessageArk:
     def __init__(
-            self,
-            template_id: int = 0,
-            kv: List[MessageArkKv] = [MessageArkKv()],
-            data=None,
+        self,
+        template_id: int = 0,
+        kv: List[MessageArkKv] = [MessageArkKv()],
+        data=None,
     ):
         self.template_id = template_id
         self.kv = kv
@@ -150,12 +135,7 @@ class MessageArk:
 
 
 class MessageMarkdownParams:
-    def __init__(
-            self,
-            data=None,
-            key="",
-            values: List[str] = None
-    ):
+    def __init__(self, data=None, key="", values: List[str] = None):
         self.key = key
         self.values = values
         if data:
@@ -163,13 +143,7 @@ class MessageMarkdownParams:
 
 
 class MessageMarkdown:
-    def __init__(
-            self,
-            data=None,
-            template_id: int = 0,
-            params=None,
-            content: str = ""
-    ):
+    def __init__(self, data=None, template_id: int = 0, params=None, content: str = ""):
         self.template_id = template_id
         self.params = params
         self.content = content
@@ -179,10 +153,7 @@ class MessageMarkdown:
 
 class MessageReference:
     def __init__(
-            self,
-            data=None,
-            message_id: str = "",
-            ignore_get_message_error: bool = False
+        self, data=None, message_id: str = "", ignore_get_message_error: bool = False
     ):
         self.message_id = message_id
         self.ignore_get_message_error = ignore_get_message_error
@@ -192,14 +163,14 @@ class MessageReference:
 
 class MessageSendRequest:
     def __init__(
-            self,
-            content: str = "",
-            msg_id: str = None,
-            embed: MessageEmbed = None,
-            ark: MessageArk = None,
-            image: str = "",
-            message_reference: MessageReference = None,
-            markdown: MessageMarkdown = None
+        self,
+        content: str = "",
+        msg_id: str = None,
+        embed: MessageEmbed = None,
+        ark: MessageArk = None,
+        image: str = "",
+        message_reference: MessageReference = None,
+        markdown: MessageMarkdown = None,
     ):
         """
         机器人发送消息时所传的数据对象
@@ -223,11 +194,7 @@ class MessageSendRequest:
 
 class DirectMessageGuild:
     def __init__(
-            self,
-            data=None,
-            guild_id: str = "",
-            channel_id: str = "",
-            creat_time: str = ""
+        self, data=None, guild_id: str = "", channel_id: str = "", creat_time: str = ""
     ):
         self.guild_id: guild_id
         self.channel_id: channel_id
@@ -251,8 +218,8 @@ class CreateDirectMessageRequest:
 class DeletedMessageOriginalAuthor:
     def __init__(self, data=None):
         self.id = ""
-        username = ""
-        bot = False
+        self.username = ""
+        self.bot = False
         if data:
             self.__dict__ = data
 
