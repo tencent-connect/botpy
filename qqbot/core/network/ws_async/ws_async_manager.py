@@ -46,6 +46,10 @@ def _cal_interval(max_concurrency):
 class SessionManager:
     session_pool: SessionPool
 
+    def __init__(self, ret_coro=False):
+        # 是否返回协程对象
+        self.ret_coro = ret_coro
+
     def start(self, websocket_ap, token=Token, intent=Intents):
         logger.info("[连接管理]程序启动...")
         # 每个机器人创建的连接数不能超过remaining剩余连接数
@@ -60,12 +64,12 @@ class SessionManager:
             "session_interval: %s, shards: %s" % (session_interval, shards_count)
         )
         # 根据限制建立分片的并发链接数
-        self.init_session_pool(
+        return self.init_session_pool(
             intent, shards_count, token, websocket_ap, session_interval
         )
 
     def init_session_pool(
-        self, intent, shards_count, token, websocket_ap, session_interval
+            self, intent, shards_count, token, websocket_ap, session_interval
     ):
 
         # 实例一个session_pool
@@ -84,15 +88,20 @@ class SessionManager:
                 shards=ShardConfig(i, shards_count),
             )
             self.session_pool.add(session)
-        self.start_session(session_interval)
+        return self.start_session(session_interval)
 
     def start_session(self, session_interval=5):
         pool = self.session_pool
         loop = pool.loop
         loop.set_exception_handler(_loop_exception_handler)
         try:
-            loop.run_until_complete(pool.run(session_interval))
-            loop.run_forever()
+            if self.ret_coro:
+                # 返回协程对象，交由开发者自行调控
+                return pool.run(session_interval)
+            else:
+                # 由sdk进行协程管理
+                loop.run_until_complete(pool.run(session_interval))
+                loop.run_forever()
         except KeyboardInterrupt:
             logger.info("[连接管理]服务强行停止!")
             # cancel all tasks lingering
