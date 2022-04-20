@@ -65,13 +65,14 @@ from qqbot.model.token import Token
 from qqbot.model.user import ReqOption
 
 
-def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
+def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler, ret_coro=False):
     """
     异步注册并监听频道相关事件
 
     :param t_token: Token对象
     :param handlers: 包含事件类型和事件回调的Handler对象，支持多个对象
     :param is_sandbox:是否沙盒环境，默认为False
+    :param ret_coro: 是否返回协程对象
     """
     # 通过api获取websocket链接
     ws_api = WebsocketAPI(t_token, is_sandbox)
@@ -79,8 +80,8 @@ def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
     # 新建和注册监听事件
     t_intent = register_handlers(handlers)
     # 实例一个session_manager
-    manager = SessionManager()
-    manager.start(ws_ap, t_token.bot_token(), t_intent)
+    manager = SessionManager(ret_coro=ret_coro)
+    return manager.start(ws_ap, t_token.bot_token(), t_intent)
 
 
 class AsyncAPIBase:
