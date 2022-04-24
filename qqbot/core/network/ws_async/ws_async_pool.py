@@ -25,7 +25,6 @@ class SessionPool:
         loop = self.loop
 
         # 根据并发数同时建立多个future
-        # 后台有频率限制，根据间隔时间发起链接请求
         index = 0
         session_list = self.session_list
         # 需要执行的链接列表，通过time_interval控制启动时间
@@ -50,7 +49,9 @@ class SessionPool:
         await asyncio.wait(tasks)
 
     async def _runner(self, session, time_interval):
-        await self.session_manager.new_connect(session, time_interval)
+        await self.session_manager.new_connect(session)
+        # 后台有频率限制，根据间隔时间发起链接请求
+        await asyncio.sleep(time_interval)
 
     def add(self, session):
         self.session_list.append(session)

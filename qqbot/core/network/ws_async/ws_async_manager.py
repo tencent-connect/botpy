@@ -69,7 +69,7 @@ class SessionManager:
         )
 
     def init_session_pool(
-            self, intent, shards_count, token, websocket_ap, session_interval
+        self, intent, shards_count, token, websocket_ap, session_interval
     ):
 
         # 实例一个session_pool
@@ -106,7 +106,7 @@ class SessionManager:
             logger.info("[连接管理]服务强行停止!")
             # cancel all tasks lingering
 
-    async def new_connect(self, session, time_interval):
+    async def new_connect(self, session):
         """
         newConnect 启动一个新的连接，如果连接在监听过程中报错了，或者被远端关闭了链接，需要识别关闭的原因，能否继续 resume
         如果能够 resume，则往 sessionChan 中放入带有 sessionID 的 session
@@ -116,7 +116,6 @@ class SessionManager:
         param session: session对象
         """
         logger.info("[连接管理]新会话启动中...")
-        await asyncio.sleep(time_interval)
 
         client = Client(session, self, _on_connected)
         try:
