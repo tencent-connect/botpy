@@ -56,21 +56,13 @@ class SessionManager:
         if _check_session_limit(websocket_ap):
             raise Exception("session limit exceeded")
         # 根据session限制建立链接
-        session_interval = _cal_interval(
-            websocket_ap["session_start_limit"]["max_concurrency"]
-        )
+        session_interval = _cal_interval(websocket_ap["session_start_limit"]["max_concurrency"])
         shards_count = websocket_ap["shards"]
-        logger.debug(
-            "session_interval: %s, shards: %s" % (session_interval, shards_count)
-        )
+        logger.debug("session_interval: %s, shards: %s" % (session_interval, shards_count))
         # 根据限制建立分片的并发链接数
-        return self.init_session_pool(
-            intent, shards_count, token, websocket_ap, session_interval
-        )
+        return self.init_session_pool(intent, shards_count, token, websocket_ap, session_interval)
 
-    def init_session_pool(
-            self, intent, shards_count, token, websocket_ap, session_interval
-    ):
+    def init_session_pool(self, intent, shards_count, token, websocket_ap, session_interval):
 
         # 实例一个session_pool
         self.session_pool = SessionPool(
@@ -106,7 +98,7 @@ class SessionManager:
             logger.info("[连接管理]服务强行停止!")
             # cancel all tasks lingering
 
-    async def new_connect(self, session, time_interval):
+    async def new_connect(self, session):
         """
         newConnect 启动一个新的连接，如果连接在监听过程中报错了，或者被远端关闭了链接，需要识别关闭的原因，能否继续 resume
         如果能够 resume，则往 sessionChan 中放入带有 sessionID 的 session
@@ -116,7 +108,6 @@ class SessionManager:
         param session: session对象
         """
         logger.info("[连接管理]新会话启动中...")
-        await asyncio.sleep(time_interval)
 
         client = Client(session, self, _on_connected)
         try:

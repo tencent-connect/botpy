@@ -52,21 +52,13 @@ class SessionManager:
         if _check_session_limit(websocket_ap):
             raise Exception("session limit exceeded")
         # 根据session限制建立链接
-        session_interval = _cal_interval(
-            websocket_ap["session_start_limit"]["max_concurrency"]
-        )
+        session_interval = _cal_interval(websocket_ap["session_start_limit"]["max_concurrency"])
         shards_count = websocket_ap["shards"]
-        logger.debug(
-            "session_interval: %s" % session_interval, "shards: %s" % shards_count
-        )
+        logger.debug("session_interval: %s" % session_interval, "shards: %s" % shards_count)
         # 根据限制建立分片的并发链接数
-        self.init_session_pool(
-            intent, shards_count, token, websocket_ap, session_interval
-        )
+        self.init_session_pool(intent, shards_count, token, websocket_ap, session_interval)
 
-    def init_session_pool(
-        self, intent, shards_count, token, websocket_ap, session_interval
-    ):
+    def init_session_pool(self, intent, shards_count, token, websocket_ap, session_interval):
 
         # 实例一个session_pool
         self.session_pool = SessionPool(
@@ -89,9 +81,7 @@ class SessionManager:
 
     def start_session(self, session_interval=5):
         self.session_pool.loop.set_exception_handler(_loop_exception_handler)
-        self.session_pool.loop.run_until_complete(
-            self.session_pool.run(session_interval)
-        )
+        self.session_pool.loop.run_until_complete(self.session_pool.run(session_interval))
 
     def new_connect(self, session):
         """

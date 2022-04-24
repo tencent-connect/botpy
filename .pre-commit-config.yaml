@@ -3,6 +3,7 @@ repos:
     rev: 21.12b0
     hooks:
       - id: black
+        args: [-l 120]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v1.2.3
     hooks:
