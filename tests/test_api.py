@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+from typing import List
 
 import qqbot
 from qqbot.core.exception.error import (
@@ -220,6 +221,11 @@ class MuteTestCase(unittest.TestCase):
         option = qqbot.MuteOption(mute_seconds="120")
         result = self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option)
         self.assertEqual(True, result)
+
+    def test_mute_multi_member(self):
+        option = qqbot.MultiMuteOption(mute_seconds="120", user_ids=[GUILD_TEST_MEMBER_ID])
+        result: List[str] = self.api.mute_multi_member(GUILD_ID, option)
+        self.assertEqual(1, len(result))
 
 
 class AnnounceTestCase(unittest.TestCase):

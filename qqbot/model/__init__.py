@@ -30,7 +30,7 @@ from .message import (
     MessageSendRequest,
     DeletedMessageInfo,
 )
-from .mute import MuteOption
+from .mute import MuteOption, MultiMuteOption
 from .schedule import ScheduleToCreate, ScheduleToPatch
 from .token import Token
 from .user import ReqOption
