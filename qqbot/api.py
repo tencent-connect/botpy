@@ -48,7 +48,11 @@ from qqbot.model.message import (
     MessagesPager,
     MessageGet,
 )
-from qqbot.model.mute import MuteOption
+from qqbot.model.mute import (
+    MuteOption,
+    MultiMuteOption,
+    UserIds
+)
 from qqbot.model.pins_message import PinsMessage
 from qqbot.model.schedule import (
     Schedule,
@@ -621,6 +625,19 @@ class MuteAPI(APIBase):
         request_json = JsonUtil.obj2json_serialize(options)
         response = self.http.patch(url, request=request_json)
         return response.status_code == HttpStatus.NO_CONTENT
+
+    def mute_multi_member(self, guild_id: str, options: MultiMuteOption):
+        """
+        禁言指定用户
+
+        :param guild_id: 频道ID
+        :param options: MultiMuteOption对象
+        """
+        url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(guild_id=guild_id)
+        request_json = JsonUtil.obj2json_serialize(options)
+        response = self.http.patch(url, request=request_json)
+        user_ids = json.loads(response.content, object_hook=UserIds)
+        return user_ids.user_ids
 
 
 class AnnouncesAPI(APIBase):
