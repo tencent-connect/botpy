@@ -48,7 +48,11 @@ from qqbot.model.message import (
     MessagesPager,
     MessageGet,
 )
-from qqbot.model.mute import MuteOption, MultiMuteOption, UserIds
+from qqbot.model.mute import (
+    MuteOption,
+    MultiMuteOption,
+    UserIds
+)
 from qqbot.model.pins_message import PinsMessage
 from qqbot.model.schedule import (
     Schedule,
