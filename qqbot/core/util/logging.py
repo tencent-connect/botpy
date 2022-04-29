@@ -14,6 +14,8 @@ LOG_COLORS_CONFIG = {
     "ERROR": "red",
     "CRITICAL": "red",
 }
+#解决Windows系统cmd运行日志输出不会显示颜色问题
+os.system('') 
 
 
 def _getLevel():
