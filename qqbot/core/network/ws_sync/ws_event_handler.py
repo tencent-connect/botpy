@@ -12,122 +12,121 @@ from qqbot.model.guild_member import GuildMember
 from qqbot.model.message import Message, DeletedMessageInfo
 from qqbot.model.reaction import Reaction
 from qqbot.model.interaction import Interaction
+from qqbot.model.ws_context import WsContext
 
 logger = logging.getLogger()
 
 
-def parse_and_handle(message_event, message):
-    event_type = message_event["t"]
+def parse_and_handle(ws_event, data):
+    event_id = ws_event["id"]
+    event_type = ws_event["t"]
+    context = WsContext(event_type, event_id)
     call_handler = event_handler_dict.get(event_type)
 
     if call_handler is None:
         if DefaultHandler.plain is not None:
             plain = DefaultHandler.plain
-            plain(event_type, message)
+            plain(context, data)
         else:
             return
     else:
-        call_handler(event_type, message)
+        call_handler(context, data)
 
 
-def _handle_event_guild(message_event, message):
+def _handle_event_guild(context, data):
     callback = DefaultHandler.guild
     if callback is None:
         return
-    guild: Guild = json.loads(_parse_data(message), object_hook=Guild)
-    callback(message_event, guild)
+    guild: Guild = json.loads(_parse_data(data), object_hook=Guild)
+    callback(context, guild)
 
 
-def _handle_event_channel(message_event, message):
+def _handle_event_channel(context, data):
     callback = DefaultHandler.channel
     if callback is None:
         return
-    channel: Channel = json.loads(_parse_data(message), object_hook=Channel)
-    callback(message_event, channel)
+    channel: Channel = json.loads(_parse_data(data), object_hook=Channel)
+    callback(context, channel)
 
 
-def _handle_event_guild_member(message_event, message):
+def _handle_event_guild_member(context, data):
     callback = DefaultHandler.guild_member
     if callback is None:
         return
-    guild_member: GuildMember = json.loads(
-        _parse_data(message), object_hook=GuildMember
-    )
-    callback(message_event, guild_member)
+    guild_member: GuildMember = json.loads(_parse_data(data), object_hook=GuildMember)
+    callback(context, guild_member)
 
 
-def _handle_event_at_message_create(message_event, message):
+def _handle_event_at_message_create(context, data):
     callback = DefaultHandler.at_message
     if callback is None:
         return
-    at_message: Message = json.loads(_parse_data(message), object_hook=Message)
-    callback(message_event, at_message)
+    at_message: Message = json.loads(_parse_data(data), object_hook=Message)
+    callback(context, at_message)
 
 
-def _handle_event_public_message_delete(message_event, message):
+def _handle_event_public_message_delete(context, data):
     callback = DefaultHandler.public_message_delete
     if callback is None:
         return
-    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
-    callback(message_event, message_deletion_info)
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(data), object_hook=DeletedMessageInfo)
+    callback(context, message_deletion_info)
 
 
-def _handle_event_message_create(message_event, message):
+def _handle_event_message_create(context, data):
     callback = DefaultHandler.message_create
     if callback is None:
         return
-    msg: Message = json.loads(_parse_data(message), object_hook=Message)
-    callback(message_event, msg)
+    msg: Message = json.loads(_parse_data(data), object_hook=Message)
+    callback(context, msg)
 
 
-def _handle_event_message_delete(message_event, message):
+def _handle_event_message_delete(context, data):
     callback = DefaultHandler.message_delete
     if callback is None:
         return
-    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
-    callback(message_event, message_deletion_info)
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(data), object_hook=DeletedMessageInfo)
+    callback(context, message_deletion_info)
 
 
-def _handle_event_direct_message_create(message_event, message):
+def _handle_event_direct_message_create(context, data):
     callback = DefaultHandler.direct_message_create
     if callback is None:
         return
-    msg: Message = json.loads(_parse_data(message), object_hook=Message)
-    callback(message_event, msg)
+    msg: Message = json.loads(_parse_data(data), object_hook=Message)
+    callback(context, msg)
 
 
-def _handle_event_direct_message_delete(message_event, message):
+def _handle_event_direct_message_delete(context, data):
     callback = DefaultHandler.direct_message_delete
     if callback is None:
         return
-    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
-    callback(message_event, message_deletion_info)
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(data), object_hook=DeletedMessageInfo)
+    callback(context, message_deletion_info)
 
 
-def _handle_event_audio(message_event, message):
+def _handle_event_audio(context, data):
     callback = DefaultHandler.audio
     if callback is None:
         return
-    audio_action: AudioAction = json.loads(
-        _parse_data(message), object_hook=AudioAction
-    )
-    callback(message_event, audio_action)
+    audio_action: AudioAction = json.loads(_parse_data(data), object_hook=AudioAction)
+    callback(context, audio_action)
 
 
-def _handle_event_message_reaction(message_event, message):
+def _handle_event_message_reaction(context, data):
     callback = DefaultHandler.message_reaction
     if callback is None:
         return
-    reaction: Reaction = json.loads(_parse_data(message), object_hook=Reaction)
-    callback(message_event, reaction)
+    reaction: Reaction = json.loads(_parse_data(data), object_hook=Reaction)
+    callback(context, reaction)
 
 
-def _handle_event_interaction_create(message_event, message):
+def _handle_event_interaction_create(context, data):
     callback = DefaultHandler.interaction_create
     if callback is None:
         return
-    interaction: Interaction = json.loads(_parse_data(message), object_hook=Interaction)
-    callback(message_event, interaction)
+    interaction: Interaction = json.loads(_parse_data(data), object_hook=Interaction)
+    callback(context, interaction)
 
 
 event_handler_dict = {

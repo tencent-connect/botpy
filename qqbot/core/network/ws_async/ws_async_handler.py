@@ -12,122 +12,121 @@ from qqbot.model.guild_member import GuildMember
 from qqbot.model.message import Message, DeletedMessageInfo
 from qqbot.model.reaction import Reaction
 from qqbot.model.interaction import Interaction
+from qqbot.model.ws_context import WsContext
 
 logger = logging.getLogger()
 
 
-async def parse_and_handle(message_event, message):
-    event_type = message_event["t"]
+async def parse_and_handle(ws_event, data):
+    event_id = ws_event["id"]
+    event_type = ws_event["t"]
+    context = WsContext(event_type, event_id)
     call_handler = event_handler_dict.get(event_type)
 
     if call_handler is None:
         if DefaultHandler.plain is not None:
             plain = DefaultHandler.plain
-            asyncio.ensure_future(plain(event_type, message))
+            asyncio.ensure_future(plain(context, data))
         else:
             return
     else:
-        asyncio.ensure_future(call_handler(event_type, message))
+        asyncio.ensure_future(call_handler(context, data))
 
 
-async def _handle_event_guild(message_event, message):
+async def _handle_event_guild(context, date):
     callback = DefaultHandler.guild
     if callback is None:
         return
-    guild: Guild = json.loads(_parse_data(message), object_hook=Guild)
-    await callback(message_event, guild)
+    guild: Guild = json.loads(_parse_data(date), object_hook=Guild)
+    await callback(context, guild)
 
 
-async def _handle_event_channel(message_event, message):
+async def _handle_event_channel(context, event_date):
     callback = DefaultHandler.channel
     if callback is None:
         return
-    channel: Channel = json.loads(_parse_data(message), object_hook=Channel)
-    await callback(message_event, channel)
+    channel: Channel = json.loads(_parse_data(event_date), object_hook=Channel)
+    await callback(context, channel)
 
 
-async def _handle_event_guild_member(message_event, message):
+async def _handle_event_guild_member(context, event_date):
     callback = DefaultHandler.guild_member
     if callback is None:
         return
-    guild_member: GuildMember = json.loads(
-        _parse_data(message), object_hook=GuildMember
-    )
-    await callback(message_event, guild_member)
+    guild_member: GuildMember = json.loads(_parse_data(event_date), object_hook=GuildMember)
+    await callback(context, guild_member)
 
 
-async def _handle_event_at_message_create(message_event, message):
+async def _handle_event_at_message_create(context, event_date):
     callback = DefaultHandler.at_message
     if callback is None:
         return
-    at_message: Message = json.loads(_parse_data(message), object_hook=Message)
-    await callback(message_event, at_message)
+    at_message: Message = json.loads(_parse_data(event_date), object_hook=Message)
+    await callback(context, at_message)
 
 
-async def _handle_event_public_message_delete(message_event, message):
+async def _handle_event_public_message_delete(context, event_date):
     callback = DefaultHandler.public_message_delete
     if callback is None:
         return
-    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
-    await callback(message_event, message_deletion_info)
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(event_date), object_hook=DeletedMessageInfo)
+    await callback(context, message_deletion_info)
 
 
-async def _handle_event_message_create(message_event, message):
+async def _handle_event_message_create(context, event_date):
     callback = DefaultHandler.message_create
     if callback is None:
         return
-    msg: Message = json.loads(_parse_data(message), object_hook=Message)
-    await callback(message_event, msg)
+    msg: Message = json.loads(_parse_data(event_date), object_hook=Message)
+    await callback(context, msg)
 
 
-async def _handle_event_message_delete(message_event, message):
+async def _handle_event_message_delete(context, event_date):
     callback = DefaultHandler.message_delete
     if callback is None:
         return
-    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
-    await callback(message_event, message_deletion_info)
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(event_date), object_hook=DeletedMessageInfo)
+    await callback(context, message_deletion_info)
 
 
-async def _handle_event_direct_message_create(message_event, message):
+async def _handle_event_direct_message_create(context, event_date):
     callback = DefaultHandler.direct_message_create
     if callback is None:
         return
-    msg: Message = json.loads(_parse_data(message), object_hook=Message)
-    await callback(message_event, msg)
+    msg: Message = json.loads(_parse_data(event_date), object_hook=Message)
+    await callback(context, msg)
 
 
-async def _handle_event_direct_message_delete(message_event, message):
+async def _handle_event_direct_message_delete(context, event_date):
     callback = DefaultHandler.direct_message_delete
     if callback is None:
         return
-    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(message), object_hook=DeletedMessageInfo)
-    await callback(message_event, message_deletion_info)
+    message_deletion_info: DeletedMessageInfo = json.loads(_parse_data(event_date), object_hook=DeletedMessageInfo)
+    await callback(context, message_deletion_info)
 
 
-async def _handle_event_audio(message_event, message):
+async def _handle_event_audio(context, event_date):
     callback = DefaultHandler.audio
     if callback is None:
         return
-    audio_action: AudioAction = json.loads(
-        _parse_data(message), object_hook=AudioAction
-    )
-    await callback(message_event, audio_action)
+    audio_action: AudioAction = json.loads(_parse_data(event_date), object_hook=AudioAction)
+    await callback(context, audio_action)
 
 
-async def _handle_event_message_reaction(message_event, message):
+async def _handle_event_message_reaction(context, event_date):
     callback = DefaultHandler.message_reaction
     if callback is None:
         return
-    reaction: Reaction = json.loads(_parse_data(message), object_hook=Reaction)
-    await callback(message_event, reaction)
+    reaction: Reaction = json.loads(_parse_data(event_date), object_hook=Reaction)
+    await callback(context, reaction)
 
 
-async def _handle_event_interaction_create(message_event, message):
+async def _handle_event_interaction_create(context, event_date):
     callback = DefaultHandler.interaction_create
     if callback is None:
         return
-    interaction: Interaction = json.loads(_parse_data(message), object_hook=Interaction)
-    await callback(message_event, interaction)
+    interaction: Interaction = json.loads(_parse_data(event_date), object_hook=Interaction)
+    await callback(context, interaction)
 
 
 event_handler_dict = {
