@@ -48,11 +48,7 @@ from qqbot.model.message import (
     MessagesPager,
     MessageGet,
 )
-from qqbot.model.mute import (
-    MuteOption,
-    MultiMuteOption,
-    UserIds
-)
+from qqbot.model.mute import MuteOption, MultiMuteOption, UserIds
 from qqbot.model.pins_message import PinsMessage
 from qqbot.model.schedule import (
     Schedule,
@@ -84,9 +80,7 @@ def listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
 
 
 class APIBase:
-    timeout = 3
-
-    def __init__(self, token: Token, is_sandbox: bool):
+    def __init__(self, token: Token, is_sandbox: bool = False, timeout: int = 3):
         """
         API初始化信息
 
@@ -95,11 +89,7 @@ class APIBase:
         """
         self.is_sandbox = is_sandbox
         self.token = token
-        self.http = Http(self.timeout, token.get_string(), token.get_type())
-
-    def with_timeout(self, timeout):
-        self.timeout = timeout
-        return self
+        self.http = Http(timeout, token.get_string(), token.get_type())
 
 
 class GuildAPI(APIBase):
@@ -135,9 +125,7 @@ class GuildRoleAPI(APIBase):
         response = self.http.get(url)
         return json.loads(response.content, object_hook=GuildRoles)
 
-    def create_guild_role(
-        self, guild_id: str, role_info: RoleUpdateInfo
-    ) -> RoleUpdateResult:
+    def create_guild_role(self, guild_id: str, role_info: RoleUpdateInfo) -> RoleUpdateResult:
         """
         创建频道身份组
 
@@ -154,9 +142,7 @@ class GuildRoleAPI(APIBase):
         response = self.http.post(url, request=serialize)
         return json.loads(response.content, object_hook=RoleUpdateResult)
 
-    def update_guild_role(
-        self, guild_id: str, role_id: str, role_info: RoleUpdateInfo
-    ) -> RoleUpdateResult:
+    def update_guild_role(self, guild_id: str, role_id: str, role_info: RoleUpdateInfo) -> RoleUpdateResult:
         """
         修改频道身份组
 
@@ -165,9 +151,7 @@ class GuildRoleAPI(APIBase):
         :param role_info:更新后的RoleUpdateInfo对象
         :return:RoleUpdateResult对象
         """
-        url = get_url(APIConstant.roleURI, self.is_sandbox).format(
-            guild_id=guild_id, role_id=role_id
-        )
+        url = get_url(APIConstant.roleURI, self.is_sandbox).format(guild_id=guild_id, role_id=role_id)
         params = RoleUpdateRequest()
         params.filter = RoleUpdateFilter(1, 1, 1)
         params.guild_id = guild_id
@@ -184,9 +168,7 @@ class GuildRoleAPI(APIBase):
         :param role_id: 身份组ID
         :return: 是否删除成功
         """
-        url = get_url(APIConstant.roleURI, self.is_sandbox).format(
-            guild_id=guild_id, role_id=role_id
-        )
+        url = get_url(APIConstant.roleURI, self.is_sandbox).format(guild_id=guild_id, role_id=role_id)
         response = self.http.delete(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
@@ -252,15 +234,11 @@ class GuildMemberAPI(APIBase):
         :param user_id:用户ID（一般从事件消息中获取）
         :return:
         """
-        url = get_url(APIConstant.guildMemberURI, self.is_sandbox).format(
-            guild_id=guild_id, user_id=user_id
-        )
+        url = get_url(APIConstant.guildMemberURI, self.is_sandbox).format(guild_id=guild_id, user_id=user_id)
         response = self.http.get(url)
         return json.loads(response.content, object_hook=Member)
 
-    def get_guild_members(
-        self, guild_id: str, guild_member_pager: QueryParams
-    ) -> List[Member]:
+    def get_guild_members(self, guild_id: str, guild_member_pager: QueryParams) -> List[Member]:
         """
         获取成员列表，需要申请接口权限
 
@@ -268,9 +246,7 @@ class GuildMemberAPI(APIBase):
         :param guild_member_pager: GuildMembersPager分页数据对象
         :return: Member列表
         """
-        url = get_url(APIConstant.guildMembersURI, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.guildMembersURI, self.is_sandbox).format(guild_id=guild_id)
         response = self.http.get(url, params=guild_member_pager.__dict__)
         return json.loads(response.content, object_hook=Member)
 
@@ -285,9 +261,7 @@ class ChannelAPI(APIBase):
         :param channel_id:子频道ID
         :return:子频道对象Channel
         """
-        url = get_url(APIConstant.channelURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.channelURI, self.is_sandbox).format(channel_id=channel_id)
         response = self.http.get(url)
         return json.loads(response.content, object_hook=Channel)
 
@@ -298,15 +272,11 @@ class ChannelAPI(APIBase):
         :param guild_id: 频道ID
         :return: Channel列表
         """
-        url = get_url(APIConstant.channelsURI, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.channelsURI, self.is_sandbox).format(guild_id=guild_id)
         response = self.http.get(url)
         return json.loads(response.content, object_hook=Channel)
 
-    def create_channel(
-        self, guild_id: str, request: CreateChannelRequest
-    ) -> ChannelResponse:
+    def create_channel(self, guild_id: str, request: CreateChannelRequest) -> ChannelResponse:
         """
         创建子频道
 
@@ -314,16 +284,12 @@ class ChannelAPI(APIBase):
         :param request: 创建子频道的请求对象CreateChannelRequest
         :return ChannelResponse 对象
         """
-        url = get_url(APIConstant.channelsURI, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.channelsURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=ChannelResponse)
 
-    def update_channel(
-        self, channel_id: str, request: PatchChannelRequest
-    ) -> ChannelResponse:
+    def update_channel(self, channel_id: str, request: PatchChannelRequest) -> ChannelResponse:
         """
         修改子频道
 
@@ -331,9 +297,7 @@ class ChannelAPI(APIBase):
         :param request: PatchChannelRequest
         :return ChannelResponse 对象
         """
-        url = get_url(APIConstant.channelURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.channelURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.patch(url, request_json)
         return json.loads(response.content, object_hook=ChannelResponse)
@@ -345,9 +309,7 @@ class ChannelAPI(APIBase):
         :param channel_id: 频道ID
         :return ChannelResponse 对象
         """
-        url = get_url(APIConstant.channelURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.channelURI, self.is_sandbox).format(channel_id=channel_id)
         response = self.http.delete(url)
         return json.loads(response.content, object_hook=ChannelResponse)
 
@@ -355,9 +317,7 @@ class ChannelAPI(APIBase):
 class ChannelPermissionsAPI(APIBase):
     """子频道权限相关接口"""
 
-    def get_channel_permissions(
-        self, channel_id: str, user_id: str
-    ) -> ChannelPermissions:
+    def get_channel_permissions(self, channel_id: str, user_id: str) -> ChannelPermissions:
         """
         获取指定子频道的权限
 
@@ -365,15 +325,11 @@ class ChannelPermissionsAPI(APIBase):
         :param user_id:用户ID
         :return:ChannelPermissions对象
         """
-        url = get_url(APIConstant.channelPermissionsURI, self.is_sandbox).format(
-            channel_id=channel_id, user_id=user_id
-        )
+        url = get_url(APIConstant.channelPermissionsURI, self.is_sandbox).format(channel_id=channel_id, user_id=user_id)
         response = self.http.get(url)
         return json.loads(response.content, object_hook=ChannelPermissions)
 
-    def update_channel_permissions(
-        self, channel_id, user_id, request: UpdatePermission
-    ) -> bool:
+    def update_channel_permissions(self, channel_id, user_id, request: UpdatePermission) -> bool:
         """
         修改指定子频道的权限
 
@@ -382,15 +338,11 @@ class ChannelPermissionsAPI(APIBase):
         :param request:UpdatePermission数据对象（构造可以查看具体的对象注释）
         :return:
         """
-        url = get_url(APIConstant.channelPermissionsURI, self.is_sandbox).format(
-            channel_id=channel_id, user_id=user_id
-        )
+        url = get_url(APIConstant.channelPermissionsURI, self.is_sandbox).format(channel_id=channel_id, user_id=user_id)
         response = self.http.put(url, request=JsonUtil.obj2json_serialize(request))
         return response.status_code == HttpStatus.NO_CONTENT
 
-    def get_channel_role_permissions(
-        self, channel_id: str, role_id: str
-    ) -> ChannelPermissions:
+    def get_channel_role_permissions(self, channel_id: str, role_id: str) -> ChannelPermissions:
         """
         获取指定子频道的权限
 
@@ -404,9 +356,7 @@ class ChannelPermissionsAPI(APIBase):
         response = self.http.get(url)
         return json.loads(response.content, object_hook=ChannelPermissions)
 
-    def update_channel_role_permissions(
-        self, channel_id: str, role_id: str, request: UpdatePermission
-    ) -> bool:
+    def update_channel_role_permissions(self, channel_id: str, role_id: str, request: UpdatePermission) -> bool:
         """
         修改指定子频道的权限
 
@@ -434,9 +384,7 @@ class MessageAPI(APIBase):
         :param message_id: 消息ID
         :return: Message 对象
         """
-        url = get_url(APIConstant.messageURI, self.is_sandbox).format(
-            channel_id=channel_id, message_id=message_id
-        )
+        url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
         response = self.http.get(url)
         return json.loads(response.content, object_hook=MessageGet)
 
@@ -448,9 +396,7 @@ class MessageAPI(APIBase):
         :param pager: MessagesPager对象
         :return: Message 对象
         """
-        url = get_url(APIConstant.messagesURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
         query = {}
         if pager.limit != "":
             query["limit"] = pager.limit
@@ -461,9 +407,7 @@ class MessageAPI(APIBase):
         response = self.http.get(url, params=query)
         return json.loads(response.content, object_hook=Message)
 
-    def post_message(
-        self, channel_id: str, message_send: MessageSendRequest
-    ) -> Message:
+    def post_message(self, channel_id: str, message_send: MessageSendRequest) -> Message:
         """
         发送消息
 
@@ -478,9 +422,7 @@ class MessageAPI(APIBase):
         :return: Message对象
         """
 
-        url = get_url(APIConstant.messagesURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(message_send)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=Message)
@@ -496,9 +438,7 @@ class MessageAPI(APIBase):
         :param message_id: 消息ID
         :param hide_tip: 是否隐藏撤回提示小灰条
         """
-        url = get_url(APIConstant.messageURI, self.is_sandbox).format(
-            channel_id=channel_id, message_id=message_id
-        )
+        url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
         response = self.http.delete(url, params={"hidetip": str(hide_tip)})
         return response.status_code == HttpStatus.OK
 
@@ -506,9 +446,7 @@ class MessageAPI(APIBase):
 class DmsAPI(APIBase):
     """私信消息"""
 
-    def create_direct_message(
-        self, create_direct_message: CreateDirectMessageRequest
-    ) -> DirectMessageGuild:
+    def create_direct_message(self, create_direct_message: CreateDirectMessageRequest) -> DirectMessageGuild:
         """
         创建私信频道
 
@@ -520,9 +458,7 @@ class DmsAPI(APIBase):
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=DirectMessageGuild)
 
-    def post_direct_message(
-        self, guild_id: str, message_send: MessageSendRequest
-    ) -> Message:
+    def post_direct_message(self, guild_id: str, message_send: MessageSendRequest) -> Message:
         """
         发送私信
 
@@ -547,9 +483,7 @@ class AudioAPI(APIBase):
         :param audio_control:AudioControl对象
         :return:是否成功
         """
-        url = get_url(APIConstant.audioControlURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.audioControlURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(audio_control)
         response = self.http.post(url, request=request_json)
         return response.status_code == HttpStatus.NO_CONTENT
@@ -604,9 +538,7 @@ class MuteAPI(APIBase):
         :param guild_id: 频道ID
         :param options: MuteOptions对象
         """
-        url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(options)
         response = self.http.patch(url, request=request_json)
         return response.status_code == HttpStatus.NO_CONTENT
@@ -619,9 +551,7 @@ class MuteAPI(APIBase):
         :param user_id: 用户ID
         :param options: MuteOptions对象
         """
-        url = get_url(APIConstant.guildMemberMuteURI, self.is_sandbox).format(
-            guild_id=guild_id, user_id=user_id
-        )
+        url = get_url(APIConstant.guildMemberMuteURI, self.is_sandbox).format(guild_id=guild_id, user_id=user_id)
         request_json = JsonUtil.obj2json_serialize(options)
         response = self.http.patch(url, request=request_json)
         return response.status_code == HttpStatus.NO_CONTENT
@@ -643,18 +573,14 @@ class MuteAPI(APIBase):
 class AnnouncesAPI(APIBase):
     """公告接口"""
 
-    def create_announce(
-        self, guild_id: str, request: CreateAnnounceRequest
-    ) -> Announce:
+    def create_announce(self, guild_id: str, request: CreateAnnounceRequest) -> Announce:
         """
         创建频道全局公告
 
         :param guild_id: 频道ID
         :param request: CreateAnnounceRequest对象
         """
-        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=Announce)
@@ -673,18 +599,14 @@ class AnnouncesAPI(APIBase):
         response = self.http.delete(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
-    def create_channel_announce(
-        self, channel_id: str, request: CreateChannelAnnounceRequest
-    ) -> Announce:
+    def create_channel_announce(self, channel_id: str, request: CreateChannelAnnounceRequest) -> Announce:
         """
         设置消息为指定子频道公告
 
         :param channel_id: 频道ID
         :param request: CreateChannelAnnounceRequest对象
         """
-        url = get_url(APIConstant.channelAnnounceURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.channelAnnounceURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=Announce)
@@ -703,18 +625,14 @@ class AnnouncesAPI(APIBase):
         response = self.http.delete(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
-    def post_recommended_channels(
-        self, guild_id: str, request: RecommendChannelRequest
-    ) -> Announce:
+    def post_recommended_channels(self, guild_id: str, request: RecommendChannelRequest) -> Announce:
         """
         创建子频道类型的频道全局公告
 
         :param guild_id: 频道ID
         :param request: RecommendChannelRequest 对象
         """
-        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=Announce)
@@ -729,16 +647,12 @@ class APIPermissionAPI(APIBase):
 
         :param guild_id: 频道ID
         """
-        url = get_url(APIConstant.guildAPIPermissionURL, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.guildAPIPermissionURL, self.is_sandbox).format(guild_id=guild_id)
         response = self.http.get(url)
         apis = json.loads(response.content, object_hook=APIs)
         return apis.apis
 
-    def post_permission_demand(
-        self, guild_id: str, request: PermissionDemandToCreate
-    ) -> APIPermissionDemand:
+    def post_permission_demand(self, guild_id: str, request: PermissionDemandToCreate) -> APIPermissionDemand:
         """
         用于创建 API 接口权限授权链接，该链接指向guild_id对应的频道 。
         每天只能在一个频道内发 3 条（默认值）频道权限授权链接，如需调整，请联系平台申请权限。
@@ -746,9 +660,7 @@ class APIPermissionAPI(APIBase):
         :param guild_id: 频道ID
         :param request: PermissionDemandToCreate对象
         """
-        url = get_url(APIConstant.guildAPIPermissionDemandURL, self.is_sandbox).format(
-            guild_id=guild_id
-        )
+        url = get_url(APIConstant.guildAPIPermissionDemandURL, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=APIPermissionDemand)
@@ -765,9 +677,7 @@ class ScheduleAPI(APIBase):
         :param channel_id: 子频道ID
         :param since: 起始时间戳(ms)
         """
-        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(channel_id=channel_id)
         if since == "":
             request = None
         else:
@@ -789,9 +699,7 @@ class ScheduleAPI(APIBase):
         response = self.http.get(url)
         return json.loads(response.content, object_hook=Schedule)
 
-    def create_schedule(
-        self, channel_id: str, schedule_to_create: ScheduleToCreate
-    ) -> Schedule:
+    def create_schedule(self, channel_id: str, schedule_to_create: ScheduleToCreate) -> Schedule:
         """
         用于在日程子频道创建一个日程。
         要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
@@ -803,16 +711,12 @@ class ScheduleAPI(APIBase):
         :param channel_id: 子频道ID
         :param schedule_to_create: 没有ID的日程对象
         """
-        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(schedule_to_create)
         response = self.http.post(url, request_json)
         return json.loads(response.content, object_hook=Schedule)
 
-    def update_schedule(
-        self, channel_id: str, schedule_id: str, schedule_to_patch: ScheduleToPatch
-    ) -> Schedule:
+    def update_schedule(self, channel_id: str, schedule_id: str, schedule_to_patch: ScheduleToPatch) -> Schedule:
         """
         要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
         修改成功后，返回修改后的日程对象。
@@ -845,9 +749,7 @@ class ScheduleAPI(APIBase):
 class ReactionAPI(APIBase):
     """表情表态接口"""
 
-    def put_reaction(
-        self, channel_id: str, message_id: str, emo_type: int, emo_id: str
-    ):
+    def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
         """
         对一条消息进行表情表态
 
@@ -862,9 +764,7 @@ class ReactionAPI(APIBase):
         response = self.http.put(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
-    def delete_reaction(
-        self, channel_id: str, message_id: str, emo_type: int, emo_id: str
-    ):
+    def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
         """
         删除自己对消息的进行表情表态
 
@@ -893,9 +793,7 @@ class PinsAPI(APIBase):
         :param channel_id: 子频道ID
         :param message_id: 该条消息对应的id
         """
-        url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(
-            channel_id=channel_id, message_id=message_id
-        )
+        url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
         response = self.http.put(url)
         return json.loads(response.content, object_hook=PinsMessage)
 
@@ -906,9 +804,7 @@ class PinsAPI(APIBase):
         :param channel_id: 子频道ID
         :param message_id: 该条消息对应的id
         """
-        url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(
-            channel_id=channel_id, message_id=message_id
-        )
+        url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
         response = self.http.delete(url)
         return response.status_code == HttpStatus.NO_CONTENT
 
@@ -919,9 +815,7 @@ class PinsAPI(APIBase):
 
         :param channel_id: 子频道ID
         """
-        url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(
-            channel_id=channel_id
-        )
+        url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
         response = self.http.get(url)
         return json.loads(response.content, object_hook=PinsMessage)
 
@@ -936,9 +830,7 @@ class InteractionAPI(APIBase):
         :param interaction_id: 互动事件的ID
         :param interaction_data: 互动事件数据体
         """
-        url = get_url(APIConstant.interactionURI, self.is_sandbox).format(
-            interaction_id=interaction_id
-        )
+        url = get_url(APIConstant.interactionURI, self.is_sandbox).format(interaction_id=interaction_id)
         request_json = JsonUtil.obj2json_serialize(interaction_data)
         response = self.http.put(url, request_json)
         return response.status_code == HttpStatus.NO_CONTENT
