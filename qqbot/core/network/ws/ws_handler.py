@@ -1,3 +1,6 @@
+from qqbot.core.network.ws.ws_event import WsEvent
+
+
 class DefaultHandler:
     """
     持有handler的实例
@@ -16,3 +19,39 @@ class DefaultHandler:
     audio = None
     message_reaction = None
     interaction_create = None
+
+    @classmethod
+    def get_handler_by_type(cls, event_type: str):
+        if event_type in (WsEvent.EventGuildCreate, WsEvent.EventGuildUpdate, WsEvent.EventGuildUpdate):
+            return cls.guild
+        elif event_type in (WsEvent.EventChannelCreate, WsEvent.EventChannelUpdate, WsEvent.EventChannelDelete):
+            return cls.channel
+        elif event_type in (
+            WsEvent.EventGuildMemberAdd,
+            WsEvent.EventGuildMemberUpdate,
+            WsEvent.EventGuildMemberRemove,
+        ):
+            return cls.guild_member
+        elif event_type in (WsEvent.EventAtMessageCreate):
+            return cls.at_message
+        elif event_type in (WsEvent.EventPublicMessageDelete):
+            return cls.public_message_delete
+        elif event_type in (WsEvent.EventMessageCreate):
+            return cls.message_create
+        elif event_type in (WsEvent.EventMessageDelete):
+            return cls.message_delete
+        elif event_type in (WsEvent.EventDirectMessageCreate):
+            return cls.direct_message_create
+        elif event_type in (WsEvent.EventDirectMessageDelete):
+            return cls.direct_message_delete
+        elif event_type in (
+            WsEvent.EventAudioStart,
+            WsEvent.EventAudioFinish,
+            WsEvent.EventAudioOnMic,
+            WsEvent.EventAudioOffMic,
+        ):
+            return cls.audio
+        elif event_type in (WsEvent.EventMessageReactionAdd, WsEvent.EventMessageReactionRemove):
+            return cls.message_reaction
+        elif event_type in (WsEvent.EventInteractionCreate):
+            return cls.interaction_create

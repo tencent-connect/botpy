@@ -5,19 +5,20 @@ import time
 
 import qqbot
 from qqbot.core.util.yaml_util import YamlUtil
+from qqbot.model.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 CHANNEL_SCHEDULE_ID = "12333"  # 修改为自己频道的日程子频道ID
 
 
-async def _schedule_handler(event, message: qqbot.Message):
+async def _schedule_handler(context: WsContext, message: qqbot.Message):
     schedule_id: str = ""  # 日程ID，可以填写或者发送/创建日程 命令后获取
 
     msg_api = qqbot.AsyncMessageAPI(t_token, False)
     schedule_api = qqbot.AsyncScheduleAPI(t_token, False)
 
-    qqbot.logger.info("event %s" % event + ",receive message %s" % message.content)
+    qqbot.logger.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
 
     # 先发送消息告知用户
     message_to_send = qqbot.MessageSendRequest("command received: %s" % message.content)
@@ -61,7 +62,5 @@ async def _schedule_handler(event, message: qqbot.Message):
 
 if __name__ == "__main__":
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
-    qqbot_handler = qqbot.Handler(
-        qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _schedule_handler
-    )
+    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _schedule_handler)
     qqbot.async_listen_events(t_token, False, qqbot_handler)

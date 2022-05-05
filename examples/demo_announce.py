@@ -8,17 +8,18 @@ from qqbot.model.announce import (
     RecommendChannel,
     CreateAnnounceRequest,
     RecommendChannelRequest,
-    CreateChannelAnnounceRequest
+    CreateChannelAnnounceRequest,
 )
+from qqbot.model.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
-async def _announce_handler(event, message: qqbot.Message):
+async def _announce_handler(context: WsContext, message: qqbot.Message):
     msg_api = qqbot.AsyncMessageAPI(t_token, False)
     announce_api = qqbot.AsyncAnnouncesAPI(t_token, False)
 
-    qqbot.logger.info("event %s" % event + ",receive message %s" % message.content)
+    qqbot.logger.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
 
     # 先发送消息告知用户
     message_to_send = qqbot.MessageSendRequest("command received: %s" % message.content)
@@ -35,9 +36,7 @@ async def _announce_handler(event, message: qqbot.Message):
 
     elif "/建子频道公告" in message.content:
         create_channel_announce_request = CreateChannelAnnounceRequest(message_id)
-        await announce_api.create_channel_announce(
-            message.channel_id, create_channel_announce_request
-        )
+        await announce_api.create_channel_announce(message.channel_id, create_channel_announce_request)
 
     elif "/删子频道公告" in message.content:
         await announce_api.delete_channel_announce(message.channel_id, message_id)
@@ -51,7 +50,5 @@ async def _announce_handler(event, message: qqbot.Message):
 if __name__ == "__main__":
     t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
     # 注册机器人被@后的事件
-    qqbot_handler = qqbot.Handler(
-        qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _announce_handler
-    )
+    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _announce_handler)
     qqbot.async_listen_events(t_token, False, qqbot_handler)
