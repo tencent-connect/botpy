@@ -18,7 +18,7 @@ logger = logging.getLogger()
 
 
 async def parse_and_handle(ws_event, data):
-    event_id = ws_event["id"]
+    event_id = ws_event["id"] if "id" in ws_event.keys() else ""
     event_type = ws_event["t"]
     context = WsContext(event_type, event_id)
     callback = DefaultHandler.get_handler_by_type(event_type)
