@@ -33,7 +33,10 @@ def plain_event_handler(callback, intent):
 def guild_event_handler(callback, intent):
     DefaultHandler.guild = callback
     intent = intent | WsEvent.event_to_intent(
-        WsEvent.EventGuildCreate, WsEvent.EventGuildDelete, WsEvent.EventGuildUpdate
+        WsEvent.EventGuildCreate,
+        WsEvent.EventGuildDelete,
+        WsEvent.EventGuildUpdate,
+        WsEvent.EventGuildDelete
     )
     return intent
 
