@@ -22,9 +22,17 @@ class DefaultHandler:
 
     @classmethod
     def get_handler_by_type(cls, event_type: str):
-        if event_type in (WsEvent.EventGuildCreate, WsEvent.EventGuildUpdate, WsEvent.EventGuildUpdate):
+        if event_type in (
+                WsEvent.EventGuildCreate,
+                WsEvent.EventGuildUpdate,
+                WsEvent.EventGuildDelete
+        ):
             return cls.guild
-        elif event_type in (WsEvent.EventChannelCreate, WsEvent.EventChannelUpdate, WsEvent.EventChannelDelete):
+        elif event_type in (
+                WsEvent.EventChannelCreate,
+                WsEvent.EventChannelUpdate,
+                WsEvent.EventChannelDelete
+        ):
             return cls.channel
         elif event_type in (
             WsEvent.EventGuildMemberAdd,
