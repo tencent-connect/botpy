@@ -40,17 +40,17 @@ class DefaultHandler:
             WsEvent.EventGuildMemberRemove,
         ):
             return cls.guild_member
-        elif event_type in (WsEvent.EventAtMessageCreate):
+        elif event_type == WsEvent.EventAtMessageCreate:
             return cls.at_message
-        elif event_type in (WsEvent.EventPublicMessageDelete):
+        elif event_type == WsEvent.EventPublicMessageDelete:
             return cls.public_message_delete
-        elif event_type in (WsEvent.EventMessageCreate):
+        elif event_type == WsEvent.EventMessageCreate:
             return cls.message_create
-        elif event_type in (WsEvent.EventMessageDelete):
+        elif event_type == WsEvent.EventMessageDelete:
             return cls.message_delete
-        elif event_type in (WsEvent.EventDirectMessageCreate):
+        elif event_type == WsEvent.EventDirectMessageCreate:
             return cls.direct_message_create
-        elif event_type in (WsEvent.EventDirectMessageDelete):
+        elif event_type == WsEvent.EventDirectMessageDelete:
             return cls.direct_message_delete
         elif event_type in (
             WsEvent.EventAudioStart,
@@ -59,7 +59,10 @@ class DefaultHandler:
             WsEvent.EventAudioOffMic,
         ):
             return cls.audio
-        elif event_type in (WsEvent.EventMessageReactionAdd, WsEvent.EventMessageReactionRemove):
+        elif event_type in (
+                WsEvent.EventMessageReactionAdd,
+                WsEvent.EventMessageReactionRemove
+        ):
             return cls.message_reaction
-        elif event_type in (WsEvent.EventInteractionCreate):
+        elif event_type == WsEvent.EventInteractionCreate:
             return cls.interaction_create
