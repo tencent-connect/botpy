@@ -152,9 +152,7 @@ class MessageMarkdown:
 
 
 class MessageReference:
-    def __init__(
-        self, data=None, message_id: str = "", ignore_get_message_error: bool = False
-    ):
+    def __init__(self, data=None, message_id: str = "", ignore_get_message_error: bool = False):
         self.message_id = message_id
         self.ignore_get_message_error = ignore_get_message_error
         if data:
@@ -193,12 +191,10 @@ class MessageSendRequest:
 
 
 class DirectMessageGuild:
-    def __init__(
-        self, data=None, guild_id: str = "", channel_id: str = "", creat_time: str = ""
-    ):
-        self.guild_id: guild_id
-        self.channel_id: channel_id
-        self.creat_time: creat_time
+    def __init__(self, data=None, guild_id: str = "", channel_id: str = "", creat_time: str = ""):
+        self.guild_id =  guild_id
+        self.channel_id =  channel_id
+        self.creat_time =  creat_time
         if data is not None:
             self.__dict__ = data
 
