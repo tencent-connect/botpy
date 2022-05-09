@@ -86,6 +86,7 @@ class APIBase:
 
         :param token: Token对象
         :param is_sandbox: 是否沙盒环境
+        :param timeout: 设置超时时间
         """
         self.is_sandbox = is_sandbox
         self.token = token
@@ -173,11 +174,11 @@ class GuildRoleAPI(APIBase):
         return response.status_code == HttpStatus.NO_CONTENT
 
     def create_guild_role_member(
-        self,
-        guild_id: str,
-        role_id: str,
-        user_id: str,
-        role_req: Channel = None,
+            self,
+            guild_id: str,
+            role_id: str,
+            user_id: str,
+            role_req: Channel = None
     ) -> bool:
         """
         增加频道身份组成员
@@ -197,11 +198,11 @@ class GuildRoleAPI(APIBase):
         return response.status_code == HttpStatus.NO_CONTENT
 
     def delete_guild_role_member(
-        self,
-        guild_id: str,
-        role_id: str,
-        user_id: str,
-        role_req: Channel = None,
+            self,
+            guild_id: str,
+            role_id: str,
+            user_id: str,
+            role_req: Channel = None
     ) -> bool:
         """
         删除频道身份组成员

@@ -2,7 +2,6 @@
 import asyncio
 import json
 
-import qqbot
 from qqbot.core.network.ws.ws_event import WsEvent
 from qqbot.core.network.ws.ws_handler import DefaultHandler
 from qqbot.core.util import logging

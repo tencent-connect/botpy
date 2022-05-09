@@ -207,11 +207,11 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         return response == ""
 
     async def delete_guild_role_member(
-        self,
-        guild_id: str,
-        role_id: str,
-        user_id: str,
-        role_req: Channel = None,
+            self,
+            guild_id: str,
+            role_id: str,
+            user_id: str,
+            role_req: Channel = None
     ) -> bool:
         """
         删除频道身份组成员
