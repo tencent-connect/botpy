@@ -95,6 +95,7 @@ class AsyncAPIBase:
 
         :param token: Token对象
         :param is_sandbox: 是否沙盒环境
+        :param timeout: 设置超时时间
         """
         self.is_sandbox = is_sandbox
         self.token = token
