@@ -16,6 +16,8 @@ class Message:
         self.id: str = ""
         self.channel_id: str = ""
         self.guild_id: str = ""
+        self.src_guild_id: str = ""
+        self.direct_message: bool = False
         self.content: str = ""
         self.timestamp: str = ""
         self.edited_timestamp: str = ""
