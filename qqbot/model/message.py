@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import List, Optional
 
 from qqbot.model.member import User, Member
 
@@ -63,7 +63,7 @@ class MessageEmbedThumbnail:
 
 
 class MessageEmbedField:
-    def __init__(self, data=None, name: str = None, value: str = None):
+    def __init__(self, data=None, name: Optional[str] = None, value: Optional[str] = None):
         self.name = name
         self.value = value
         if data:
@@ -92,7 +92,7 @@ class MessageEmbed:
 
 
 class MessageArkObjKv:
-    def __init__(self, data=None, key: str = None, value: str = None):
+    def __init__(self, data=None, key: Optional[str] = None, value: Optional[str] = None):
         self.key = key
         self.value = value
         if data:
@@ -100,7 +100,7 @@ class MessageArkObjKv:
 
 
 class MessageArkObj:
-    def __init__(self, data=None, obj_kv: List[MessageArkObjKv] = None):
+    def __init__(self, data=None, obj_kv: Optional[List[MessageArkObjKv]] = None):
         self.obj_kv = obj_kv
         if data:
             self.__dict__ = data
@@ -110,9 +110,9 @@ class MessageArkKv:
     def __init__(
         self,
         data=None,
-        key: str = None,
-        value: str = None,
-        obj: List[MessageArkObj] = None,
+        key: Optional[str] = None,
+        value: Optional[str] = None,
+        obj: Optional[List[MessageArkObj]] = None,
     ):
         self.key = key
         self.value = value
@@ -135,7 +135,7 @@ class MessageArk:
 
 
 class MessageMarkdownParams:
-    def __init__(self, data=None, key="", values: List[str] = None):
+    def __init__(self, data=None, key="", values: Optional[List[str]] = None):
         self.key = key
         self.values = values
         if data:
@@ -163,12 +163,12 @@ class MessageSendRequest:
     def __init__(
         self,
         content: str = "",
-        msg_id: str = None,
-        embed: MessageEmbed = None,
-        ark: MessageArk = None,
+        msg_id: Optional[str] = None,
+        embed: Optional[MessageEmbed] = None,
+        ark: Optional[MessageArk] = None,
         image: str = "",
-        message_reference: MessageReference = None,
-        markdown: MessageMarkdown = None,
+        message_reference: Optional[MessageReference] = None,
+        markdown: Optional[MessageMarkdown] = None,
     ):
         """
         机器人发送消息时所传的数据对象
