@@ -14,8 +14,15 @@ LOG_COLORS_CONFIG = {
     "ERROR": "red",
     "CRITICAL": "red",
 }
-#解决Windows系统cmd运行日志输出不会显示颜色问题
-os.system('') 
+# 解决Windows系统cmd运行日志输出不会显示颜色问题
+os.system('')
+
+log_path = os.getenv("QQBOT_LOG_PATH", os.path.join(os.getcwd(), "%(name)s.log"))
+
+print_format = os.getenv("QQBOT_LOG_PRINT_FORMAT",
+                         "\033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m%(message)s")
+file_format = os.getenv("QQBOT_LOG_FILE_FORMAT",
+                        "%(asctime)s [%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s")
 
 
 def _getLevel():
@@ -24,12 +31,12 @@ def _getLevel():
     try:
         level = int(level_str)
         if level not in (
-            logging.NOTSET,
-            logging.DEBUG,
-            logging.INFO,
-            logging.WARNING,
-            logging.ERROR,
-            logging.CRITICAL,
+                logging.NOTSET,
+                logging.DEBUG,
+                logging.INFO,
+                logging.WARNING,
+                logging.ERROR,
+                logging.CRITICAL,
         ):
             logging.error("wrong logging level %s" % level_str)
             level = logging.INFO
@@ -40,9 +47,6 @@ def _getLevel():
 
 
 def getLogger(name=None):
-    print_format = "\033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m%(message)s"
-    file_format = "%(asctime)s [%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
-
     if name is None:
         logger = logging.getLogger("qqbot")
     else:
@@ -63,7 +67,7 @@ def getLogger(name=None):
         formatter = logging.Formatter(file_format)
         if name is None:
             name = "qqbot"
-        log_file = os.path.join(os.getcwd(), name + ".log")
+        log_file = log_path % {"name": name}
         file_handler = None
         if platform.system().lower() != "windows":
             # do not use RotatingFileHandler under Windows
