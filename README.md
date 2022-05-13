@@ -221,13 +221,20 @@ os.environ["QQBOT_LOG_PATH"] = os.path.join(os.getcwd(), "log", "%(name)s.log") 
 
 ### 修改日志格式
 
-通过 `export` 命令添加 `QQBOT_LOG_PRINT_FORMAT` 和 `QQBOT_LOG_FILE_FORMAT` 环境变量可以设置日志格式。例如：
+通过 `export` 命令添加 `QQBOT_LOG_FILE_FORMAT` 和 `QQBOT_LOG_PRINT_FORMAT` 环境变量可以设置日志格式。例如：
 
 ```bash
-# 设置控制台输出
-export QQBOT_LOG_PRINT_FORMAT="%(asctime)s \033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m %(message)s" 
-# 设置文件输出
+ # 设置文件输出格式
 export QQBOT_LOG_FILE_FORMAT="%(asctime)s [%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
+```
+
+如需使用转义字符，可以使用 `os` 模块添加。例如：
+
+```python
+ # 设置控制台输出格式
+import os
+
+os.environ["QQBOT_LOG_PRINT_FORMAT"] = "%(asctime)s \033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m %(message)s"
 ```
 
 # sdk开发
