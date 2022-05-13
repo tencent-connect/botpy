@@ -209,9 +209,9 @@ export QQBOT_LOG_LEVEL=10  # 10表示DEBUG级别
 export QQBOT_DISABLE_LOG=1  # 1表示禁用日志
 ```
 
-### 修改日志路径
+### 修改日志输出路径
 
-SDK也支持修改日志储存路径，由于实际路径不尽相同，所以此处使用 `os` 模块来设置临时环境变量。
+SDK也支持修改日志输出路径，由于实际路径不尽相同，所以此处使用 `os` 模块来设置临时环境变量。
 
 ```python
 import os
