@@ -209,6 +209,34 @@ export QQBOT_LOG_LEVEL=10  # 10表示DEBUG级别
 export QQBOT_DISABLE_LOG=1  # 1表示禁用日志
 ```
 
+### 修改日志路径
+
+SDK也支持修改日志储存路径，由于实际路径不尽相同，所以此处使用 `os` 模块来设置临时环境变量。
+
+```python
+import os
+
+os.environ["QQBOT_LOG_PATH"] = os.path.join(os.getcwd(), "log", "%(name)s.log") # 日志将生成在执行目录下log文件夹内
+```
+
+### 修改日志格式
+
+通过 `export` 命令添加 `QQBOT_LOG_FILE_FORMAT` 和 `QQBOT_LOG_PRINT_FORMAT` 环境变量可以设置日志格式。例如：
+
+```bash
+ # 设置文件输出格式
+export QQBOT_LOG_FILE_FORMAT="%(asctime)s [%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
+```
+
+如需使用转义字符，可以使用 `os` 模块添加。例如：
+
+```python
+ # 设置控制台输出格式
+import os
+
+os.environ["QQBOT_LOG_PRINT_FORMAT"] = "%(asctime)s \033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m %(message)s"
+```
+
 # sdk开发
 
 ## 环境配置
