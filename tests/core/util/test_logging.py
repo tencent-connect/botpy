@@ -4,7 +4,7 @@
 import logging
 import unittest
 
-from qqbot.core.util import logging as new_logging
+from botpy.core.util import logging as new_logging
 
 logger = new_logging.getLogger()
 

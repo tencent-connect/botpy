@@ -3,14 +3,12 @@
 
 import unittest
 
-from qqbot.core.network.ws.ws_event import WsEvent
+from botpy.core.network.ws.ws_event import WsEvent
 
 
 class EventTestCase(unittest.TestCase):
     def test_register_handlers(self):
-        intent = WsEvent.event_to_intent(
-            WsEvent.EventGuildCreate, WsEvent.EventMessageCreate
-        )
+        intent = WsEvent.event_to_intent(WsEvent.EventGuildCreate, WsEvent.EventMessageCreate)
         self.assertEqual(intent, 513)
 
 

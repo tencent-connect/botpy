@@ -3,8 +3,8 @@
 
 import unittest
 
-from qqbot.core.util import logging
-from qqbot.core.network.url import get_url, APIConstant
+from botpy.core.util import logging
+from botpy.core.network.url import get_url, APIConstant
 
 logger = logging.getLogger()
 
@@ -13,9 +13,7 @@ class MyTestCase(unittest.TestCase):
     def test_get_url(self):
         url = get_url(APIConstant.guildMembersURI, False)
         logger.info(url.format(guild_id="123"))
-        self.assertEqual(
-            url.format(guild_id="123"), "https://api.sgroup.qq.com/guilds/123/members"
-        )
+        self.assertEqual(url.format(guild_id="123"), "https://api.sgroup.qq.com/guilds/123/members")
 
         url = get_url(APIConstant.guildMembersURI, True)
         logger.info(url.format(guild_id="123"))

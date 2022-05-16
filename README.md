@@ -17,7 +17,7 @@ pip install qq-bot  # 注意是 qq-bot 而不是 qqbot！
 需要使用的地方import SDK
 
 ```python
-import qqbot
+import botpy
 ```
 
 ## 示例机器人

@@ -3,7 +3,7 @@
 
 import unittest
 
-from qqbot.model.token import Token
+from botpy.model.token import Token
 
 
 class MyTestCase(unittest.TestCase):
