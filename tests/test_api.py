@@ -277,7 +277,7 @@ class APIReactionTestCase(unittest.TestCase):
 
         time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
 
-        reaction_users: ReactionUsers = self.api.get_reaction_users(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4", ReactionUsersPager())
+        reaction_users: ReactionUsers = self.api.get_reaction_users(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "5", ReactionUsersPager())
         self.assertNotEqual(0, len(reaction_users.users))
 
         time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
