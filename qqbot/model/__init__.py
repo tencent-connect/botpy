@@ -27,7 +27,6 @@ from .message import (
     DeletedMessageOriginalAuthor,
     DeletedMessage,
     DeletionOperator,
-    MessageSendRequest,
     DeletedMessageInfo,
 )
 from .mute import MuteOption, MultiMuteOption

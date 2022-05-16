@@ -67,6 +67,10 @@ from qqbot.model.schedule import (
 )
 from qqbot.model.token import Token
 from qqbot.model.user import ReqOption
+from qqbot.model.reaction import (
+    ReactionUsers,
+    ReactionUsersPager,
+)
 
 
 def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler, ret_coro=False):
@@ -793,6 +797,23 @@ class AsyncReactionAPI(AsyncAPIBase):
         )
         response = await self.http_async.delete(url)
         return response == ""
+
+    async def get_reaction_users(self, channel_id: str, message_id: str, emo_type: int, emo_id: str, pager: ReactionUsersPager) -> ReactionUsers:
+        """
+        获取对消息 messageId 指定表情表态的用户列表
+
+        :param channel_id: 子频道ID
+        :param message_id: 该条消息对应的id
+        :param emo_type: 表情类型
+        :param emo_id: 表情ID
+        :param pager: 请求用户列表的分页数据对象
+        """
+        url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
+            channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
+        )
+        query = {"cookie": pager.cookie, "limit": pager.limit}
+        response = await self.http_async.get(url, params=query)
+        return json.loads(response, object_hook=ReactionUsers)
 
 
 class AsyncPinsAPI(AsyncAPIBase):
