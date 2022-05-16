@@ -17,6 +17,10 @@ from qqbot.model.api_permission import (
     APIPermissionDemandIdentify,
 )
 from qqbot.model.emoji import EmojiType
+from qqbot.model.reaction import (
+    ReactionUsersPager,
+    ReactionUsers,
+)
 from tests import test_config
 
 logger = logging.getLogger()
@@ -270,6 +274,11 @@ class APIReactionTestCase(unittest.TestCase):
     def test_put_and_delete_reaction(self):
         result = self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "5")
         self.assertEqual(True, result)
+
+        time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
+
+        reaction_users: ReactionUsers = self.api.get_reaction_users(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4", ReactionUsersPager())
+        self.assertNotEqual(0, len(reaction_users.users))
 
         time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
 

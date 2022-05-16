@@ -20,6 +20,10 @@ from qqbot.model.api_permission import (
     PermissionDemandToCreate,
 )
 from qqbot.model.emoji import EmojiType
+from qqbot.model.reaction import (
+    ReactionUsersPager,
+    ReactionUsers,
+)
 from tests import test_config
 
 logger = logging.getLogger()
@@ -323,6 +327,13 @@ class APIReactionTestCase(unittest.TestCase):
             self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4")
         )
         self.assertEqual(True, result)
+
+        time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
+
+        reaction_users: ReactionUsers = self.loop.run_until_complete(
+            self.api.get_reaction_users(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4", ReactionUsersPager())
+        )
+        self.assertNotEqual(0, len(reaction_users.users))
 
         time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
 
