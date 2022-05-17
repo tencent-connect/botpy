@@ -184,12 +184,12 @@ class Intents(BaseFlags):
 
         通过增加`client`的`on_xx`事件可以获取事件下发的数据:
 
-        - :func:`on_guild_join`                 // 当机器人加入新guild时
-        - :func:`on_guild_remove`               // 当机器人退出guild时
+        - :func:`on_guild_create`               // 当机器人加入新guild时
         - :func:`on_guild_update`               // 当guild资料发生变更时
-        - :func:`on_guild_channel_update`       // 当channel被更新时
-        - :func:`on_guild_channel_create`       // 当channel被创建时
-        - :func:`on_guild_channel_delete`       // 当channel被删除时
+        - :func:`on_guild_delete`               // 当机器人退出guild时
+        - :func:`on_channel_create`             // 当channel被创建时
+        - :func:`on_channel_update`             // 当channel被更新时
+        - :func:`on_channel_delete`             // 当channel被删除时
 
         """
         return 1 << 0
@@ -248,8 +248,8 @@ class Intents(BaseFlags):
 
         通过增加`client`的`on_xx`事件可以获取事件下发的数据:
 
-        - :func:`on_robot_at`                // 当收到@机器人的消息时
-        - :func:`on_message_delete`          // 当频道的消息被删除时
+        - :func:`on_at_message_create`            // 当收到@机器人的消息时
+        - :func:`on_public_message_delete`        // 当频道的消息被删除时
 
         """
         return 1 << 30

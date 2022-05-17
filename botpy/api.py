@@ -1,51 +1,50 @@
 # -*- coding: utf-8 -*-
 
 # 异步api
+import asyncio
 import json
 from json import JSONDecodeError
 from typing import List
 
-from botpy import WebsocketAPI
-from botpy.core.network.async_http import AsyncHttp
-from botpy.core.network.url import get_url, APIConstant
-from botpy.core.network.ws.ws_intents_handler import Handler, register_handlers
-from botpy.core.network.ws_async.ws_async_manager import SessionManager
-from botpy.core.util.json_util import JsonUtil
-from botpy.model.announce import (
+from .core.network.url import get_url, APIConstant
+from .core.network.ws.ws_intents_handler import Handler, register_handlers
+from .core.util.json_util import JsonUtil
+from .http import AsyncHttp
+from .model.announce import (
     CreateAnnounceRequest,
     Announce,
     CreateChannelAnnounceRequest,
     RecommendChannelRequest,
 )
-from botpy.model.api_permission import (
+from .model.api_permission import (
     APIPermission,
     PermissionDemandToCreate,
     APIPermissionDemand,
     APIs,
 )
-from botpy.model.audio import AudioControl
-from botpy.model.channel import (
+from .model.audio import AudioControl
+from .model.channel import (
     Channel,
     ChannelResponse,
     CreateChannelRequest,
     PatchChannelRequest,
 )
-from botpy.model.channel_permissions import (
+from .model.channel_permissions import (
     ChannelPermissions,
     UpdatePermission,
 )
-from botpy.model.guild import Guild
-from botpy.model.guild_member import QueryParams
-from botpy.model.guild_role import (
+from .model.guild import Guild
+from .model.guild_member import QueryParams
+from .model.guild_role import (
     GuildRoles,
     RoleUpdateResult,
     RoleUpdateRequest,
     RoleUpdateFilter,
     RoleUpdateInfo,
 )
-from botpy.model.interaction import InteractionData
-from botpy.model.member import User, Member
-from botpy.model.message import (
+from .model.interaction import InteractionData
+from .model.member import User, Member
+from .model.message import (
     MessageSendRequest,
     Message,
     CreateDirectMessageRequest,
@@ -53,43 +52,46 @@ from botpy.model.message import (
     MessagesPager,
     MessageGet,
 )
-from botpy.model.mute import (
+from .model.mute import (
     MuteOption,
     MultiMuteOption,
     UserIds,
 )
-from botpy.model.pins_message import PinsMessage
-from botpy.model.schedule import (
+from .model.pins_message import PinsMessage
+from .model.schedule import (
     Schedule,
     GetSchedulesRequest,
     ScheduleToCreate,
     ScheduleToPatch,
 )
-from botpy.model.token import Token
-from botpy.model.user import ReqOption
+from .model.token import Token
+from .model.user import ReqOption
 
 
 def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler, ret_coro=False):
-    """
-    异步注册并监听频道相关事件
+    """异步注册并监听频道相关事件
 
     :param t_token: Token对象
     :param handlers: 包含事件类型和事件回调的Handler对象，支持多个对象
     :param is_sandbox:是否沙盒环境，默认为False
     :param ret_coro: 是否返回协程对象
+
+    保留 `qq-bot` 版本 < 1.0.0 的使用方法
     """
     # 通过api获取websocket链接
-    ws_api = WebsocketAPI(t_token, is_sandbox)
-    ws_ap = ws_api.ws()
+    ws_api = AsyncWebsocketAPI(t_token, is_sandbox)
+    ws_ap = asyncio.run(ws_api.ws())
     # 新建和注册监听事件
     t_intent = register_handlers(handlers)
     # 实例一个session_manager
+    from botpy import SessionManager
+
     manager = SessionManager(ret_coro=ret_coro)
     return manager.start(ws_ap, t_token.bot_token(), t_intent)
 
 
 class AsyncAPIBase:
-    def __init__(self, token: Token, is_sandbox: bool, timeout: int = 3):
+    def __init__(self, token: Token, is_sandbox: bool = False, timeout: int = 3):
         """
         API初始化信息
 
@@ -336,8 +338,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         return json.loads(response, object_hook=ChannelPermissions)
 
     async def update_channel_permissions(self, channel_id, user_id, request: UpdatePermission) -> bool:
-        """
-        修改指定子频道的权限
+        """修改指定子频道的权限
 
         :param channel_id:子频道ID
         :param user_id:用户ID
@@ -367,8 +368,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         return json.loads(response, object_hook=ChannelPermissions)
 
     async def update_channel_role_permissions(self, channel_id: str, role_id: str, request: UpdatePermission) -> bool:
-        """
-        修改指定子频道的权限
+        """修改指定子频道身份组的权限
 
         :param channel_id:子频道ID
         :param role_id:身份组ID

@@ -8,16 +8,13 @@ test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml
 
 class MyClient(botpy.Client):
     async def on_ready(self):
-        print(f"Logged in as {self.user} (ID: {self.user.id})")
         print("------")
 
-    async def on_robot_at(self, message):
+    async def on_at_message_create(self, message):
         print(f"message: {message}")
-        print(f"------user: {self.user}")
 
     async def on_message_delete(self, message):
         print(f"message: {message}")
-        print(f"------user: {self.user}")
 
 
 if __name__ == "__main__":
