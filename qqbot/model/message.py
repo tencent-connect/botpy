@@ -29,6 +29,7 @@ class Message:
         self.seq: int = 0
         self.seq_in_channel = ""
         self.message_reference = MessageReference()
+        self.src_guild_id = ""
         if data:
             self.__dict__ = data
 
@@ -227,6 +228,7 @@ class DeletedMessageOriginalAuthor:
 class DeletedMessage:
     def __init__(self, data=None):
         self.guild_id = ""
+        self.src_guild_id = ""
         self.channel_id = ""
         self.id = ""
         self.author = DeletedMessageOriginalAuthor()
