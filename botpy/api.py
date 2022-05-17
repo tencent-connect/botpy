@@ -5,7 +5,7 @@ from typing import Any, List, Dict
 
 from .flags import Permission
 from .http import BotHttp, Route
-from .types import guild, user, channel, message, audio, announce, permission, schedule, emoji, pins_message
+from .types import guild, user, channel, message, audio, announce, permission, schedule, emoji, pins_message, reaction
 
 
 def _handle_message_parameters(
@@ -516,7 +516,6 @@ class BotAPI:
         route = Route("POST", "/users/@me/dms")
         return await self._http.request(route, json=payload)
 
-    # 私信消息
     async def post_dms(
         self,
         guild_id: str,
@@ -957,7 +956,7 @@ class BotAPI:
         )
         return await self._http.request(route)
 
-    # 异步表情表态接口
+    # 表情表态接口
     async def put_reaction(self, channel_id: str, message_id: str, emoji_type: emoji.EmojiType, emoji_id: str) -> str:
         """
         对一条消息进行表情表态。
@@ -982,7 +981,7 @@ class BotAPI:
         )
         return await self._http.request(route)
 
-    async def delete_reaction(self, channel_id: str, message_id: str, emoji_type: int, emoji_id: str):
+    async def delete_reaction(self, channel_id: str, message_id: str, emoji_type: emoji.EmojiType, emoji_id: str):
         """
         删除消息的表情表态。
 
@@ -1005,6 +1004,42 @@ class BotAPI:
             id=emoji_id,
         )
         return await self._http.request(route)
+
+    async def get_reaction_users(
+        self,
+        channel_id: str,
+        message_id: str,
+        emoji_type: emoji.EmojiType,
+        emoji_id: str,
+        cookie: str = None,
+        limit: int = 20,
+    ) -> reaction.ReactionUsers:
+        """
+        获取表情表态用户列表
+
+        Args:
+          channel_id (str): 消息所在子频道的 ID。
+          message_id (str): 要从中获取表情表态的消息的 ID。
+          emoji_type (emoji.EmojiType): 表情符号的类型。1: 系统表情, 2: emoji表情
+          emoji_id (str): 表情符号的 ID。
+          cookie (str): cookie 上次请求返回的cookie，第一次请求无需填写。
+          limit (int): 返回的最大用户数 (1-100)。. Defaults to 20
+
+        Returns:
+          对带有特定表情符号的消息做出反应的用户列表。
+        """
+        route = Route(
+            "GET",
+            "/channels/{channel_id}/messages/{message_id}/reactions/{type}/{id}",
+            channel_id=channel_id,
+            message_id=message_id,
+            type=emoji_type,
+            id=emoji_id,
+        )
+        path = {"limit": limit}
+        if cookie:
+            path.update({"cookie": cookie})
+        return await self._http.request(route, params=path)
 
     # 精华消息API
     async def put_pin(self, channel_id: str, message_id: str) -> pins_message.PinsMessage:

@@ -83,7 +83,7 @@ class BotWebSocket:
         if event == "RESUMED":
             # 心跳检查
             self._connection.loop.create_task(self._send_heart(interval=30))
-            _log.info("[botpy]机器人重连成功✅")
+            _log.info("[botpy]机器人重连成功! ")
 
         if event and opcode == self.WS_DISPATCH_EVENT:
             event = msg["t"].lower()
