@@ -220,6 +220,9 @@ class AudioTestCase(unittest.TestCase):
             print(result)
         except AuthenticationFailedError as e:
             print(e)
+        except ServerError as e:
+            print(e)
+            self.assertEqual("validate params error", e.msgs)
 
 
 class DmsTestCase(unittest.TestCase):
