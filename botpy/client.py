@@ -157,8 +157,8 @@ class Client:
         # 实例一个session_pool
         self._connection = ConnectionSession(
             max_async=self._ws_ap["session_start_limit"]["max_concurrency"],
-            _connect=self.connect,
-            _dispatch=self.dispatch,
+            connect=self.connect,
+            dispatch=self.dispatch,
             loop=asyncio.get_event_loop(),
         )
         for i in range(self._ws_ap["shards"]):
@@ -202,42 +202,13 @@ class Client:
         except (Exception, KeyboardInterrupt, SystemExit) as e:
             await client.on_error(e)
 
-    async def dispatch(self, event: str, *args: Any, **kwargs: Any) -> None:
+    def dispatch(self, event: str, *args: Any, **kwargs: Any) -> None:
         """分发ws的下行事件
 
         解析client类的on_event事件，进行对应的事件回调
         """
-        _log.debug("Dispatching event %s", event)
+        _log.debug("dispatching event %s", event)
         method = "on_" + event
-
-        listeners = self._listeners.get(event)
-        if listeners:
-            removed = []
-            for i, (future, condition) in enumerate(listeners):
-                if future.cancelled():
-                    removed.append(i)
-                    continue
-
-                try:
-                    result = condition(*args)
-                except Exception as exc:
-                    future.set_exception(exc)
-                    removed.append(i)
-                else:
-                    if result:
-                        if len(args) == 0:
-                            future.set_result(None)
-                        elif len(args) == 1:
-                            future.set_result(args[0])
-                        else:
-                            future.set_result(args)
-                        removed.append(i)
-
-            if len(removed) == len(listeners):
-                self._listeners.pop(event)
-            else:
-                for idx in reversed(removed):
-                    del listeners[idx]
 
         try:
             coro = getattr(self, method)

@@ -7,35 +7,56 @@ from typing import Optional
 import aiohttp
 from aiohttp import WSMessage, ClientWebSocketResponse
 
+from .core.network.ws.dto.enum_intents import Intents
 from .session import ConnectionSession
 from .core.network.ws.ws_session import Session
 from .core.exception.error import WebsocketError
-from .core.network.ws.dto.enum_intents import Intents
-from .core.network.ws.dto.enum_opcode import OpCode
 from .core.network.ws.dto.ws_payload import (
     WSPayload,
     WsIdentifyData,
     WSResumeData,
 )
 from .core.util import logging
+from .types.gateway import ReadyEvent
 
 _log = logging.getLogger()
 
 
 class BotWebSocket:
-    """Bot的Websocket实现"""
+    """Bot的Websocket实现
+
+    CODE	名称	客户端操作	描述
+    0	Dispatch	Receive	服务端进行消息推送
+    1	Heartbeat	Send/Receive	客户端或服务端发送心跳
+    2	Identify	Send	客户端发送鉴权
+    6	Resume	Send	客户端恢复连接
+    7	Reconnect	Receive	服务端通知客户端重新连接
+    9	Invalid Session	Receive	当identify或resume的时候，如果参数有错，服务端会返回该消息
+    10	Hello	Receive	当客户端与网关建立ws连接之后，网关下发的第一条消息
+    11	Heartbeat ACK	Receive	当发送心跳成功之后，就会收到该消息
+    """
+
+    WS_DISPATCH_EVENT = 0
+    WS_HEARTBEAT = 1
+    WS_IDENTITY = 2
+    WS_RESUME = 6
+    WS_RECONNECT = 7
+    WS_INVALID_SESSION = 9
+    WS_HELLO = 10
+    WS_HEARTBEAT_ACK = 11
 
     def __init__(self, session: Session, _connection: ConnectionSession):
         self._conn: Optional[ClientWebSocketResponse] = None
         self._session = session
         self._connection = _connection
+        self._parser = _connection.parser
         self._can_reconnect = False
 
     async def on_error(self, exception: BaseException):
         _log.error("on_error: websocket connection: %s, exception : %s" % (self._conn, exception))
         traceback.print_exc()
 
-    async def on_close(self, ws, close_status_code, close_msg):
+    async def on_close(self, close_status_code, close_msg):
         _log.info("[ws连接]关闭, 返回码: %s" % close_status_code + ", 返回信息:%s" % close_msg)
         # 这种不能重新链接
         if (
@@ -53,17 +74,25 @@ class BotWebSocket:
         msg = json.loads(message)
         if await self._is_system_event(msg, ws):
             return
+
         if "t" in msg.keys() and msg["t"] == "READY":
             _log.info("[ws连接]鉴权成功")
             event_seq = msg["s"]
             if event_seq > 0:
                 self._session.last_seq = event_seq
-            await self._ready_handler(msg)
-            _log.info("[ws连接]程序启动成功！")
-            return
+            ready = await self._ready_handler(msg)
+            _log.info(f"[ws连接] 机器人「 {ready['user']['username']} 」 启动成功！")
+
         if "t" in msg.keys():
+            event = msg["t"].lower()
             _log.debug("[ws连接]接收消息: %s" % message)
-            await self._connection.dispatch(msg["t"].lower(), message)
+
+            try:
+                func = self._parser[event]
+            except KeyError:
+                _log.debug("unknown event %s.", event)
+            else:
+                func(msg.get("d"))
 
     async def on_connected(self, ws: ClientWebSocketResponse):
         self._conn = ws
@@ -96,7 +125,7 @@ class BotWebSocket:
                     elif msg.type == aiohttp.WSMsgType.ERROR:
                         await self.on_error(ws_conn.exception())
                     elif msg.type == aiohttp.WSMsgType.CLOSED or msg.type == aiohttp.WSMsgType.CLOSE:
-                        await self.on_close(ws_conn, ws_conn.close_code, msg.extra)
+                        await self.on_close(ws_conn.close_code, msg.extra)
                     if ws_conn.closed:
                         _log.debug("ws is closed, stop circle receive msg")
                         break
@@ -118,7 +147,7 @@ class BotWebSocket:
                         self._session.shards.shard_count,
                     ],
                 ).__dict__,
-                op=OpCode.WS_IDENTITY.value,
+                op=self.WS_IDENTITY,
             ).__dict__
         )
         await self.send_msg(identify_event)
@@ -148,18 +177,19 @@ class BotWebSocket:
                     session_id=self._session.session_id,
                     seq=self._session.last_seq,
                 ).__dict__,
-                op=OpCode.WS_RESUME.value,
+                op=self.WS_RESUME,
             ).__dict__
         )
         await self.send_msg(resume_event)
 
-    async def _ready_handler(self, message_event):
+    async def _ready_handler(self, message_event) -> ReadyEvent:
         data = message_event["d"]
         self.version = data["version"]
         self._session.session_id = data["session_id"]
         self._session.shards.shard_id = data["shard"][0]
         self._session.shards.shard_count = data["shard"][1]
         self.user = data["user"]
+        return data
 
     async def _is_system_event(self, message_event, ws):
         """
@@ -169,15 +199,15 @@ class BotWebSocket:
         :return:
         """
         event_op = message_event["op"]
-        if event_op == OpCode.WS_HELLO.value:
+        if event_op == self.WS_HELLO:
             await self.on_connected(ws)
             return True
-        if event_op == OpCode.WS_HEARTBEAT_ACK.value:
+        if event_op == self.WS_HEARTBEAT_ACK:
             return True
-        if event_op == OpCode.WS_RECONNECT.value:
+        if event_op == self.WS_RECONNECT:
             self._can_reconnect = True
             return True
-        if event_op == OpCode.WS_INVALID_SESSION.value:
+        if event_op == self.WS_INVALID_SESSION:
             self._can_reconnect = False
             return True
         return False
@@ -189,7 +219,7 @@ class BotWebSocket:
         """
         _log.info("[ws连接]心跳检测启动...")
         while True:
-            heartbeat_event = json.dumps(WSPayload(op=OpCode.WS_HEARTBEAT.value, d=self._session.last_seq).__dict__)
+            heartbeat_event = json.dumps(WSPayload(op=self.WS_HEARTBEAT, d=self._session.last_seq).__dict__)
             if self._conn is None:
                 _log.debug("[ws连接]连接已关闭!")
                 return

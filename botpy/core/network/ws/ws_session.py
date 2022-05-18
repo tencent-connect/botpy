@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from typing import TypedDict, Union
 
 from botpy.model.token import Token
 
@@ -21,3 +22,14 @@ class Session:
         self.token = token
         self.url = url
         self.session_id = session_id
+
+
+class Test(TypedDict):
+    a: Union[str, int]
+    b: str
+
+
+if __name__ == "__main__":
+    test: Test = {"a": 1, "b": "test"}
+    if test.get("c"):
+        print("in")

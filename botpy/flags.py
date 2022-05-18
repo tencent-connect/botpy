@@ -103,43 +103,7 @@ class Flag:
 
 @fill_with_flags()
 class Intents(BaseFlags):
-    r"""Wraps up a Discord gateway intent flag.
-
-    Similar to :class:`Permissions`\, the properties provided are two way.
-    You can set and retrieve individual bits using the properties as if they
-    were regular bools.
-
-    To construct an object you can pass keyword arguments denoting the flags
-    to enable or disable.
-
-    This is used to disable certain gateway features that are unnecessary to
-    run your bot. To make use of this, it is passed to the ``intents`` keyword
-    argument of :class:`Client`.
-
-    .. versionadded:: 1.5
-
-    .. container:: operations
-
-        .. describe:: x == y
-
-            Checks if two flags are equal.
-        .. describe:: x != y
-
-            Checks if two flags are not equal.
-        .. describe:: hash(x)
-
-               Return the flag's hash.
-        .. describe:: iter(x)
-
-               Returns an iterator of ``(name, value)`` pairs. This allows it
-               to be, for example, constructed as a dict or a list of pairs.
-
-    Attributes
-    -----------
-    value: :class:`int`
-        The raw value. You should query flags via the properties
-        rather than using this raw value.
-    """
+    # TODO 补全所有事件的注释
 
     __slots__ = ()
 
