@@ -46,7 +46,8 @@ from qqbot.model.message import (
     CreateDirectMessageRequest,
     DirectMessageGuild,
     MessagesPager,
-    MessageGet, MessageKeyboard,
+    MessageGet,
+    MessageKeyboard,
 )
 from qqbot.model.mute import MuteOption, MultiMuteOption, UserIds
 from qqbot.model.pins_message import PinsMessage
