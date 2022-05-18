@@ -465,6 +465,13 @@ class AsyncMessageAPI(AsyncAPIBase):
         return response == ""
 
     async def post_keyboard_message(self, channel_id: str, keyboard: MessageKeyboard) -> Message:
+        """
+        发送含有消息按钮组件的消息
+
+        :param channel_id: 子频道ID
+        :param keyboard: MessageKeyboard对象
+        :return: Message对象
+        """
         url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(keyboard)
         response = await self.http_async.post(url, request_json)

@@ -46,7 +46,7 @@ from qqbot.model.message import (
     CreateDirectMessageRequest,
     DirectMessageGuild,
     MessagesPager,
-    MessageGet,
+    MessageGet, MessageKeyboard,
 )
 from qqbot.model.mute import MuteOption, MultiMuteOption, UserIds
 from qqbot.model.pins_message import PinsMessage
@@ -63,6 +63,7 @@ from qqbot.model.reaction import (
     ReactionUsers,
     ReactionUsersPager,
 )
+
 
 def listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler):
     """
@@ -445,6 +446,19 @@ class MessageAPI(APIBase):
         url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
         response = self.http.delete(url, params={"hidetip": str(hide_tip)})
         return response.status_code == HttpStatus.OK
+
+    def post_keyboard_message(self, channel_id: str, keyboard: MessageKeyboard) -> Message:
+        """
+        发送含有消息按钮组件的消息
+
+        :param channel_id: 子频道ID
+        :param keyboard: MessageKeyboard对象
+        :return: Message对象
+        """
+        url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
+        request_json = JsonUtil.obj2json_serialize(keyboard)
+        response = self.http.post(url, request_json)
+        return json.loads(response.content, object_hook=Message)
 
 
 class DmsAPI(APIBase):
