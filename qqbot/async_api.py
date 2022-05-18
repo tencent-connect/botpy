@@ -52,6 +52,7 @@ from qqbot.model.message import (
     DirectMessageGuild,
     MessagesPager,
     MessageGet,
+    MessageKeyboard,
 )
 from qqbot.model.mute import (
     MuteOption,
@@ -462,6 +463,12 @@ class AsyncMessageAPI(AsyncAPIBase):
         url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
         response = await self.http_async.delete(url, params={"hidetip": str(hide_tip)})
         return response == ""
+
+    async def post_keyboard_message(self, channel_id: str, keyboard: MessageKeyboard) -> Message:
+        url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
+        request_json = JsonUtil.obj2json_serialize(keyboard)
+        response = await self.http_async.post(url, request_json)
+        return json.loads(response, object_hook=Message)
 
 
 class AsyncDmsAPI(AsyncAPIBase):

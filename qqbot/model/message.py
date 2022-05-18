@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
+from qqbot.model.inline_keyboard import InlineKeyboard
 from qqbot.model.member import User, Member
 
 
@@ -160,6 +161,17 @@ class MessageReference:
             self.__dict__ = data
 
 
+class MessageKeyboard:
+    """
+    id 和 content 两个参数互斥，都传值将返回错误
+    """
+    def __init__(self, id: str = None, content: InlineKeyboard = None):
+        if id:
+            self.id = id
+        if content:
+            self.content = content
+
+
 class MessageSendRequest:
     def __init__(
         self,
@@ -170,6 +182,7 @@ class MessageSendRequest:
         image: str = "",
         message_reference: MessageReference = None,
         markdown: MessageMarkdown = None,
+        keyboard: MessageKeyboard = None
     ):
         """
         机器人发送消息时所传的数据对象
@@ -180,6 +193,8 @@ class MessageSendRequest:
         :param ark: ark 消息
         :param image: 图片url地址
         :param message_reference: 引用消息
+        :param markdown: markdown 消息
+        :param keyboard: markdown 消息内的按钮
         """
 
         self.content = content
@@ -189,6 +204,7 @@ class MessageSendRequest:
         self.msg_id = msg_id
         self.message_reference = message_reference
         self.markdown = markdown
+        self.keyboard = keyboard
 
 
 class DirectMessageGuild:
