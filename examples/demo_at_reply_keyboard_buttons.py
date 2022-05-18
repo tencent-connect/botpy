@@ -19,7 +19,7 @@ async def _message_handler(context: WsContext, message: qqbot.Message):
     :param context: WsContext 对象，包含 event_type 和 event_id
     :param message: 事件对象（如监听消息是Message对象）
     """
-    # await send_template_keyboard(message.channel_id, message.id)
+    await send_template_keyboard(message.channel_id, message.id)
     await send_self_defined_keyboard(message.channel_id, message.id)
 
 
