@@ -66,7 +66,9 @@ class BotWebSocket:
         asyncio.ensure_future(self._connection.run())
 
     async def on_message(self, ws, message):
+        _log.debug("[ws连接]接收消息: %s" % message)
         msg = json.loads(message)
+
         if await self._is_system_event(msg, ws):
             return
 
@@ -80,8 +82,6 @@ class BotWebSocket:
 
         if "t" in msg.keys():
             event = msg["t"].lower()
-            _log.debug("[ws连接]接收消息: %s" % message)
-
             try:
                 func = self._parser[event]
             except KeyError:
