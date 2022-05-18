@@ -6,11 +6,11 @@ import unittest
 from typing import List
 
 import botpy
-from botpy.core.exception.error import (
+from botpy.error import (
     AuthenticationFailedError,
     ServerError,
 )
-from botpy.core.util import logging
+from botpy import logging
 from botpy.model.announce import RecommendChannel, RecommendChannelRequest
 from botpy.model.api_permission import (
     APIPermissionDemandIdentify,

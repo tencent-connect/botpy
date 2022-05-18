@@ -4,9 +4,8 @@ import traceback
 from types import TracebackType
 from typing import Any, Callable, Coroutine, Dict, List, Tuple, Optional, Type
 
+from . import logging
 from .api import AsyncWebsocketAPI
-from .core.network.ws.ws_session import Session, ShardConfig
-from .core.util import logging
 from .flags import Intents
 from .gateway import BotWebSocket
 from .model import Token
@@ -162,14 +161,14 @@ class Client:
             loop=asyncio.get_event_loop(),
         )
         for i in range(self._ws_ap["shards"]):
-            session = Session(
-                session_id="",
-                url=self._ws_ap["url"],
-                intent=self.intents,
-                last_seq=0,
-                token=token,
-                shards=ShardConfig(i, self._ws_ap["shards"]),
-            )
+            session = {
+                "session_id": "",
+                "last_seq": 0,
+                "intent": self.intents,
+                "token": token,
+                "url": self._ws_ap["url"],
+                "shards": {"shard_id": i, "shard_count": self._ws_ap["shards"]},
+            }
             self._connection.add(session)
 
         loop = self._connection._loop

@@ -2,9 +2,9 @@ import asyncio
 import inspect
 from typing import List, Callable, Dict, Any
 
-from .core.network.ws.ws_session import Session
-from .core.util import logging
+from .logging import logging
 from .types.gateway import ReadyEvent
+from .types.session import Session
 
 _log = logging.getLogger()
 
@@ -52,7 +52,7 @@ class ConnectionSession:
         # 后台有频率限制，根据间隔时间发起链接请求
         await asyncio.sleep(time_interval)
 
-    def add(self, session):
+    def add(self, session: Session):
         self._session_list.append(session)
 
 

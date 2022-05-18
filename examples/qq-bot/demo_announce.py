@@ -3,7 +3,7 @@
 import os.path
 
 import botpy
-from botpy.core.util.yaml_util import YamlUtil
+from botpy.utils import YamlUtil
 from botpy.model.announce import (
     RecommendChannel,
     CreateAnnounceRequest,

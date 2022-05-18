@@ -3,8 +3,8 @@
 
 import unittest
 
-from botpy.core.util import logging
-from botpy.core.network.url import get_url, APIConstant
+from botpy import logging
+from botpy.url import get_url, APIConstant
 
 logger = logging.getLogger()
 

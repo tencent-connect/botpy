@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 # 异步api
-import asyncio
 import json
 from json import JSONDecodeError
 from typing import List
 
-from .core.network.url import get_url, APIConstant
-from .core.network.ws.ws_intents_handler import Handler, register_handlers
-from .core.util.json_util import JsonUtil
+from botpy.url import get_url, APIConstant
+from botpy.utils import JsonUtil
 from .http import AsyncHttp
 from .model.announce import (
     CreateAnnounceRequest,
@@ -66,28 +64,6 @@ from .model.schedule import (
 )
 from .model.token import Token
 from .model.user import ReqOption
-
-
-def async_listen_events(t_token: Token, is_sandbox: bool, *handlers: Handler, ret_coro=False):
-    """异步注册并监听频道相关事件
-
-    :param t_token: Token对象
-    :param handlers: 包含事件类型和事件回调的Handler对象，支持多个对象
-    :param is_sandbox:是否沙盒环境，默认为False
-    :param ret_coro: 是否返回协程对象
-
-    保留 `qq-bot` 版本 < 1.0.0 的使用方法
-    """
-    # 通过api获取websocket链接
-    ws_api = AsyncWebsocketAPI(t_token, is_sandbox)
-    ws_ap = asyncio.run(ws_api.ws())
-    # 新建和注册监听事件
-    t_intent = register_handlers(handlers)
-    # 实例一个session_manager
-    from botpy import SessionManager
-
-    manager = SessionManager(ret_coro=ret_coro)
-    return manager.start(ws_ap, t_token.bot_token(), t_intent)
 
 
 class AsyncAPIBase:

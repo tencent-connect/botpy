@@ -4,14 +4,14 @@ import json
 import aiohttp
 from aiohttp import ClientResponse
 
-from botpy.core.exception.error import (
+from botpy.error import (
     AuthenticationFailedError,
     NotFoundError,
     MethodNotAllowedError,
     SequenceNumberError,
     ServerError,
 )
-from botpy.core.util import logging
+from botpy import logging
 
 X_TPS_TRACE_ID = "X-Tps-trace-Id"
 

@@ -4,7 +4,7 @@ import asyncio
 import os.path
 
 import botpy
-from botpy.core.util.yaml_util import YamlUtil
+from botpy.utils import YamlUtil
 from botpy.model.message import MessageEmbedField, MessageEmbed
 from botpy.model.ws_context import WsContext
 

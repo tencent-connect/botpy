@@ -7,17 +7,12 @@ from typing import Optional
 import aiohttp
 from aiohttp import WSMessage, ClientWebSocketResponse
 
-from .core.network.ws.dto.enum_intents import Intents
+from . import logging
+from .error import WebsocketError
 from .session import ConnectionSession
-from .core.network.ws.ws_session import Session
-from .core.exception.error import WebsocketError
-from .core.network.ws.dto.ws_payload import (
-    WSPayload,
-    WsIdentifyData,
-    WSResumeData,
-)
-from .core.util import logging
 from .types.gateway import ReadyEvent
+from .types.session import Session
+from .utils import JsonUtil
 
 _log = logging.getLogger()
 
@@ -64,8 +59,8 @@ class BotWebSocket:
             or close_status_code == WebsocketError.CodeInvalidSession
             or self._can_reconnect is False
         ):
-            self._session.session_id = ""
-            self._session.last_seq = 0
+            self._session["session_id"] = ""
+            self._session["last_seq"] = 0
         # 断连后启动一个新的链接并透传当前的session，不使用内部重连的方式，避免死循环
         self._connection.add(self._session)
         asyncio.ensure_future(self._connection.run())
@@ -79,7 +74,7 @@ class BotWebSocket:
             _log.info("[ws连接]鉴权成功")
             event_seq = msg["s"]
             if event_seq > 0:
-                self._session.last_seq = event_seq
+                self._session["last_seq"] = event_seq
             ready = await self._ready_handler(msg)
             _log.info(f"[ws连接] 机器人「 {ready['user']['username']} 」 启动成功！")
 
@@ -98,7 +93,7 @@ class BotWebSocket:
         self._conn = ws
         if self._conn is None:
             raise Exception("websocket connection failed ")
-        if self._session.session_id != "":
+        if self._session["session_id"] != "":
             await self.connect()
         else:
             await self.identify()
@@ -111,12 +106,12 @@ class BotWebSocket:
         """
 
         _log.info("[ws连接]启动中...")
-        ws_url = self._session.url
+        ws_url = self._session["url"]
         if ws_url == "":
             raise Exception("session url is none")
 
         async with aiohttp.ClientSession() as session:
-            async with session.ws_connect(self._session.url) as ws_conn:
+            async with session.ws_connect(self._session["url"]) as ws_conn:
                 while True:
                     msg: WSMessage
                     msg = await ws_conn.receive()
@@ -131,26 +126,25 @@ class BotWebSocket:
                         break
 
     async def identify(self):
-        """
-        websocket鉴权
-        """
-        if self._session.intent == 0:
-            self._session.intent = Intents.INTENT_GUILDS.value
+        """websocket鉴权"""
+        if self._session["intent"] == 0:
+            self._session["intent"] = 1
+
         _log.info("[ws连接]鉴权中...")
-        identify_event = json.dumps(
-            WSPayload(
-                WsIdentifyData(
-                    token=self._session.token.get_string(),
-                    intents=self._session.intent,
-                    shard=[
-                        self._session.shards.shard_id,
-                        self._session.shards.shard_count,
-                    ],
-                ).__dict__,
-                op=self.WS_IDENTITY,
-            ).__dict__
-        )
-        await self.send_msg(identify_event)
+
+        payload = {
+            "op": self.WS_IDENTITY,
+            "d": {
+                "shard": [
+                    self._session["shards"]["shard_id"],
+                    self._session["shards"]["shard_count"],
+                ],
+                "token": self._session["token"].get_string(),
+                "intents": self._session["intent"],
+            },
+        }
+
+        await self.send_msg(JsonUtil.dict2json(payload))
 
     async def send_msg(self, event_json):
         """
@@ -165,29 +159,29 @@ class BotWebSocket:
             else:
                 await self._conn.send_str(data=send_msg)
 
-    async def reconnect(self):
+    async def resume(self):
         """
         websocket重连
         """
         _log.info("[ws连接]重连启动...")
-        resume_event = json.dumps(
-            WSPayload(
-                WSResumeData(
-                    token=self._session.token.get_string(),
-                    session_id=self._session.session_id,
-                    seq=self._session.last_seq,
-                ).__dict__,
-                op=self.WS_RESUME,
-            ).__dict__
-        )
-        await self.send_msg(resume_event)
+
+        payload = {
+            "op": self.WS_RESUME,
+            "d": {
+                "token": self._session["token"].get_string(),
+                "session_id": self._session["session_id"],
+                "seq": self._session["last_seq"],
+            },
+        }
+
+        await self.send_msg(JsonUtil.dict2json(payload))
 
     async def _ready_handler(self, message_event) -> ReadyEvent:
         data = message_event["d"]
         self.version = data["version"]
-        self._session.session_id = data["session_id"]
-        self._session.shards.shard_id = data["shard"][0]
-        self._session.shards.shard_count = data["shard"][1]
+        self._session["session_id"] = data["session_id"]
+        self._session["shards"]["shard_id"] = data["shard"][0]
+        self._session["shards"]["shard_count"] = data["shard"][1]
         self.user = data["user"]
         return data
 
@@ -219,7 +213,11 @@ class BotWebSocket:
         """
         _log.info("[ws连接]心跳检测启动...")
         while True:
-            heartbeat_event = json.dumps(WSPayload(op=self.WS_HEARTBEAT, d=self._session.last_seq).__dict__)
+            payload = {
+                "op": self.WS_HEARTBEAT,
+                "d": self._session["last_seq"],
+            }
+
             if self._conn is None:
                 _log.debug("[ws连接]连接已关闭!")
                 return
@@ -229,4 +227,4 @@ class BotWebSocket:
                     return
                 else:
                     await asyncio.sleep(interval)
-                    await self.send_msg(heartbeat_event)
+                    await self.send_msg(JsonUtil.dict2json(payload))
