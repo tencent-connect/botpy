@@ -140,7 +140,7 @@ cython_debug/
 # botpy
 config.y*ml
 tests/.test.yaml
-qqbot.log.*
+botpy.log.*
 temp/
 
 # idea config
