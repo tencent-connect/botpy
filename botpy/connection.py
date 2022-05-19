@@ -1,8 +1,9 @@
 import asyncio
 import inspect
-from typing import List, Callable, Dict, Any
+from typing import List, Callable, Dict, Any, Optional
 
 from .logging import logging
+from .model.robot import Robot
 from .types.gateway import ReadyEvent
 from .types.session import Session
 
@@ -18,7 +19,8 @@ class ConnectionSession:
 
     def __init__(self, max_async, connect: Callable, dispatch: Callable, loop=None):
         self.dispatch = dispatch
-        self.parser: Dict[str, Callable[[Any], None]] = ConnectionState(dispatch).parsers
+        self.connect_state = ConnectionState(dispatch)
+        self.parser: Dict[str, Callable[[Any], None]] = self.connect_state.parsers
 
         self._connect = connect
         self._max_async = max_async
@@ -60,6 +62,8 @@ class ConnectionState:
     """Client的Websocket状态处理"""
 
     def __init__(self, dispatch: Callable):
+        self.robot: Optional[Robot] = None
+
         self.parsers: Dict[str, Callable[[Any], None]]
         self.parsers = parsers = {}
         for attr, func in inspect.getmembers(self):
@@ -69,9 +73,10 @@ class ConnectionState:
         self._dispatch = dispatch
 
     def parse_at_message_create(self, data):
-        self._dispatch("robot_at", data)
+        self._dispatch("at_message_create", data)
 
     def parse_ready(self, data: ReadyEvent):
+        self.robot = Robot(data=data["user"])
         self._dispatch("ready")
 
     # TODO 补全解析的所有事件

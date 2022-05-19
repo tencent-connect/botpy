@@ -9,7 +9,7 @@ from aiohttp import WSMessage, ClientWebSocketResponse
 
 from . import logging
 from .error import WebsocketError
-from .session import ConnectionSession
+from .connection import ConnectionSession
 from .types.gateway import ReadyEvent
 from .types.session import Session
 from .utils import JsonUtil

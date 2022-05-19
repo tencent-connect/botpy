@@ -1,7 +1,7 @@
 from typing import TypedDict, List
 
 
-class RobotInfo(TypedDict):
+class UserPayload(TypedDict):
     id: str
     username: str
     bot: bool
@@ -11,5 +11,5 @@ class RobotInfo(TypedDict):
 class ReadyEvent(TypedDict):
     version: int
     session_id: str
-    user: RobotInfo
+    user: UserPayload
     shard: List[int]

@@ -9,7 +9,7 @@ from .api import AsyncWebsocketAPI
 from .flags import Intents
 from .gateway import BotWebSocket
 from .model import Token
-from .session import ConnectionSession
+from .connection import ConnectionSession
 
 _log = logging.getLogger()
 
@@ -63,6 +63,10 @@ class Client:
 
         if not self.is_closed():
             await self.close()
+
+    @property
+    def robot(self):
+        return self._connection.connect_state.robot
 
     async def close(self) -> None:
         """关闭client相关的连接"""

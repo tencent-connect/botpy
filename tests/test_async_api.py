@@ -86,7 +86,7 @@ class GuildMemberAPITestCase(unittest.TestCase):
 
     def test_guild_member(self):
         member = self.loop.run_until_complete(self.api.get_guild_member(GUILD_ID, GUILD_OWNER_ID))
-        self.assertEqual(GUILD_OWNER_NAME, member.user.username)
+        self.assertEqual(GUILD_OWNER_NAME, member.robot.username)
 
     def test_guild_members(self):
         query_params = botpy.QueryParams("0", 1)
