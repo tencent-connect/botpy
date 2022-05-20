@@ -17,7 +17,7 @@ async def _message_handler(context: WsContext, message: botpy.Message):
     :param context: WsContext 对象，包含 event_type 和 event_id
     :param message: 事件对象（如监听消息是Message对象）
     """
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
     # 打印返回信息
     botpy._log.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
     # 构造消息发送请求数据对象

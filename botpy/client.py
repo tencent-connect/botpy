@@ -5,11 +5,13 @@ from types import TracebackType
 from typing import Any, Callable, Coroutine, Dict, List, Tuple, Optional, Type
 
 from . import logging
-from .api import AsyncWebsocketAPI
+from .api import BotAPI
+from .connection import ConnectionSession
 from .flags import Intents
 from .gateway import BotWebSocket
-from .model import Token
-from .connection import ConnectionSession
+from .http import BotHttp
+from .instances.robot import Robot
+from .instances.token import Token
 
 _log = logging.getLogger()
 
@@ -40,8 +42,10 @@ class Client:
     def __init__(self, intents: Intents):
         self.intents: int = intents.value
         self.ret_coro: bool = False
-        self.http = None
+        # TODO loop的整体梳理
         self.loop = None
+        self.http: BotHttp = BotHttp(timeout=5)
+        self.api: BotAPI = BotAPI(http=self.http)
 
         self._connection: Optional[ConnectionSession] = None
         self._closed: bool = False
@@ -66,7 +70,7 @@ class Client:
 
     @property
     def robot(self):
-        return self._connection.connect_state.robot
+        return self._connection.state.robot
 
     async def close(self) -> None:
         """关闭client相关的连接"""
@@ -75,6 +79,8 @@ class Client:
             return
 
         self._closed = True
+
+        await self.http.close()
 
     def is_closed(self) -> bool:
         """:class:`bool`: Indicates if the websocket connection is closed."""
@@ -129,18 +135,29 @@ class Client:
         token = Token(appid, token)
         self.ret_coro = ret_coro
 
+        if self.loop is _loop:
+            await self._async_setup_hook()
+
         await self._login(token)
         return await self._init(token)
 
     async def _login(self, token: Token) -> None:
         _log.info("[连接管理]登录机器人账号中...")
 
-        if self.loop is _loop:
-            await self._async_setup_hook()
+        user = await self.http.login(token)
 
         # 通过api获取websocket链接
-        ws_api = AsyncWebsocketAPI(token)
-        self._ws_ap = await ws_api.ws()
+        self._ws_ap = await self.api.ws()
+
+        # 实例一个session_pool
+        self._connection = ConnectionSession(
+            max_async=self._ws_ap["session_start_limit"]["max_concurrency"],
+            connect=self.connect,
+            dispatch=self.dispatch,
+            loop=asyncio.get_event_loop(),
+        )
+
+        self._connection.state.robot = Robot(user)
 
     async def _init(self, token):
         _log.info("[连接管理]程序启动...")
@@ -157,13 +174,7 @@ class Client:
         return await self._pool_init(token.bot_token(), session_interval)
 
     async def _pool_init(self, token, session_interval):
-        # 实例一个session_pool
-        self._connection = ConnectionSession(
-            max_async=self._ws_ap["session_start_limit"]["max_concurrency"],
-            connect=self.connect,
-            dispatch=self.dispatch,
-            loop=asyncio.get_event_loop(),
-        )
+
         for i in range(self._ws_ap["shards"]):
             session = {
                 "session_id": "",

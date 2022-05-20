@@ -6,7 +6,7 @@ import unittest
 from typing import List
 
 import botpy
-from botpy.error import (
+from botpy.errors import (
     AuthenticationFailedError,
     ServerError,
 )
@@ -38,7 +38,7 @@ MESSAGE_ID = test_params_["message_id"]
 
 
 class GuildAPITestCase(unittest.TestCase):
-    api = botpy.AsyncGuildAPI(token, IS_SANDBOX)
+    api = botpy.BotGuildAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_guild(self):
@@ -47,7 +47,7 @@ class GuildAPITestCase(unittest.TestCase):
 
 
 class GuildRoleAPITest(unittest.TestCase):
-    api = botpy.AsyncGuildRoleAPI(token, IS_SANDBOX)
+    api = botpy.BotGuildRoleAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_guild_roles(self):
@@ -81,7 +81,7 @@ class GuildRoleAPITest(unittest.TestCase):
 
 
 class GuildMemberAPITestCase(unittest.TestCase):
-    api = botpy.AsyncGuildMemberAPI(token, IS_SANDBOX)
+    api = botpy.BotGuildMemberAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_guild_member(self):
@@ -98,7 +98,7 @@ class GuildMemberAPITestCase(unittest.TestCase):
 
 
 class ChannelAPITestCase(unittest.TestCase):
-    api = botpy.AsyncChannelAPI(token, IS_SANDBOX)
+    api = botpy.BotChannelAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_channel(self):
@@ -131,7 +131,7 @@ class ChannelAPITestCase(unittest.TestCase):
 
 
 class ChannelPermissionsTestCase(unittest.TestCase):
-    api = botpy.AsyncChannelPermissionsAPI(token, IS_SANDBOX)
+    api = botpy.BotChannelPermissionsAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_channel_permissions(self):
@@ -160,7 +160,7 @@ class ChannelPermissionsTestCase(unittest.TestCase):
 
 
 class UserAPITestCase(unittest.TestCase):
-    api = botpy.AsyncUserAPI(token, IS_SANDBOX)
+    api = botpy.BotUserAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_me(self):
@@ -177,7 +177,7 @@ class UserAPITestCase(unittest.TestCase):
 
 
 class AudioTestCase(unittest.TestCase):
-    api = botpy.AsyncAudioAPI(token, IS_SANDBOX)
+    api = botpy.BotAudioAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_post_audio(self):
@@ -190,7 +190,7 @@ class AudioTestCase(unittest.TestCase):
 
 
 class DmsTestCase(unittest.TestCase):
-    api = botpy.AsyncDmsAPI(token, IS_SANDBOX)
+    api = botpy.BotDmsAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_create_and_send_dms(self):
@@ -208,7 +208,7 @@ class DmsTestCase(unittest.TestCase):
 
 
 class WebsocketTestCase(unittest.TestCase):
-    api = botpy.AsyncWebsocketAPI(token, IS_SANDBOX)
+    api = botpy.BotWebsocketAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_ws(self):
@@ -217,7 +217,7 @@ class WebsocketTestCase(unittest.TestCase):
 
 
 class MuteTestCase(unittest.TestCase):
-    api = botpy.AsyncMuteAPI(token, IS_SANDBOX)
+    api = botpy.BotMuteAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_mute_all(self):
@@ -237,7 +237,7 @@ class MuteTestCase(unittest.TestCase):
 
 
 class AnnounceTestCase(unittest.TestCase):
-    api = botpy.AsyncAnnouncesAPI(token, IS_SANDBOX)
+    api = botpy.BotAnnouncesAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_post_recommend_channel(self):
@@ -248,7 +248,7 @@ class AnnounceTestCase(unittest.TestCase):
 
 
 class APIPermissionTestCase(unittest.TestCase):
-    api = botpy.AsyncAPIPermissionAPI(token, IS_SANDBOX)
+    api = botpy.BotAPIPermissionAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_get_permissions(self):
@@ -263,7 +263,7 @@ class APIPermissionTestCase(unittest.TestCase):
 
 
 class APIScheduleTestCase(unittest.TestCase):
-    api = botpy.AsyncScheduleAPI(token, IS_SANDBOX)
+    api = botpy.BotScheduleAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_get_schedules(self):
@@ -272,7 +272,7 @@ class APIScheduleTestCase(unittest.TestCase):
 
 
 class APIReactionTestCase(unittest.TestCase):
-    api = botpy.AsyncReactionAPI(token, IS_SANDBOX)
+    api = botpy.BotReactionAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_delete_reaction(self):
@@ -286,7 +286,7 @@ class APIReactionTestCase(unittest.TestCase):
 
 
 class APIPinsTestCase(unittest.TestCase):
-    api = botpy.AsyncPinsAPI(token, IS_SANDBOX)
+    api = botpy.BotPinsAPI(token, IS_SANDBOX)
     loop = asyncio.get_event_loop()
 
     def test_put_pin(self):

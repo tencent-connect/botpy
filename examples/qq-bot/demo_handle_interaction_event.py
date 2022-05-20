@@ -18,12 +18,12 @@ async def _interaction_handler(context: WsContext, interaction: botpy.Interactio
     :param interaction: 事件对象（如监听消息是Message对象）
     """
     # 发送回复消息通知
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
     send = botpy.MessageSendRequest(content="收到了 markdown 交互事件，data_type: %d" % interaction.data.type)
     await msg_api.post_message(interaction.channel_id, send)
 
     # 异步更新交互数据
-    interaction_api = botpy.AsyncInteractionAPI(t_token, False)
+    interaction_api = botpy.BotInteractionAPI(t_token, False)
     data = InteractionData(type=InteractionDataType.INLINE_KEYBOARD_BUTTON_CLICK, resolved="Test")
     await interaction_api.put_interaction(interaction.id, data)
 

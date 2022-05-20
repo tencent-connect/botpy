@@ -10,7 +10,7 @@ test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml
 
 
 async def _recall_handler(context: WsContext, message: botpy.Message):
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
     # 打印返回信息
     botpy._log.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
     send = botpy.MessageSendRequest("async recall")

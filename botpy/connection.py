@@ -2,8 +2,8 @@ import asyncio
 import inspect
 from typing import List, Callable, Dict, Any, Optional
 
+from .instances.robot import Robot
 from .logging import logging
-from .model.robot import Robot
 from .types.gateway import ReadyEvent
 from .types.session import Session
 
@@ -19,8 +19,8 @@ class ConnectionSession:
 
     def __init__(self, max_async, connect: Callable, dispatch: Callable, loop=None):
         self.dispatch = dispatch
-        self.connect_state = ConnectionState(dispatch)
-        self.parser: Dict[str, Callable[[Any], None]] = self.connect_state.parsers
+        self.state = ConnectionState(dispatch)
+        self.parser: Dict[str, Callable[[Any], None]] = self.state.parsers
 
         self._connect = connect
         self._max_async = max_async
@@ -76,7 +76,6 @@ class ConnectionState:
         self._dispatch("at_message_create", data)
 
     def parse_ready(self, data: ReadyEvent):
-        self.robot = Robot(data=data["user"])
         self._dispatch("ready")
 
     # TODO 补全解析的所有事件

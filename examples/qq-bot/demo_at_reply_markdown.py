@@ -23,7 +23,7 @@ async def _message_handler(context: WsContext, message: botpy.Message):
 
 
 async def handle_send_markdown_by_template(channel_id, msg_id):
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
 
     markdown = MessageMarkdown()
     markdown.template_id = 65
@@ -38,7 +38,7 @@ async def handle_send_markdown_by_template(channel_id, msg_id):
 
 
 async def handle_send_markdown_by_content(channel_id, msg_id):
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
 
     markdown = MessageMarkdown()
     markdown.content = "# 标题 \n## 简介很开心 \n内容"

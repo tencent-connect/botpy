@@ -7,7 +7,7 @@ from typing import List
 
 from botpy.url import get_url, APIConstant
 from botpy.utils import JsonUtil
-from .http import AsyncHttp
+from .http import BotHttp, Route
 from .model.announce import (
     CreateAnnounceRequest,
     Announce,
@@ -62,25 +62,14 @@ from .model.schedule import (
     ScheduleToCreate,
     ScheduleToPatch,
 )
-from .model.token import Token
 from .model.user import ReqOption
 
 
-class AsyncAPIBase:
-    def __init__(self, token: Token, is_sandbox: bool = False, timeout: int = 3):
-        """
-        API初始化信息
+class BotAPI:
+    def __init__(self, http: BotHttp):
+        """API初始化信息"""
+        self._http = http
 
-        :param token: Token对象
-        :param is_sandbox: 是否沙盒环境
-        :param timeout: 设置超时时间
-        """
-        self.is_sandbox = is_sandbox
-        self.token = token
-        self.http_async = AsyncHttp(timeout, token.get_string(), token.get_type())
-
-
-class AsyncGuildAPI(AsyncAPIBase):
     """
     频道相关接口
     """
@@ -93,11 +82,9 @@ class AsyncGuildAPI(AsyncAPIBase):
         :return: 频道Guild对象
         """
         url = get_url(APIConstant.guildURI, self.is_sandbox).format(guild_id=guild_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=Guild)
 
-
-class AsyncGuildRoleAPI(AsyncAPIBase):
     """
     频道身份组相关接口
     """
@@ -110,7 +97,7 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         :return:GuildRoles对象
         """
         url = get_url(APIConstant.rolesURI, self.is_sandbox).format(guild_id=guild_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=GuildRoles)
 
     async def create_guild_role(self, guild_id: str, role_info: RoleUpdateInfo) -> RoleUpdateResult:
@@ -127,7 +114,7 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         params.guild_id = guild_id
         params.info = role_info
         serialize = JsonUtil.obj2json_serialize(params)
-        response = await self.http_async.post(url, request=serialize)
+        response = await self._http.post(url, request=serialize)
         return json.loads(response, object_hook=RoleUpdateResult)
 
     async def update_guild_role(self, guild_id: str, role_id: str, role_info: RoleUpdateInfo) -> RoleUpdateResult:
@@ -145,7 +132,7 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         params.guild_id = guild_id
         params.info = role_info
         serialize = JsonUtil.obj2json_serialize(params)
-        response = await self.http_async.patch(url, request=serialize)
+        response = await self._http.patch(url, request=serialize)
         return json.loads(response, object_hook=RoleUpdateResult)
 
     async def delete_guild_role(self, guild_id: str, role_id: str) -> bool:
@@ -157,7 +144,7 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         :return: 是否删除成功
         """
         url = get_url(APIConstant.roleURI, self.is_sandbox).format(guild_id=guild_id, role_id=role_id)
-        response = await self.http_async.delete(url)
+        response = await self._http.delete(url)
         return response == ""
 
     async def create_guild_role_member(
@@ -181,7 +168,7 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         url = get_url(APIConstant.memberRoleURI, self.is_sandbox).format(
             guild_id=guild_id, role_id=role_id, user_id=user_id
         )
-        response = await self.http_async.put(url, request=JsonUtil.obj2json_serialize(role_req))
+        response = await self._http.put(url, request=JsonUtil.obj2json_serialize(role_req))
         return response == ""
 
     async def delete_guild_role_member(
@@ -201,11 +188,9 @@ class AsyncGuildRoleAPI(AsyncAPIBase):
         url = get_url(APIConstant.memberRoleURI, self.is_sandbox).format(
             guild_id=guild_id, role_id=role_id, user_id=user_id
         )
-        response = await self.http_async.delete(url, request=JsonUtil.obj2json_serialize(role_req))
+        response = await self._http.delete(url, request=JsonUtil.obj2json_serialize(role_req))
         return response == ""
 
-
-class AsyncGuildMemberAPI(AsyncAPIBase):
     """
     成员相关接口，添加成员到用户组等
     """
@@ -219,7 +204,7 @@ class AsyncGuildMemberAPI(AsyncAPIBase):
         :return:
         """
         url = get_url(APIConstant.guildMemberURI, self.is_sandbox).format(guild_id=guild_id, user_id=user_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=Member)
 
     async def get_guild_members(self, guild_id: str, guild_member_pager: QueryParams) -> List[Member]:
@@ -231,11 +216,9 @@ class AsyncGuildMemberAPI(AsyncAPIBase):
         :return: Member列表
         """
         url = get_url(APIConstant.guildMembersURI, self.is_sandbox).format(guild_id=guild_id)
-        response = await self.http_async.get(url, params=guild_member_pager.__dict__)
+        response = await self._http.get(url, params=guild_member_pager.__dict__)
         return json.loads(response, object_hook=Member)
 
-
-class AsyncChannelAPI(AsyncAPIBase):
     """子频道相关接口"""
 
     async def get_channel(self, channel_id) -> Channel:
@@ -246,7 +229,7 @@ class AsyncChannelAPI(AsyncAPIBase):
         :return:子频道对象Channel
         """
         url = get_url(APIConstant.channelURI, self.is_sandbox).format(channel_id=channel_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=Channel)
 
     async def get_channels(self, guild_id: str) -> List[Channel]:
@@ -257,7 +240,7 @@ class AsyncChannelAPI(AsyncAPIBase):
         :return: Channel列表
         """
         url = get_url(APIConstant.channelsURI, self.is_sandbox).format(guild_id=guild_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=Channel)
 
     async def create_channel(self, guild_id: str, request: CreateChannelRequest) -> ChannelResponse:
@@ -270,7 +253,7 @@ class AsyncChannelAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.channelsURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=ChannelResponse)
 
     async def update_channel(self, channel_id: str, request: PatchChannelRequest) -> ChannelResponse:
@@ -283,7 +266,7 @@ class AsyncChannelAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.channelURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(request)
-        response = await self.http_async.patch(url, request_json)
+        response = await self._http.patch(url, request_json)
         return json.loads(response, object_hook=ChannelResponse)
 
     async def delete_channel(self, channel_id: str) -> ChannelResponse:
@@ -294,11 +277,9 @@ class AsyncChannelAPI(AsyncAPIBase):
         :return ChannelResponse 对象
         """
         url = get_url(APIConstant.channelURI, self.is_sandbox).format(channel_id=channel_id)
-        response = await self.http_async.delete(url)
+        response = await self._http.delete(url)
         return json.loads(response, object_hook=ChannelResponse)
 
-
-class AsyncChannelPermissionsAPI(AsyncAPIBase):
     """子频道权限相关接口"""
 
     async def get_channel_permissions(self, channel_id: str, user_id: str) -> ChannelPermissions:
@@ -310,7 +291,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         :return:ChannelPermissions对象
         """
         url = get_url(APIConstant.channelPermissionsURI, self.is_sandbox).format(channel_id=channel_id, user_id=user_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=ChannelPermissions)
 
     async def update_channel_permissions(self, channel_id, user_id, request: UpdatePermission) -> bool:
@@ -326,7 +307,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
             request.add = str(int(request.add, 16))
         if request.remove != "":
             request.remove = str(int(request.remove, 16))
-        response = await self.http_async.put(url, request=JsonUtil.obj2json_serialize(request))
+        response = await self._http.put(url, request=JsonUtil.obj2json_serialize(request))
         return response == ""
 
     async def get_channel_role_permissions(self, channel_id: str, role_id: str) -> ChannelPermissions:
@@ -340,7 +321,7 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
         url = get_url(APIConstant.channelRolePermissionsURI, self.is_sandbox).format(
             channel_id=channel_id, role_id=role_id
         )
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=ChannelPermissions)
 
     async def update_channel_role_permissions(self, channel_id: str, role_id: str, request: UpdatePermission) -> bool:
@@ -358,11 +339,9 @@ class AsyncChannelPermissionsAPI(AsyncAPIBase):
             request.add = str(int(request.add, 16))
         if request.remove != "":
             request.remove = str(int(request.remove, 16))
-        response = await self.http_async.put(url, request=JsonUtil.obj2json_serialize(request))
+        response = await self._http.put(url, request=JsonUtil.obj2json_serialize(request))
         return response == ""
 
-
-class AsyncMessageAPI(AsyncAPIBase):
     """消息"""
 
     async def get_message(self, channel_id: str, message_id: str) -> MessageGet:
@@ -374,7 +353,7 @@ class AsyncMessageAPI(AsyncAPIBase):
         :return: Message 对象
         """
         url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=MessageGet)
 
     async def get_messages(self, channel_id: str, pager: MessagesPager) -> List[Message]:
@@ -393,7 +372,7 @@ class AsyncMessageAPI(AsyncAPIBase):
         if pager.type != "" and pager.id != "":
             query[pager.type] = pager.id
 
-        response = await self.http_async.get(url, params=query)
+        response = await self._http.get(url, params=query)
         return json.loads(response, object_hook=Message)
 
     async def post_message(self, channel_id: str, message_send: MessageSendRequest) -> Message:
@@ -413,7 +392,7 @@ class AsyncMessageAPI(AsyncAPIBase):
 
         url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(message_send)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=Message)
 
     async def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False):
@@ -428,11 +407,9 @@ class AsyncMessageAPI(AsyncAPIBase):
         :param hide_tip: 是否隐藏撤回提示小灰条
         """
         url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
-        response = await self.http_async.delete(url, params={"hidetip": str(hide_tip)})
+        response = await self._http.delete(url, params={"hidetip": str(hide_tip)})
         return response == ""
 
-
-class AsyncDmsAPI(AsyncAPIBase):
     """私信消息"""
 
     async def create_direct_message(self, create_direct_message: CreateDirectMessageRequest) -> DirectMessageGuild:
@@ -444,7 +421,7 @@ class AsyncDmsAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.userMeDMURI, self.is_sandbox)
         request_json = JsonUtil.obj2json_serialize(create_direct_message)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=DirectMessageGuild)
 
     async def post_direct_message(self, guild_id: str, message_send: MessageSendRequest) -> Message:
@@ -457,11 +434,9 @@ class AsyncDmsAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.dmsURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(message_send)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=Message)
 
-
-class AsyncAudioAPI(AsyncAPIBase):
     """音频接口"""
 
     async def post_audio(self, channel_id: str, audio_control: AudioControl) -> bool:
@@ -474,11 +449,9 @@ class AsyncAudioAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.audioControlURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(audio_control)
-        response = await self.http_async.post(url, request=request_json)
+        response = await self._http.post(url, request=request_json)
         return response == ""
 
-
-class AsyncUserAPI(AsyncAPIBase):
     """用户相关接口"""
 
     async def me(self) -> User:
@@ -486,7 +459,7 @@ class AsyncUserAPI(AsyncAPIBase):
         :return:使用当前用户信息填充的 User 对象
         """
         url = get_url(APIConstant.userMeURI, self.is_sandbox)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=User)
 
     async def me_guilds(self, option: ReqOption = None) -> List[Guild]:
@@ -502,21 +475,14 @@ class AsyncUserAPI(AsyncAPIBase):
         else:
             query = option.__dict__
 
-        response = await self.http_async.get(url, params=query)
+        response = await self._http.get(url, params=query)
         return json.loads(response, object_hook=Guild)
 
-
-class AsyncWebsocketAPI(AsyncAPIBase):
     """WebsocketAPI"""
 
     async def ws(self):
-        url = get_url(APIConstant.gatewayBotURI, self.is_sandbox)
-        response = await self.http_async.get(url)
-        websocket_ap = json.loads(response)
-        return websocket_ap
+        return await self._http.request(Route("GET", "/gateway/bot"))
 
-
-class AsyncMuteAPI(AsyncAPIBase):
     """禁言接口"""
 
     async def mute_all(self, guild_id: str, options: MuteOption):
@@ -528,7 +494,7 @@ class AsyncMuteAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(options)
-        response = await self.http_async.patch(url, request=request_json)
+        response = await self._http.patch(url, request=request_json)
         return response == ""
 
     async def mute_member(self, guild_id: str, user_id: str, options: MuteOption):
@@ -541,7 +507,7 @@ class AsyncMuteAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.guildMemberMuteURI, self.is_sandbox).format(guild_id=guild_id, user_id=user_id)
         request_json = JsonUtil.obj2json_serialize(options)
-        response = await self.http_async.patch(url, request=request_json)
+        response = await self._http.patch(url, request=request_json)
         return response == ""
 
     async def mute_multi_member(self, guild_id: str, options: MultiMuteOption):
@@ -553,12 +519,10 @@ class AsyncMuteAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(options)
-        response = await self.http_async.patch(url, request=request_json)
+        response = await self._http.patch(url, request=request_json)
         user_ids = json.loads(response, object_hook=UserIds)
         return user_ids.user_ids
 
-
-class AsyncAnnouncesAPI(AsyncAPIBase):
     """公告接口"""
 
     async def create_announce(self, guild_id: str, request: CreateAnnounceRequest) -> Announce:
@@ -570,7 +534,7 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=Announce)
 
     async def delete_announce(self, guild_id: str, message_id: str):
@@ -584,7 +548,7 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         url = get_url(APIConstant.deleteGuildAnnounceURI, self.is_sandbox).format(
             guild_id=guild_id, message_id=message_id
         )
-        response = await self.http_async.delete(url)
+        response = await self._http.delete(url)
         return response == ""
 
     async def create_channel_announce(self, channel_id: str, request: CreateChannelAnnounceRequest) -> Announce:
@@ -596,7 +560,7 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.channelAnnounceURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(request)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=Announce)
 
     async def delete_channel_announce(self, channel_id: str, message_id: str):
@@ -610,7 +574,7 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         url = get_url(APIConstant.deleteChannelAnnounceURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id
         )
-        response = await self.http_async.delete(url)
+        response = await self._http.delete(url)
         return response == ""
 
     async def post_recommended_channels(self, guild_id: str, request: RecommendChannelRequest) -> Announce:
@@ -622,11 +586,9 @@ class AsyncAnnouncesAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=Announce)
 
-
-class AsyncAPIPermissionAPI(AsyncAPIBase):
     """接口权限接口"""
 
     async def get_permissions(self, guild_id: str) -> List[APIPermission]:
@@ -636,7 +598,7 @@ class AsyncAPIPermissionAPI(AsyncAPIBase):
         :param guild_id: 频道ID
         """
         url = get_url(APIConstant.guildAPIPermissionURL, self.is_sandbox).format(guild_id=guild_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         apis = json.loads(response, object_hook=APIs)
         return apis.apis
 
@@ -650,11 +612,9 @@ class AsyncAPIPermissionAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.guildAPIPermissionDemandURL, self.is_sandbox).format(guild_id=guild_id)
         request_json = JsonUtil.obj2json_serialize(request)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=APIPermissionDemand)
 
-
-class AsyncScheduleAPI(AsyncAPIBase):
     """日程接口"""
 
     async def get_schedules(self, channel_id: str, since: str = "") -> List[Schedule]:
@@ -671,7 +631,7 @@ class AsyncScheduleAPI(AsyncAPIBase):
         else:
             request = GetSchedulesRequest(int(since))
         request_json = JsonUtil.obj2json_serialize(request)
-        response = await self.http_async.get(url, request_json)
+        response = await self._http.get(url, request_json)
         return json.loads(response, object_hook=Schedule)
 
     async def get_schedule(self, channel_id: str, schedule_id: str) -> Schedule:
@@ -684,7 +644,7 @@ class AsyncScheduleAPI(AsyncAPIBase):
         url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
             channel_id=channel_id, schedule_id=schedule_id
         )
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=Schedule)
 
     async def create_schedule(self, channel_id: str, schedule_to_create: ScheduleToCreate) -> Schedule:
@@ -701,7 +661,7 @@ class AsyncScheduleAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(channel_id=channel_id)
         request_json = JsonUtil.obj2json_serialize(schedule_to_create)
-        response = await self.http_async.post(url, request_json)
+        response = await self._http.post(url, request_json)
         return json.loads(response, object_hook=Schedule)
 
     async def update_schedule(self, channel_id: str, schedule_id: str, schedule_to_patch: ScheduleToPatch) -> Schedule:
@@ -717,7 +677,7 @@ class AsyncScheduleAPI(AsyncAPIBase):
             channel_id=channel_id, schedule_id=schedule_id
         )
         request_json = JsonUtil.obj2json_serialize(schedule_to_patch)
-        response = await self.http_async.patch(url, request_json)
+        response = await self._http.patch(url, request_json)
         return json.loads(response, object_hook=Schedule)
 
     async def delete_schedule(self, channel_id: str, schedule_id: str):
@@ -730,11 +690,9 @@ class AsyncScheduleAPI(AsyncAPIBase):
         url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
             channel_id=channel_id, schedule_id=schedule_id
         )
-        response = await self.http_async.delete(url)
+        response = await self._http.delete(url)
         return response == ""
 
-
-class AsyncReactionAPI(AsyncAPIBase):
     """异步表情表态接口"""
 
     async def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
@@ -749,7 +707,7 @@ class AsyncReactionAPI(AsyncAPIBase):
         url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
         )
-        response = await self.http_async.put(url)
+        response = await self._http.put(url)
         return response == ""
 
     async def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
@@ -764,11 +722,9 @@ class AsyncReactionAPI(AsyncAPIBase):
         url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
             channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
         )
-        response = await self.http_async.delete(url)
+        response = await self._http.delete(url)
         return response == ""
 
-
-class AsyncPinsAPI(AsyncAPIBase):
     """精华消息API"""
 
     async def put_pin(self, channel_id: str, message_id: str) -> PinsMessage:
@@ -783,7 +739,7 @@ class AsyncPinsAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
         try:
-            response = await self.http_async.put(url)
+            response = await self._http.put(url)
             return json.loads(response, object_hook=PinsMessage)
         except (Exception, JSONDecodeError):
             return PinsMessage()
@@ -796,7 +752,7 @@ class AsyncPinsAPI(AsyncAPIBase):
         :param message_id: 该条消息对应的id
         """
         url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
-        response = await self.http_async.delete(url)
+        response = await self._http.delete(url)
         return response == ""
 
     async def get_pins(self, channel_id: str) -> PinsMessage:
@@ -807,11 +763,9 @@ class AsyncPinsAPI(AsyncAPIBase):
         :param channel_id: 子频道ID
         """
         url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
-        response = await self.http_async.get(url)
+        response = await self._http.get(url)
         return json.loads(response, object_hook=PinsMessage)
 
-
-class AsyncInteractionAPI(AsyncAPIBase):
     """互动回调API"""
 
     async def put_interaction(self, interaction_id: str, interaction_data: InteractionData):
@@ -823,5 +777,5 @@ class AsyncInteractionAPI(AsyncAPIBase):
         """
         url = get_url(APIConstant.interactionURI, self.is_sandbox).format(interaction_id=interaction_id)
         request_json = JsonUtil.obj2json_serialize(interaction_data)
-        response = await self.http_async.put(url, request_json)
+        response = await self._http.put(url, request_json)
         return response == ""

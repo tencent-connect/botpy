@@ -19,7 +19,7 @@ async def _member_event_handler(context: WsContext, guild_member: GuildMember):
     """
     botpy._log.info("event_type %s" % context.event_type + ", event_id %s" % context.event_id)
 
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
 
     # 这里将 WsContext.event_id 作为回复消息的 msg_id，可以使回复消息被识别为被动消息。
     send = botpy.MessageSendRequest(content="收到了成员事件", msg_id=context.event_id)

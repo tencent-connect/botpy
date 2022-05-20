@@ -8,7 +8,6 @@ import aiohttp
 from aiohttp import WSMessage, ClientWebSocketResponse
 
 from . import logging
-from .error import WebsocketError
 from .connection import ConnectionSession
 from .types.gateway import ReadyEvent
 from .types.session import Session
@@ -46,6 +45,7 @@ class BotWebSocket:
         self._connection = _connection
         self._parser = _connection.parser
         self._can_reconnect = False
+        self._invalid_reconnect_code = [9001, 9005]
 
     async def on_error(self, exception: BaseException):
         _log.error("on_error: websocket connection: %s, exception : %s" % (self._conn, exception))
@@ -54,11 +54,7 @@ class BotWebSocket:
     async def on_close(self, close_status_code, close_msg):
         _log.info("[ws连接]关闭, 返回码: %s" % close_status_code + ", 返回信息:%s" % close_msg)
         # 这种不能重新链接
-        if (
-            close_status_code == WebsocketError.CodeConnCloseErr
-            or close_status_code == WebsocketError.CodeInvalidSession
-            or self._can_reconnect is False
-        ):
+        if close_status_code in self._invalid_reconnect_code or self._can_reconnect is False:
             self._session["session_id"] = ""
             self._session["last_seq"] = 0
         # 断连后启动一个新的链接并透传当前的session，不使用内部重连的方式，避免死循环

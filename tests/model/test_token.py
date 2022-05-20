@@ -3,7 +3,7 @@
 
 import unittest
 
-from botpy.model.token import Token
+from botpy.models.token import Token
 
 
 class MyTestCase(unittest.TestCase):

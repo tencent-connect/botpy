@@ -22,7 +22,7 @@ async def _message_handler(context: WsContext, message: botpy.Message):
 
 
 async def handle_send_ark(time, channel_id, msg_id):
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
 
     for i in range(time):
         await asyncio.sleep(1)

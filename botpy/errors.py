@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-class WebsocketError:
-    CodeInvalidSession = 9001
-    CodeConnCloseErr = 9005
-
-
 class AuthenticationFailedError(RuntimeError):
     def __init__(self, msg):
         self.msgs = msg
@@ -44,3 +39,13 @@ class ServerError(RuntimeError):
 
     def __str__(self):
         return self.msgs
+
+
+HttpErrorDict = {
+    401: AuthenticationFailedError,
+    404: NotFoundError,
+    405: MethodNotAllowedError,
+    429: SequenceNumberError,
+    500: ServerError,
+    504: ServerError,
+}

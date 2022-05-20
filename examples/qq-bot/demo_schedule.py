@@ -15,8 +15,8 @@ CHANNEL_SCHEDULE_ID = "12333"  # 修改为自己频道的日程子频道ID
 async def _schedule_handler(context: WsContext, message: botpy.Message):
     schedule_id: str = ""  # 日程ID，可以填写或者发送/创建日程 命令后获取
 
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
-    schedule_api = botpy.AsyncScheduleAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
+    schedule_api = botpy.BotScheduleAPI(t_token, False)
 
     botpy._log.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
 

@@ -10,7 +10,7 @@ test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml
 
 
 async def _pins_handler(context: WsContext, message: botpy.Message):
-    pins_api = botpy.AsyncPinsAPI(t_token, False)
+    pins_api = botpy.BotPinsAPI(t_token, False)
     botpy._log.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
 
     if "/获取精华列表" in message.content:

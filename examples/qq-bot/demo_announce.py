@@ -16,8 +16,8 @@ test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml
 
 
 async def _announce_handler(context: WsContext, message: botpy.Message):
-    msg_api = botpy.AsyncMessageAPI(t_token, False)
-    announce_api = botpy.AsyncAnnouncesAPI(t_token, False)
+    msg_api = botpy.BotMessageAPI(t_token, False)
+    announce_api = botpy.BotAnnouncesAPI(t_token, False)
 
     botpy._log.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
 

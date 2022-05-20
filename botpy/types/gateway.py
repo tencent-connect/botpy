@@ -13,3 +13,7 @@ class ReadyEvent(TypedDict):
     session_id: str
     user: UserPayload
     shard: List[int]
+
+
+class WsUrlPayload(TypedDict):
+    url: str

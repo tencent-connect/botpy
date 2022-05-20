@@ -11,7 +11,7 @@ test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml
 
 
 async def _reaction_handler(context: WsContext, message: botpy.Message):
-    reaction_api = botpy.AsyncReactionAPI(t_token, False)
+    reaction_api = botpy.BotReactionAPI(t_token, False)
     botpy._log.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
     await reaction_api.put_reaction(message.channel_id, message.id, EmojiType.system, "4")
 

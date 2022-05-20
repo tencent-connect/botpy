@@ -1,30 +1,19 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import json
+from typing import Any, Optional, ClassVar, Union, Dict
 
 import aiohttp
 from aiohttp import ClientResponse
 
-from botpy.error import (
-    AuthenticationFailedError,
-    NotFoundError,
-    MethodNotAllowedError,
-    SequenceNumberError,
-    ServerError,
-)
-from botpy import logging
+from .errors import HttpErrorDict, ServerError
+from .instances.token import Token
+from .logging import logging
+from .types import robot
 
 X_TPS_TRACE_ID = "X-Tps-trace-Id"
 
 logger = logging.getLogger()
-
-HttpErrorDict = {
-    401: AuthenticationFailedError,
-    404: NotFoundError,
-    405: MethodNotAllowedError,
-    429: SequenceNumberError,
-    500: ServerError,
-    504: ServerError,
-}
 
 
 class HttpErrorMessage:
@@ -41,125 +30,92 @@ class HttpStatus:
     NO_CONTENT = 204
 
 
-def _handle_response(api_url, response: ClientResponse, content: str):
+async def _handle_response(url, response: ClientResponse) -> Union[Dict[str, Any], str]:
+    data = await _json_or_text(response)
     if response.status in (HttpStatus.NO_CONTENT, HttpStatus.OK, HttpStatus.ACCEPTED):
-        logger.debug(
-            "[HTTP]请求成功, 请求连接: %s, 返回内容: %s"
-            % (
-                api_url,
-                content,
-            )
-        )
-        return
+        logger.debug(f"[HTTP]请求成功, 请求连接: {url}, 返回内容: {data}")
+        return data
     else:
         logger.error(
-            "[HTTP]接口请求异常，请求连接: %s, error: %s, 返回内容: %s, trace_id:%s"
-            % (
-                api_url,
-                response.status,
-                content,
-                response.headers.get(X_TPS_TRACE_ID),
-            )  # trace_id 用于定位接口问题
+            f"[HTTP]接口请求异常，请求连接: {url},"
+            f" error code: {response.status}, 返回内容: {data}, trace_id:{response.headers.get(X_TPS_TRACE_ID)}"
+            # trace_id 用于定位接口问题
         )
-        error_message_: HttpErrorMessage = json.loads(content, object_hook=HttpErrorMessage)
+        error_message_: HttpErrorMessage = json.loads(data, object_hook=HttpErrorMessage)
         error_dict_get = HttpErrorDict.get(response.status)
         if error_dict_get is None:
             raise ServerError(error_message_.message)
         raise error_dict_get(msg=error_message_.message)
 
 
-class AsyncHttp:
-    def __init__(self, time_out, token, type):
-        self.timeout = time_out
-        self.token = token
-        self.scheme = type
+async def _json_or_text(response: aiohttp.ClientResponse) -> Union[Dict[str, Any], str]:
+    text = await response.text(encoding="utf-8")
+    try:
+        if response.headers["content-type"] == "application/json":
+            return json.loads(text)
+    except KeyError:
+        # Thanks Cloudflare
+        pass
 
-    async def get(self, api_url, request=None, params=None):
-        headers = {
-            "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "BotPythonSDK/v0.5.4",
-        }
-        logger.debug("[HTTP] get headers: %s, api_url: %s" % (headers, api_url))
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                url=api_url,
-                params=params,
-                json=request,
-                timeout=self.timeout,
-                headers=headers,
-            ) as resp:
-                content = await resp.text()
-                _handle_response(api_url, resp, content)
-                return content
+    return text
 
-    async def post(self, api_url, request=None, params=None):
-        headers = {
-            "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "BotPythonSDK/v0.5.4",
-        }
-        logger.debug("[HTTP] post headers: %s, api_url: %s, request: %s" % (headers, api_url, request))
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                url=api_url,
-                params=params,
-                json=request,
-                timeout=self.timeout,
-                headers=headers,
-            ) as resp:
-                content = await resp.text()
-                _handle_response(api_url, resp, content)
-                return content
 
-    async def delete(self, api_url, request=None, params=None):
-        headers = {
-            "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "BotPythonSDK/v0.5.4",
-        }
-        logger.debug("[HTTP] delete headers: %s, api_url: %s" % (headers, api_url))
-        async with aiohttp.ClientSession() as session:
-            async with session.delete(
-                url=api_url,
-                params=params,
-                json=request,
-                timeout=self.timeout,
-                headers=headers,
-            ) as resp:
-                content = await resp.text()
-                _handle_response(api_url, resp, content)
-                return content
+class Route:
+    DOMAIN: ClassVar[str] = "api.sgroup.qq.com"
+    SANDBOX_DOMAIN: ClassVar[str] = "sandbox.api.sgroup.qq.com"
+    SCHEME: ClassVar[str] = "https"
 
-    async def put(self, api_url, request=None, params=None):
-        headers = {
-            "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "BotPythonSDK/v0.5.4",
-        }
-        logger.debug("[HTTP] put headers: %s, api_url: %s, request: %s" % (headers, api_url, request))
-        async with aiohttp.ClientSession() as session:
-            async with session.put(
-                url=api_url,
-                params=params,
-                json=request,
-                timeout=self.timeout,
-                headers=headers,
-            ) as resp:
-                content = await resp.text()
-                _handle_response(api_url, resp, content)
-                return content
+    def __init__(self, method: str, path: str, is_sandbox: str = False) -> None:
+        self.method: str = method
+        self.path: str = path
+        self.is_sandbox = is_sandbox
 
-    async def patch(self, api_url, request=None, params=None):
+    @property
+    def url(self):
+        d = self.DOMAIN
+        if self.is_sandbox:
+            d = self.SANDBOX_DOMAIN
+        s__format = "{}://{}{}".format(self.SCHEME, d, self.path)
+        return s__format
+
+
+class BotHttp:
+    """
+    TODO 增加请求重试功能
+    TODO 增加并发请求的锁控制
+    """
+
+    def __init__(self, timeout: int, is_sandbox: str = False):
+        self.timeout = timeout
+        self.is_sandbox = is_sandbox
+
+        self._token: Optional[Token] = None
+        self._session: Optional[aiohttp.ClientSession] = None
+        self._global_over: Optional[asyncio.Event] = None
+
+    async def close(self) -> None:
+        if self._session:
+            await self._session.close()
+
+    async def request(self, route: Route, **kwargs: Any):
         headers = {
-            "Authorization": self.scheme + " " + self.token,
-            "User-Agent": "BotPythonSDK/v0.5.4",
+            "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
+            "User-Agent": "botpy/v1",
         }
-        logger.debug("[HTTP] patch headers: %s, api_url: %s, request: %s" % (headers, api_url, request))
-        async with aiohttp.ClientSession() as session:
-            async with session.patch(
-                url=api_url,
-                params=params,
-                json=request,
-                timeout=self.timeout,
-                headers=headers,
-            ) as resp:
-                content = await resp.text()
-                _handle_response(api_url, resp, content)
-                return content
+        logger.debug(f"[HTTP] get headers: {headers}, method: {route.method}, api_url: {route.url}")
+        async with self._session.request(method=route.method, url=route.url, headers=headers) as response:
+            return await _handle_response(route.url, response)
+
+    async def login(self, token: Token) -> robot.BaseInfo:
+        """login后保存token和session"""
+
+        self._session = aiohttp.ClientSession()
+        self._global_over = asyncio.Event()
+        self._global_over.set()
+
+        self._token = token
+
+        data = await self.request(Route("GET", "/users/@me"))
+        # TODO 检查机器人token错误的raise exception
+
+        return data
