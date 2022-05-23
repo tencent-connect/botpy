@@ -123,7 +123,7 @@ class APITestCase(unittest.TestCase):
         self.assertEqual("7", channel_permissions["permissions"])
 
     def test_channel_permissions_update(self):
-        remove = Permission(view_permission=True)
+        remove = Permission(manager_permission=True)
         coroutine = self.api.update_channel_user_permissions(CHANNEL_ID, GUILD_TEST_MEMBER_ID, remove=remove)
         result = self.loop.run_until_complete(coroutine)
         self.assertEqual("", result)
@@ -134,7 +134,7 @@ class APITestCase(unittest.TestCase):
         self.assertEqual("0", channel_permissions["permissions"])
 
     def test_channel_role_permissions_update(self):
-        add = Permission(view_permission=True)
+        add = Permission(manager_permission=True)
         coroutine = self.api.update_channel_role_permissions(CHANNEL_ID, GUILD_TEST_MEMBER_ID, add=add)
         result = self.loop.run_until_complete(coroutine)
         self.assertEqual("", result)
