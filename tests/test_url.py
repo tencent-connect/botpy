@@ -6,7 +6,7 @@ import unittest
 from botpy import logging
 from botpy.url import get_url, APIConstant
 
-logger = logging.getLogger()
+logger = logging.get_logger()
 
 
 class MyTestCase(unittest.TestCase):

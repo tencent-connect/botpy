@@ -6,20 +6,22 @@ import unittest
 from typing import List
 
 import botpy
+from botpy import logging, BotHttp, Permission
 from botpy.errors import (
     AuthenticationFailedError,
     ServerError,
 )
-from botpy import logging
 from botpy.model.announce import RecommendChannel, RecommendChannelRequest
 from botpy.model.api_permission import (
     APIPermissionDemandIdentify,
     PermissionDemandToCreate,
 )
 from botpy.model.emoji import EmojiType
+from botpy.types import guild, user, channel
+from botpy.types.channel import ChannelType, ChannelSubType
 from tests import test_config
 
-logger = logging.getLogger()
+logger = logging.get_logger()
 
 token = botpy.Token(test_config["token"]["appid"], test_config["token"]["token"])
 test_params_ = test_config["test_params"]
@@ -37,131 +39,105 @@ IS_SANDBOX = test_params_["is_sandbox"]
 MESSAGE_ID = test_params_["message_id"]
 
 
-class GuildAPITestCase(unittest.TestCase):
-    api = botpy.BotGuildAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
+class APITestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        print("setUp")
+        self.loop = asyncio.get_event_loop()
+        self.http = BotHttp(timeout=5)
+        self.loop.run_until_complete(self.http.login(token))
+        self.api = botpy.BotAPI(self.http)
+
+    def tearDown(self) -> None:
+        print("tearDown")
+        self.loop.run_until_complete(self.http.close())
 
     def test_guild(self):
-        guild = self.loop.run_until_complete(self.api.get_guild(GUILD_ID))
-        self.assertNotEqual("", guild.name)
-
-
-class GuildRoleAPITest(unittest.TestCase):
-    api = botpy.BotGuildRoleAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
+        result: guild.Guild = self.loop.run_until_complete(self.api.get_guild(GUILD_ID))
+        self.assertNotEqual("", result["name"])
 
     def test_guild_roles(self):
-        guild_roles = self.loop.run_until_complete(self.api.get_guild_roles(GUILD_ID))
-        self.assertEqual(GUILD_ID, guild_roles.guild_id)
+        result: guild.GuildRoles = self.loop.run_until_complete(self.api.get_guild_roles(GUILD_ID))
+        self.assertEqual(GUILD_ID, result["guild_id"])
 
     def test_guild_role_create_update_delete(self):
-        role_info = botpy.RoleUpdateInfo("Test Role", 4278245297, 0)
-        result = self.loop.run_until_complete(self.api.create_guild_role(GUILD_ID, role_info))
-        role_id = result.role_id
-        self.assertEqual("Test Role", result.role.name)
+        coroutine = self.api.create_guild_role(GUILD_ID, name="Test Role", color=4278245297)
+        result: guild.GuildRole = self.loop.run_until_complete(coroutine)
+        self.assertEqual("Test Role", result["role"]["name"])
+        id = result["role"]["id"]
 
-        role_info = botpy.RoleUpdateInfo("Test Update Role", 4278245297, 0)
-        result = self.loop.run_until_complete(self.api.update_guild_role(GUILD_ID, role_id, role_info))
-        self.assertEqual("Test Update Role", result.role.name)
+        coroutine = self.api.update_guild_role(GUILD_ID, role_id=id, name="Test Update Role")
+        result = self.loop.run_until_complete(coroutine)
+        self.assertEqual("Test Update Role", result["role"]["name"])
 
-        result = self.loop.run_until_complete(self.api.delete_guild_role(GUILD_ID, role_id))
-        self.assertEqual(True, result)
+        result = self.loop.run_until_complete(self.api.delete_guild_role(GUILD_ID, role_id=id))
+        self.assertEqual("", result)
 
     def test_guild_role_member_add_delete(self):
         result = self.loop.run_until_complete(
             self.api.create_guild_role_member(GUILD_ID, GUILD_TEST_ROLE_ID, GUILD_TEST_MEMBER_ID)
         )
-        self.assertEqual(True, result)
+        self.assertEqual("", result)
 
     def test_guild_role_member_delete(self):
         result = self.loop.run_until_complete(
             self.api.delete_guild_role_member(GUILD_ID, GUILD_TEST_ROLE_ID, GUILD_TEST_MEMBER_ID)
         )
-        self.assertEqual(True, result)
-
-
-class GuildMemberAPITestCase(unittest.TestCase):
-    api = botpy.BotGuildMemberAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
+        self.assertEqual("", result)
 
     def test_guild_member(self):
-        member = self.loop.run_until_complete(self.api.get_guild_member(GUILD_ID, GUILD_OWNER_ID))
-        self.assertEqual(GUILD_OWNER_NAME, member.robot.username)
+        member: user.Member = self.loop.run_until_complete(self.api.get_guild_member(GUILD_ID, GUILD_OWNER_ID))
+        self.assertEqual(GUILD_OWNER_NAME, member["user"]["username"])
 
     def test_guild_members(self):
-        query_params = botpy.QueryParams("0", 1)
         try:
-            members = self.loop.run_until_complete(self.api.get_guild_members(GUILD_ID, query_params))
+            members = self.loop.run_until_complete(self.api.get_guild_members(GUILD_ID))
             print(members)
         except AuthenticationFailedError as e:
             print(e.args)
 
-
-class ChannelAPITestCase(unittest.TestCase):
-    api = botpy.BotChannelAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
-
     def test_channel(self):
-        channel = self.loop.run_until_complete(self.api.get_channel(CHANNEL_ID))
-        self.assertEqual(CHANNEL_NAME, channel.name)
+        result: channel.Channel = self.loop.run_until_complete(self.api.get_channel(CHANNEL_ID))
+        self.assertEqual(CHANNEL_NAME, result["name"])
 
     def test_channels(self):
-        channels = self.loop.run_until_complete(self.api.get_channels(GUILD_ID))
-        self.assertNotEqual(0, len(channels))
+        result: List[channel.Channel] = self.loop.run_until_complete(self.api.get_channels(GUILD_ID))
+        self.assertNotEqual(0, len(result))
 
     def test_create_update_delete_channel(self):
         # create
-        request = botpy.CreateChannelRequest(
-            "channel_test",
-            botpy.ChannelType.TEXT_CHANNEL,
-            botpy.ChannelSubType.TALK,
-            99,
-            CHANNEL_PARENT_ID,
-        )
-        channel = self.loop.run_until_complete(self.api.create_channel(GUILD_ID, request))
+        coro = self.api.create_channel(GUILD_ID, "channel_test", ChannelType.TEXT_CHANNEL, ChannelSubType.TALK)
+        result: channel.Channel = self.loop.run_until_complete(coro)
         # patch
-        patch_channel = botpy.PatchChannelRequest(
-            "update_channel", botpy.ChannelType.TEXT_CHANNEL, 99, CHANNEL_PARENT_ID
-        )
-        api_patch_channel = self.loop.run_until_complete(self.api.update_channel(channel.id, patch_channel))
-        self.assertEqual("update_channel", api_patch_channel.name)
+        coro = self.api.update_channel(result["id"], name="update_channel")
+        result: channel.Channel = self.loop.run_until_complete(coro)
+        self.assertEqual("update_channel", result["name"])
         # delete
-        delete_channel = self.loop.run_until_complete(self.api.delete_channel(channel.id))
-        self.assertTrue("update_channel" == delete_channel.name or delete_channel.name is None)
-
-
-class ChannelPermissionsTestCase(unittest.TestCase):
-    api = botpy.BotChannelPermissionsAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
+        coro = self.api.delete_channel(result["id"])
+        delete_channel: channel.Channel = self.loop.run_until_complete(coro)
+        self.assertTrue(result["name"], delete_channel["name"])
 
     def test_channel_permissions(self):
-        channel_permissions = self.loop.run_until_complete(self.api.get_channel_permissions(CHANNEL_ID, GUILD_OWNER_ID))
-        self.assertNotEqual("0", channel_permissions.permissions)
+        coroutine = self.api.get_channel_user_permissions(CHANNEL_ID, GUILD_OWNER_ID)
+        channel_permissions: channel.ChannelPermissions = self.loop.run_until_complete(coroutine)
+        # 可查看、可发言、可管理
+        self.assertEqual("7", channel_permissions["permissions"])
 
     def test_channel_permissions_update(self):
-        request = botpy.UpdatePermission("0x0000000002", "")
-        result = self.loop.run_until_complete(
-            self.api.update_channel_permissions(CHANNEL_ID, GUILD_TEST_MEMBER_ID, request)
-        )
-        self.assertEqual(True, result)
+        remove = Permission(view_permission=True)
+        coroutine = self.api.update_channel_user_permissions(CHANNEL_ID, GUILD_TEST_MEMBER_ID, remove=remove)
+        result = self.loop.run_until_complete(coroutine)
+        self.assertEqual("", result)
 
     def test_channel_role_permissions(self):
-        channel_permissions = self.loop.run_until_complete(
-            self.api.get_channel_role_permissions(CHANNEL_ID, GUILD_TEST_ROLE_ID)
-        )
-        self.assertEqual("0", channel_permissions.permissions)
+        coroutine = self.api.get_channel_role_permissions(CHANNEL_ID, GUILD_TEST_ROLE_ID)
+        channel_permissions: channel.ChannelPermissions = self.loop.run_until_complete(coroutine)
+        self.assertEqual("0", channel_permissions["permissions"])
 
     def test_channel_role_permissions_update(self):
-        request = botpy.UpdatePermission("0x0000000002", "")
-        result = self.loop.run_until_complete(
-            self.api.update_channel_permissions(CHANNEL_ID, GUILD_TEST_ROLE_ID, request)
-        )
-        self.assertEqual(True, result)
-
-
-class UserAPITestCase(unittest.TestCase):
-    api = botpy.BotUserAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
+        add = Permission(view_permission=True)
+        coroutine = self.api.update_channel_role_permissions(CHANNEL_ID, GUILD_TEST_MEMBER_ID, add=add)
+        result = self.loop.run_until_complete(coroutine)
+        self.assertEqual("", result)
 
     def test_me(self):
         user = self.loop.run_until_complete(self.api.me())
@@ -175,11 +151,6 @@ class UserAPITestCase(unittest.TestCase):
         guilds = self.loop.run_until_complete(self.api.me_guilds(option))
         self.assertEqual(1, len(guilds))
 
-
-class AudioTestCase(unittest.TestCase):
-    api = botpy.BotAudioAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
-
     def test_post_audio(self):
         audio = botpy.AudioControl("", "Test", botpy.STATUS.START)
         try:
@@ -187,11 +158,6 @@ class AudioTestCase(unittest.TestCase):
             print(result)
         except AuthenticationFailedError as e:
             print(e)
-
-
-class DmsTestCase(unittest.TestCase):
-    api = botpy.BotDmsAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
 
     def test_create_and_send_dms(self):
         try:
@@ -206,19 +172,9 @@ class DmsTestCase(unittest.TestCase):
         except (Exception, ServerError) as e:
             print(e)
 
-
-class WebsocketTestCase(unittest.TestCase):
-    api = botpy.BotWebsocketAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
-
     def test_ws(self):
         ws = self.loop.run_until_complete(self.api.ws())
         self.assertEqual(ws["url"], "wss://api.sgroup.qq.com/websocket")
-
-
-class MuteTestCase(unittest.TestCase):
-    api = botpy.BotMuteAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
 
     def test_mute_all(self):
         option = botpy.MuteOption(mute_seconds="20")
@@ -235,21 +191,11 @@ class MuteTestCase(unittest.TestCase):
         result: List[str] = self.loop.run_until_complete(self.api.mute_multi_member(GUILD_ID, option))
         self.assertEqual(1, len(result))
 
-
-class AnnounceTestCase(unittest.TestCase):
-    api = botpy.BotAnnouncesAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
-
     def test_post_recommend_channel(self):
         channel_list = [RecommendChannel(CHANNEL_ID, "introduce")]
         request = RecommendChannelRequest(0, channel_list)
         result = self.loop.run_until_complete(self.api.post_recommended_channels(GUILD_ID, request))
         self.assertEqual(len(channel_list), len(result.recommend_channels))
-
-
-class APIPermissionTestCase(unittest.TestCase):
-    api = botpy.BotAPIPermissionAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
 
     def test_get_permissions(self):
         result = self.loop.run_until_complete(self.api.get_permissions(GUILD_ID))
@@ -261,19 +207,9 @@ class APIPermissionTestCase(unittest.TestCase):
         result = self.loop.run_until_complete(self.api.post_permission_demand(GUILD_ID, permission_demand_to_create))
         print(result.title)
 
-
-class APIScheduleTestCase(unittest.TestCase):
-    api = botpy.BotScheduleAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
-
     def test_get_schedules(self):
         schedules = self.loop.run_until_complete(self.api.get_schedules(CHANNEL_SCHEDULE_ID))
         self.assertEqual(None, schedules)
-
-
-class APIReactionTestCase(unittest.TestCase):
-    api = botpy.BotReactionAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
 
     def test_delete_reaction(self):
         result = self.loop.run_until_complete(self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4"))
@@ -283,11 +219,6 @@ class APIReactionTestCase(unittest.TestCase):
 
         result = self.loop.run_until_complete(self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4"))
         self.assertEqual(True, result)
-
-
-class APIPinsTestCase(unittest.TestCase):
-    api = botpy.BotPinsAPI(token, IS_SANDBOX)
-    loop = asyncio.get_event_loop()
 
     def test_put_pin(self):
         result = self.loop.run_until_complete(self.api.put_pin(CHANNEL_ID, MESSAGE_ID))

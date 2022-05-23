@@ -1,6 +1,6 @@
 from typing import Callable, overload, Optional, Any, Type, ClassVar, Dict, Iterator, Tuple, TypeVar
 
-__all__ = ("Intents",)
+__all__ = ("Intents", "Permission")
 
 BF = TypeVar("BF", bound="BaseFlags")
 
@@ -217,3 +217,34 @@ class Intents(BaseFlags):
 
         """
         return 1 << 30
+
+
+@fill_with_flags()
+class Permission(BaseFlags):
+    def __init__(self, **kwargs: bool) -> None:
+        super().__init__(**kwargs)
+        self.value: int = self.DEFAULT_VALUE
+        for key, value in kwargs.items():
+            if key not in self.VALID_FLAGS:
+                raise TypeError(f"{key!r} is not a valid flag name.")
+            setattr(self, key, value)
+
+    @Flag
+    def view_permission(self):
+        """可查看子频道	0x0000000001 (1 << 0)	支持指定成员可见类型，支持身份组可见类型"""
+        return 1 << 0
+
+    @Flag
+    def manager_permission(self):
+        """可管理子频道	0x0000000002 (1 << 1)	创建者、管理员、子频道管理员都具有此权限"""
+        return 1 << 1
+
+    @Flag
+    def speak_permission(self):
+        """可发言子频道	0x0000000004 (1 << 2)	支持指定成员发言类型，支持身份组发言类型"""
+        return 1 << 2
+
+    @Flag
+    def live_permission(self):
+        """可直播子频道	0x0000000008 (1 << 3)	支持指定成员发起直播，支持身份组发起直播；仅可在直播子频道中设置"""
+        return 1 << 3

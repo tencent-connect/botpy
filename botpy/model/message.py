@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
-from botpy.model.member import User, Member
+from botpy.types.user import User, Member
 
 
 class MessageGet:

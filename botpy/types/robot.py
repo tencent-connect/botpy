@@ -1,7 +1,7 @@
 from typing import TypedDict
 
 
-class BaseInfo(TypedDict):
+class Robot(TypedDict):
     id: str
     username: str
     avatar: str

@@ -6,7 +6,7 @@ import unittest
 
 from botpy import logging as new_logging
 
-logger = new_logging.getLogger()
+logger = new_logging.get_logger()
 
 
 class MyTestCase(unittest.TestCase):

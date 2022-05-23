@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from botpy.model.member import Member
+from botpy.types.user import Member
 
 
 class Schedule:

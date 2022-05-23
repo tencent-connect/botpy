@@ -2,10 +2,12 @@
 import asyncio
 import json
 from typing import Any, Optional, ClassVar, Union, Dict
+from urllib.parse import quote
 
 import aiohttp
 from aiohttp import ClientResponse
 
+from .utils import JsonUtil
 from .errors import HttpErrorDict, ServerError
 from .instances.token import Token
 from .logging import logging
@@ -41,17 +43,16 @@ async def _handle_response(url, response: ClientResponse) -> Union[Dict[str, Any
             f" error code: {response.status}, 返回内容: {data}, trace_id:{response.headers.get(X_TPS_TRACE_ID)}"
             # trace_id 用于定位接口问题
         )
-        error_message_: HttpErrorMessage = json.loads(data, object_hook=HttpErrorMessage)
         error_dict_get = HttpErrorDict.get(response.status)
         if error_dict_get is None:
-            raise ServerError(error_message_.message)
-        raise error_dict_get(msg=error_message_.message)
+            raise ServerError(data["message"])
+        raise error_dict_get(msg=data["message"])
 
 
 async def _json_or_text(response: aiohttp.ClientResponse) -> Union[Dict[str, Any], str]:
     text = await response.text(encoding="utf-8")
     try:
-        if response.headers["content-type"] == "application/json":
+        if response.headers["content-type"] == "application/json" and text:
             return json.loads(text)
     except KeyError:
         # Thanks Cloudflare
@@ -65,18 +66,24 @@ class Route:
     SANDBOX_DOMAIN: ClassVar[str] = "sandbox.api.sgroup.qq.com"
     SCHEME: ClassVar[str] = "https"
 
-    def __init__(self, method: str, path: str, is_sandbox: str = False) -> None:
+    def __init__(self, method: str, path: str, is_sandbox: str = False, **parameters: Any) -> None:
         self.method: str = method
         self.path: str = path
         self.is_sandbox = is_sandbox
 
-    @property
-    def url(self):
-        d = self.DOMAIN
         if self.is_sandbox:
             d = self.SANDBOX_DOMAIN
-        s__format = "{}://{}{}".format(self.SCHEME, d, self.path)
-        return s__format
+        else:
+            d = self.DOMAIN
+        self._url = "{}://{}{}".format(self.SCHEME, d, self.path)
+
+        # path的参数:
+        if parameters:
+            self._url = self._url.format_map({k: quote(v) if isinstance(v, str) else v for k, v in parameters.items()})
+
+    @property
+    def url(self):
+        return self._url
 
 
 class BotHttp:
@@ -85,7 +92,11 @@ class BotHttp:
     TODO 增加并发请求的锁控制
     """
 
-    def __init__(self, timeout: int, is_sandbox: str = False):
+    def __init__(
+        self,
+        timeout: int,
+        is_sandbox: str = False,
+    ):
         self.timeout = timeout
         self.is_sandbox = is_sandbox
 
@@ -102,11 +113,18 @@ class BotHttp:
             "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
             "User-Agent": "botpy/v1",
         }
-        logger.debug(f"[HTTP] get headers: {headers}, method: {route.method}, api_url: {route.url}")
-        async with self._session.request(method=route.method, url=route.url, headers=headers) as response:
+        # some checking if it's a JSON request
+        if "json" in kwargs:
+            headers["Content-Type"] = "application/json"
+            kwargs["data"] = JsonUtil.dict2json(kwargs.pop("json"))
+
+        kwargs["headers"] = headers
+
+        logger.debug(f"[HTTP] request headers: {headers}, method: {route.method}, api_url: {route.url}")
+        async with self._session.request(method=route.method, url=route.url, **kwargs) as response:
             return await _handle_response(route.url, response)
 
-    async def login(self, token: Token) -> robot.BaseInfo:
+    async def login(self, token: Token) -> robot.Robot:
         """login后保存token和session"""
 
         self._session = aiohttp.ClientSession()

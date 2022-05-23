@@ -18,10 +18,10 @@ os.system("")
 log_path = os.getenv("QQBOT_LOG_PATH", os.path.join(os.getcwd(), "%(name)s.log"))
 
 print_format = os.getenv(
-    "QQBOT_LOG_PRINT_FORMAT", "\033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m%(message)s"
+    "QQBOT_LOG_PRINT_FORMAT", "\033[1;33m[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t\033[0m%(message)s"
 )
 file_format = os.getenv(
-    "QQBOT_LOG_FILE_FORMAT", "%(asctime)s [%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
+    "QQBOT_LOG_FILE_FORMAT", "%(asctime)s\t[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t%(message)s"
 )
 
 
@@ -46,7 +46,7 @@ def _getLevel():
     return level
 
 
-def getLogger(name=None):
+def get_logger(name=None):
     if name is None:
         logger = logging.getLogger("botpy")
     else:

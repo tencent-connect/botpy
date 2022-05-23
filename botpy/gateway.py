@@ -13,7 +13,7 @@ from .types.gateway import ReadyEvent
 from .types.session import Session
 from .utils import JsonUtil
 
-_log = logging.getLogger()
+_log = logging.get_logger()
 
 
 class BotWebSocket:
@@ -90,13 +90,13 @@ class BotWebSocket:
         if self._conn is None:
             raise Exception("websocket connection failed ")
         if self._session["session_id"] != "":
-            await self.connect()
+            await self.ws_connect()
         else:
             await self.identify()
         # 心跳检查
-        asyncio.ensure_future(self._send_heartbeat(interval=30))
+        asyncio.ensure_future(self._send_heart(interval=30))
 
-    async def connect(self):
+    async def ws_connect(self):
         """
         websocket向服务器端发起链接，并定时发送心跳
         """
@@ -202,7 +202,7 @@ class BotWebSocket:
             return True
         return False
 
-    async def _send_heartbeat(self, interval):
+    async def _send_heart(self, interval):
         """
         心跳包
         :param interval: 间隔时间

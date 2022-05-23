@@ -13,7 +13,7 @@ from .http import BotHttp
 from .instances.robot import Robot
 from .instances.token import Token
 
-_log = logging.getLogger()
+_log = logging.get_logger()
 
 
 class _LoopSentinel:
@@ -53,7 +53,7 @@ class Client:
         self._ws_ap: Dict = {}
 
     async def __aenter__(self):
-        _log.debug("__aenter__")
+        _log.debug("bot client is __aenter__")
         await self._async_setup_hook()
         return self
 
@@ -63,7 +63,7 @@ class Client:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        _log.debug("__aexit__")
+        _log.debug("bot client is __aexit__")
 
         if not self.is_closed():
             await self.close()
@@ -138,10 +138,10 @@ class Client:
         if self.loop is _loop:
             await self._async_setup_hook()
 
-        await self._login(token)
-        return await self._init(token)
+        await self._bot_login(token)
+        return await self._bot_init(token)
 
-    async def _login(self, token: Token) -> None:
+    async def _bot_login(self, token: Token) -> None:
         _log.info("[连接管理]登录机器人账号中...")
 
         user = await self.http.login(token)
@@ -152,14 +152,14 @@ class Client:
         # 实例一个session_pool
         self._connection = ConnectionSession(
             max_async=self._ws_ap["session_start_limit"]["max_concurrency"],
-            connect=self.connect,
+            connect=self.bot_connect,
             dispatch=self.dispatch,
             loop=asyncio.get_event_loop(),
         )
 
         self._connection.state.robot = Robot(user)
 
-    async def _init(self, token):
+    async def _bot_init(self, token):
         _log.info("[连接管理]程序启动...")
         # 每个机器人创建的连接数不能超过remaining剩余连接数
         if self._ws_ap["shards"] > self._ws_ap["session_start_limit"]["remaining"]:
@@ -199,7 +199,7 @@ class Client:
             _log.info("[连接管理]服务强行停止!")
             # cancel all tasks lingering
 
-    async def connect(self, session):
+    async def bot_connect(self, session):
         """
         newConnect 启动一个新的连接，如果连接在监听过程中报错了，或者被远端关闭了链接，需要识别关闭的原因，能否继续 resume
         如果能够 resume，则往 sessionChan 中放入带有 sessionID 的 session
@@ -212,7 +212,7 @@ class Client:
 
         client = BotWebSocket(session, self._connection)
         try:
-            await client.connect()
+            await client.ws_connect()
         except (Exception, KeyboardInterrupt, SystemExit) as e:
             await client.on_error(e)
 

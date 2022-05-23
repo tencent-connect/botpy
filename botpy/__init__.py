@@ -3,4 +3,4 @@ from . import logging
 from .client import *
 from .flags import *
 
-logger = logging.getLogger()
+logger = logging.get_logger()
