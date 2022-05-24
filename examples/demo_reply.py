@@ -16,8 +16,7 @@ class MyClient(botpy.Client):
 
     async def on_at_message_create(self, message: Message):
         _log.info(f"robot 「{self.robot.name}」 is on at, message: {message}")
-
-        await message.reply("ok")
+        await message.reply(f"Ok! Receive your message: {message.content}")
 
 
 if __name__ == "__main__":
