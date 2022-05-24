@@ -1,50 +1,50 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import List, TypedDict
 
 from .gateway import MessagePayload
 
 
-class Attachment:
+class Attachment(TypedDict):
     url: str
 
 
-class Thumbnail:
+class Thumbnail(TypedDict):
     url: str  # 图片地址
 
 
-class EmbedField:
+class EmbedField(TypedDict):
     name: str
     value: str
 
 
-class Embed:
+class Embed(TypedDict):
     title: str  # 标题
     prompt: str  # 消息弹窗内容
     thumbnail: Thumbnail  # 缩略图
     fields: List[EmbedField]  # 消息创建时间
 
 
-class ArkObjKv:
+class ArkObjKv(TypedDict):
     key: str
     value: str
 
 
-class ArkObj:
+class ArkObj(TypedDict):
     obj_kv: List[ArkObjKv]
 
 
-class ArkKv:
+class ArkKv(TypedDict):
     key: str
     value: str
     obj: List[ArkObj]
 
 
-class Ark:
+class Ark(TypedDict):
     template_id: int
     kv: List[ArkKv]
 
 
-class Reference:
+class Reference(TypedDict):
     message_id: str
     ignore_get_message_error: bool
 
@@ -72,24 +72,24 @@ class MessagesPager:
         limit = limit
 
 
-class MessageMarkdownParams:
+class MessageMarkdownParams(TypedDict):
     key: str
     values: List[str]
 
 
-class Markdown:
+class Markdown(TypedDict):
     template_id: int
-    params = None
+    params: MessageMarkdownParams
     content: str
 
 
-class DirectMessageGuild:
+class DirectMessageGuild(TypedDict):
     guild_id: str
     channel_id: str
     creat_time: str
 
 
-class CreateDirectMessageRequest:
+class CreateDirectMessageRequest(TypedDict):
     """机器人发送私信时所传的数据对象
 
     :param source_guild_id: 创建的私信频道ID
@@ -100,23 +100,23 @@ class CreateDirectMessageRequest:
     source_guild_id: str
 
 
-class DeletedMessageOriginalAuthor:
+class DeletedMessageOriginalAuthor(TypedDict):
     id: str
     username: str
     bot: bool
 
 
-class DeletedMessage:
+class DeletedMessage(TypedDict):
     guild_id: str
     channel_id: str
     id: str
     author: DeletedMessageOriginalAuthor
 
 
-class DeletionOperator:
+class DeletionOperator(TypedDict):
     id: str
 
 
-class DeletedMessageInfo:
+class DeletedMessageInfo(TypedDict):
     message: DeletedMessage
     op_user: DeletionOperator
