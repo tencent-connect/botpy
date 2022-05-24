@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from ..instances.token import Token
+from ..robot import Token
 
 
 class ShardConfig(TypedDict):

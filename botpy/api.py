@@ -5,7 +5,37 @@ from typing import Any, List, Dict
 
 from .flags import Permission
 from .http import BotHttp, Route
-from .types import guild, user, channel
+from .types import guild, user, channel, message
+
+
+def _handle_message_parameters(
+    content: str = None,
+    embed: message.Embed = None,
+    ark: message.Ark = None,
+    message_reference: message.Reference = None,
+    image: str = None,
+    msg_id: str = None,
+    event_id: str = None,
+    markdown: message.Markdown = None,
+) -> Dict:
+    payload = {}
+    if content is not None:
+        payload["content"] = content
+    if embed is not None:
+        payload["embed"] = embed
+    if ark is not None:
+        payload["ark"] = ark
+    if message_reference is not None:
+        payload["message_reference"] = message_reference
+    if image is not None:
+        payload["image"] = image
+    if msg_id is not None:
+        payload["msg_id"] = msg_id
+    if event_id is not None:
+        payload["event_id"] = event_id
+    if markdown is not None:
+        payload["markdown"] = markdown
+    return payload
 
 
 class BotAPI:
@@ -309,6 +339,9 @@ class BotAPI:
     ) -> str:
         """修改指定子频道用户的权限
 
+        注意
+            如果是公共频道不能进行添加和移除查看或发言权限
+
         :param channel_id:
             子频道ID
         :param user_id:
@@ -377,9 +410,7 @@ class BotAPI:
         )
         return await self._http.request(route, json=payload)
 
-    #
-    # """消息"""
-    #
+    # 消息
     # async def get_message(self, channel_id: str, message_id: str) -> MessageGet:
     #     """
     #     获取指定消息
@@ -410,27 +441,49 @@ class BotAPI:
     #
     #     response = await self._http.get(url, params=query)
     #     return json.loads(response, object_hook=Message)
-    #
-    # async def post_message(self, channel_id: str, message_send: MessageSendRequest) -> Message:
-    #     """
-    #     发送消息
-    #
-    #     要求操作人在该子频道具有发送消息的权限。
-    #     发送成功之后，会触发一个创建消息的事件。
-    #     被动回复消息有效期为 5 分钟
-    #     主动推送消息每日每个子频道限 2 条
-    #     发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
-    #
-    #     :param channel_id: 子频道ID
-    #     :param message_send: MessageSendRequest对象
-    #     :return: Message对象
-    #     """
-    #
-    #     url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
-    #     request_json = JsonUtil.obj2json_serialize(message_send)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=Message)
-    #
+
+    async def post_message(
+        self,
+        channel_id: str,
+        content: str = None,
+        embed: message.Embed = None,
+        ark: message.Ark = None,
+        message_reference: message.Reference = None,
+        image: str = None,
+        msg_id: str = None,
+        event_id: str = None,
+        markdown: message.Markdown = None,
+    ) -> message.Message:
+        """发送消息
+
+        注意
+            - 要求操作人在该子频道具有发送消息的权限。
+            - 发送成功之后，会触发一个创建消息的事件。
+            - 被动回复消息有效期为 5 分钟
+            - 主动推送消息每日每个子频道限 2 条
+            - 发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
+
+        :param channel_id:
+            子频道ID
+        :param content:
+            消息内容，文本内容，支持内嵌格式
+        :param msg_id:
+            要回复的消息id(Message.id), 在 AT_CREATE_MESSAGE 事件中获取。带了 msg_id 视为被动回复消息，否则视为主动推送消息
+        :param embed:
+            embed 消息，一种特殊的 ark
+        :param ark:
+            ark 消息
+        :param image:
+            图片url地址
+        :param message_reference:
+            引用消息
+
+        :return: Message
+        """
+        params = _handle_message_parameters(content, embed, ark, message_reference, image, msg_id, event_id, markdown)
+        route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
+        return await self._http.request(route, json=params)
+
     # async def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False):
     #     """
     #     撤回消息
@@ -514,10 +567,10 @@ class BotAPI:
     #     response = await self._http.get(url, params=query)
     #     return json.loads(response, object_hook=Guild)
     #
-    # """WebsocketAPI"""
-    #
-    # async def ws(self):
-    #     return await self._http.request(Route("GET", "/gateway/bot"))
+    # WebsocketAPI
+    async def ws(self):
+        return await self._http.request(Route("GET", "/gateway/bot"))
+
     #
     # """禁言接口"""
     #

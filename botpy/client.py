@@ -10,8 +10,7 @@ from .connection import ConnectionSession
 from .flags import Intents
 from .gateway import BotWebSocket
 from .http import BotHttp
-from .instances.robot import Robot
-from .instances.token import Token
+from .robot import Robot, Token
 
 _log = logging.get_logger()
 
@@ -155,6 +154,7 @@ class Client:
             connect=self.bot_connect,
             dispatch=self.dispatch,
             loop=asyncio.get_event_loop(),
+            api=self.api,
         )
 
         self._connection.state.robot = Robot(user)

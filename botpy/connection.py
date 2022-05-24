@@ -2,8 +2,11 @@ import asyncio
 import inspect
 from typing import List, Callable, Dict, Any, Optional
 
-from .instances.robot import Robot
+from .api import BotAPI
+from .message import Message
+from .robot import Robot
 from .logging import logging
+from .types import gateway
 from .types.gateway import ReadyEvent
 from .types.session import Session
 
@@ -17,9 +20,9 @@ class ConnectionSession:
     这里通过设置session_id=""空则任务session需要重连
     """
 
-    def __init__(self, max_async, connect: Callable, dispatch: Callable, loop=None):
+    def __init__(self, max_async, connect: Callable, dispatch: Callable, loop=None, api: BotAPI = None):
         self.dispatch = dispatch
-        self.state = ConnectionState(dispatch)
+        self.state = ConnectionState(dispatch, api)
         self.parser: Dict[str, Callable[[Any], None]] = self.state.parsers
 
         self._connect = connect
@@ -61,7 +64,7 @@ class ConnectionSession:
 class ConnectionState:
     """Client的Websocket状态处理"""
 
-    def __init__(self, dispatch: Callable):
+    def __init__(self, dispatch: Callable, api: BotAPI):
         self.robot: Optional[Robot] = None
 
         self.parsers: Dict[str, Callable[[Any], None]]
@@ -71,9 +74,11 @@ class ConnectionState:
                 parsers[attr[6:].lower()] = func
 
         self._dispatch = dispatch
+        self.api = api
 
-    def parse_at_message_create(self, data):
-        self._dispatch("at_message_create", data)
+    def parse_at_message_create(self, data: gateway.MessagePayload):
+        message = Message(self.api, data)
+        self._dispatch("at_message_create", message)
 
     def parse_ready(self, data: ReadyEvent):
         self._dispatch("ready")

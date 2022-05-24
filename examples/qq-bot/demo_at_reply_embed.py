@@ -5,7 +5,7 @@ import os.path
 
 import botpy
 from botpy.utils import YamlUtil
-from botpy.model.message import MessageEmbedField, MessageEmbed
+from botpy.types.message import MessageEmbedField, MessageEmbed
 from botpy.model.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))

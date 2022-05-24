@@ -4,7 +4,7 @@ import os.path
 
 import botpy
 from botpy.utils import YamlUtil
-from botpy.model.message import MessageMarkdown, MessageMarkdownParams
+from botpy.types.message import Markdown, MessageMarkdownParams
 from botpy.model.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
@@ -25,7 +25,7 @@ async def _message_handler(context: WsContext, message: botpy.Message):
 async def handle_send_markdown_by_template(channel_id, msg_id):
     msg_api = botpy.BotMessageAPI(t_token, False)
 
-    markdown = MessageMarkdown()
+    markdown = Markdown()
     markdown.template_id = 65
     markdown.params = [
         MessageMarkdownParams(key="title", values=["标题"]),
@@ -40,7 +40,7 @@ async def handle_send_markdown_by_template(channel_id, msg_id):
 async def handle_send_markdown_by_content(channel_id, msg_id):
     msg_api = botpy.BotMessageAPI(t_token, False)
 
-    markdown = MessageMarkdown()
+    markdown = Markdown()
     markdown.content = "# 标题 \n## 简介很开心 \n内容"
 
     send = botpy.MessageSendRequest(content="", markdown=markdown, msg_id=msg_id)

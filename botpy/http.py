@@ -9,7 +9,7 @@ from aiohttp import ClientResponse
 
 from .utils import JsonUtil
 from .errors import HttpErrorDict, ServerError
-from .instances.token import Token
+from .robot import Token
 from .logging import logging
 from .types import robot
 

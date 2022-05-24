@@ -1,29 +1,5 @@
 # -*- coding: utf-8 -*-
 from .audio import AudioControl, STATUS
-from .message import (
-    Message,
-    TypesEnum,
-    MessagesPager,
-    MessageAttachment,
-    MessageEmbedThumbnail,
-    MessageEmbedField,
-    MessageEmbed,
-    MessageArkObjKv,
-    MessageArkObj,
-    MessageArkKv,
-    MessageArk,
-    MessageMarkdownParams,
-    MessageMarkdown,
-    MessageReference,
-    MessageSendRequest,
-    DirectMessageGuild,
-    CreateDirectMessageRequest,
-    DeletedMessageOriginalAuthor,
-    DeletedMessage,
-    DeletionOperator,
-    MessageSendRequest,
-    DeletedMessageInfo,
-)
 from .mute import MuteOption, MultiMuteOption
 from .schedule import ScheduleToCreate, ScheduleToPatch
 from .user import ReqOption

@@ -5,7 +5,7 @@ import os.path
 
 import botpy
 from botpy.utils import YamlUtil
-from botpy.model.message import MessageArk, MessageArkKv
+from botpy.types.message import Ark, ArkKv
 from botpy.model.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
@@ -27,14 +27,14 @@ async def handle_send_ark(time, channel_id, msg_id):
     for i in range(time):
         await asyncio.sleep(1)
         # 构造消息发送请求数据对象
-        ark = MessageArk()
+        ark = Ark()
         ark.template_id = 37
 
         ark.kv = [
-            MessageArkKv(key="#PROMPT#", value="通知提醒"),
-            MessageArkKv(key="#METATITLE#", value="标题"),
-            MessageArkKv(key="#METASUBTITLE#", value="子标题"),
-            MessageArkKv(
+            ArkKv(key="#PROMPT#", value="通知提醒"),
+            ArkKv(key="#METATITLE#", value="标题"),
+            ArkKv(key="#METASUBTITLE#", value="子标题"),
+            ArkKv(
                 key="#METACOVER#",
                 value="https://vfiles.gtimg.cn/vupload/20211029/bf0ed01635493790634.jpg",
             ),
