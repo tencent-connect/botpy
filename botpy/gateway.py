@@ -45,16 +45,17 @@ class BotWebSocket:
         self._connection = _connection
         self._parser = _connection.parser
         self._can_reconnect = False
-        self._invalid_reconnect_code = [9001, 9005]
+        self._INVALID_RECONNECT_CODE = [9001, 9005]
 
     async def on_error(self, exception: BaseException):
         _log.error("on_error: websocket connection: %s, exception : %s" % (self._conn, exception))
         traceback.print_exc()
 
     async def on_close(self, close_status_code, close_msg):
-        _log.info("[ws连接]关闭, 返回码: %s" % close_status_code + ", 返回信息:%s" % close_msg)
+        _log.info("[ws连接]关闭, 返回码: %s" % close_status_code + ", 返回信息: %s" % close_msg)
         # 这种不能重新链接
-        if close_status_code in self._invalid_reconnect_code or self._can_reconnect is False:
+        if close_status_code in self._INVALID_RECONNECT_CODE or not self._can_reconnect:
+            _log.info("[ws连接]无法重连，创建新连接!")
             self._session["session_id"] = ""
             self._session["last_seq"] = 0
         # 断连后启动一个新的链接并透传当前的session，不使用内部重连的方式，避免死循环
@@ -74,7 +75,7 @@ class BotWebSocket:
             if event_seq > 0:
                 self._session["last_seq"] = event_seq
             ready = await self._ready_handler(msg)
-            _log.info(f"[ws连接] 机器人「 {ready['user']['username']} 」 启动成功！")
+            _log.info(f"[ws连接]机器人「{ready['user']['username']}」 启动成功！")
 
         if "t" in msg.keys():
             event = msg["t"].lower()
