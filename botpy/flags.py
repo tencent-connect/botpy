@@ -103,7 +103,7 @@ class Flag:
 
 @fill_with_flags()
 class Intents(BaseFlags):
-    # TODO 补全所有事件的注释
+    # TODO 补全所有事件的注释 @veehou
 
     __slots__ = ()
 

@@ -25,7 +25,7 @@ file_format = os.getenv(
 )
 
 
-def _getLevel():
+def _get_level():
     level = logging.INFO
     level_str = os.getenv("QQBOT_LOG_LEVEL", str(logging.INFO))
     try:
@@ -47,10 +47,9 @@ def _getLevel():
 
 
 def get_logger(name=None):
-    if name is None:
-        logger = logging.getLogger("botpy")
-    else:
-        logger = logging.getLogger(name)
+    if not name:
+        name = "botpy"
+    logger = logging.getLogger(name)
 
     logging.basicConfig(format=print_format)
 
@@ -59,27 +58,29 @@ def get_logger(name=None):
     if len(argv) > 1 and argv[1] in ["-d", "--debug"]:
         logger.setLevel(level=logging.DEBUG)
     else:
-        logger.setLevel(level=_getLevel())
+        logger.setLevel(level=_get_level())
 
     # FileHandler
-    no_log = os.getenv("QQBOT_DISABLE_LOG", "0")
-    if no_log == "0":
-        formatter = logging.Formatter(file_format)
-        if name is None:
-            name = "botpy"
-        log_file = log_path % {"name": name}
-        file_handler = None
-        # do not use RotatingFileHandler under Windows
-        # due to multi-process issue
-        # save last 7 days log
-        file_handler = TimedRotatingFileHandler(
-            filename=log_file,
-            when="D",
-            backupCount=7,
-        )
-        if len(logger.handlers) == 0:
-            file_handler.setLevel(level=logging.DEBUG)
-            file_handler.setFormatter(formatter)
-            logger.addHandler(file_handler)
+    log_flag = os.getenv("QQBOT_DISABLE_LOG", "0")
+    if log_flag != "0":
+        return
+
+    formatter = logging.Formatter(file_format)
+    if name is None:
+        name = "botpy"
+    log_file = log_path % {"name": name}
+    file_handler = None
+    # do not use RotatingFileHandler under Windows
+    # due to multi-process issue
+    # save last 7 days log
+    file_handler = TimedRotatingFileHandler(
+        filename=log_file,
+        when="D",
+        backupCount=7,
+    )
+    if len(logger.handlers) == 0:
+        file_handler.setLevel(level=logging.DEBUG)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
 
     return logger

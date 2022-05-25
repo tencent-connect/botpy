@@ -17,8 +17,10 @@ class Token:
 
     def __init__(self, app_id: str, access_token: str):
         """
-        :param app_id: 机器人appid
-        :param access_token: 机器人token
+        :param app_id:
+            机器人appid
+        :param access_token:
+            机器人token
         """
         self.app_id = app_id
         self.access_token = access_token

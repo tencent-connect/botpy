@@ -19,64 +19,72 @@ def _handle_message_parameters(
     markdown: message.Markdown = None,
 ) -> Dict:
     payload = {}
-    if content is not None:
-        payload["content"] = content
-    if embed is not None:
-        payload["embed"] = embed
-    if ark is not None:
-        payload["ark"] = ark
-    if message_reference is not None:
-        payload["message_reference"] = message_reference
-    if image is not None:
-        payload["image"] = image
-    if msg_id is not None:
-        payload["msg_id"] = msg_id
-    if event_id is not None:
-        payload["event_id"] = event_id
-    if markdown is not None:
-        payload["markdown"] = markdown
+    params = locals()
+    payload.update({k: v for k, v in params.items() if v})
     return payload
 
 
 class BotAPI:
+    """
+    机器人相关的API接口类
+
+    使用注意:
+        - 如果要直接使用api，可以通过client的内部成员变量，通过`self.api.xx`来使用
+        - 设置超时时间: Client(timeout=5)
+        - API当前返回的所有自定义类型数据为字典数据，通过TypedDict进行类型提示
+    """
+
     def __init__(self, http: BotHttp):
-        """API初始化信息"""
+        """
+        Args:
+          http (BotHttp): 用于发送请求的 http 客户端。
+        """
         self._http = http
 
-    # TODO 重写所有的api及单测
+    # TODO 重写所有的api及单测 @veehou
 
     # 频道相关接口
     async def get_guild(self, guild_id: str) -> guild.Guild:
-        """获取频道信息
+        """
+        获取频道信息。
 
-        :param guild_id: 频道ID（一般从事件中获取相关的ID信息）
-        :return: GuildPayload
+        Args:
+          guild_id (str): 频道ID（一般从事件中获取相关的ID信息）
+
+        Returns:
+          GuildPayload (字典数据)
         """
         route = Route("GET", "/guilds/{guild_id}", guild_id=guild_id)
         return await self._http.request(route)
 
     # 频道身份组相关接口
     async def get_guild_roles(self, guild_id: str) -> guild.GuildRoles:
-        """获取频道身份组列表
+        """
+        获取频道身份组列表
 
-        :param guild_id:频道ID
-        :return:GuildRolesPayload
+        Args:
+          guild_id (str): 频道ID。
+
+        Returns:
+          GuildRolesPayload
         """
         route = Route("GET", "/guilds/{guild_id}/roles", guild_id=guild_id)
         return await self._http.request(route)
 
     async def create_guild_role(self, guild_id: str, **fields: Any) -> guild.GuildRole:
-        """创建频道身份组
+        """
+        创建频道身份组
 
-        guild_id:str
-            频道ID
+        Args:
+          guild_id (str): 在其中创建角色的频道ID。
 
-        fields
-            参数字段，可以通过字典设置参数值，如 `create_guild_role(guild_id,name="test")`
-            name	string	名称(非必填)
-            color	uint32	ARGB 的 HEX 十六进制颜色值转换后的十进制数值(非必填)
-            hoist	int32	在成员列表中单独展示: 0-否, 1-是(非必填)
-        return::class:GuildRole
+        Kwargs（fields）:
+          name (str): 名称(非必填)
+          color (int): ARGB 的 HEX 十六进制颜色值转换后的十进制数值(非必填)
+          hoist (int): 在成员列表中单独展示: 0-否, 1-是(非必填)
+
+        Returns:
+          class:GuildRole
         """
         valid_keys = ("name", "color", "hoist")
         payload = {k: v for k, v in fields.items() if k in valid_keys}
@@ -84,18 +92,20 @@ class BotAPI:
         return await self._http.request(route, json=payload)
 
     async def update_guild_role(self, guild_id: str, role_id: str, **fields: Any) -> guild.GuildRole:
-        """修改频道身份组
+        """
+        修改频道身份组
 
-        guild_id:
-            频道ID
-        role_id:
-            身份组ID
-        fields
-            参数字段，可以通过字典设置参数值，如 `create_guild_role(guild_id,name="test")`
-            name	string	名称(非必填)
-            color	uint32	ARGB 的 HEX 十六进制颜色值转换后的十进制数值(非必填)
-            hoist	int32	在成员列表中单独展示: 0-否, 1-是(非必填)
-        return:class:GuildRole
+        Args:
+          guild_id (str): 在其中创建角色的公会 ID。
+          role_id (str): 您要修改的角色的 ID。
+
+        Kwargs（fields）:
+          name (str): 名称(非必填)
+          color (int): ARGB 的 HEX 十六进制颜色值转换后的十进制数值(非必填)
+          hoist (int): 在成员列表中单独展示: 0-否, 1-是(非必填)
+
+        Returns:
+          class:GuildRole
         """
         valid_keys = ("name", "color", "hoist")
         payload = {k: v for k, v in fields.items() if k in valid_keys}
@@ -103,13 +113,15 @@ class BotAPI:
         return await self._http.request(route, json=payload)
 
     async def delete_guild_role(self, guild_id: str, role_id: str) -> str:
-        """删除频道身份组
+        """
+        删除频道身份组
 
-        :param guild_id:
-            频道ID
-        :param role_id:
-            身份组ID
-        :return: 删除正常返回空字符串
+        Args:
+          guild_id (str): 频道 ID。
+          role_id (str): 身份组 ID。
+
+        Returns:
+          返回值是一个字符串。
         """
         route = Route("DELETE", "/guilds/{guild_id}/roles/{role_id}", guild_id=guild_id, role_id=role_id)
         return await self._http.request(route)
@@ -121,20 +133,17 @@ class BotAPI:
         user_id: str,
         channel_id: str = None,
     ) -> str:
-        """增加频道身份组成员
+        """
+        增加频道身份组成员。
 
-        如果是机器人，要求被添加为管理员。
+        Args:
+          guild_id (str): 频道 ID。
+          role_id (str): 身份组 ID。
+          user_id (str): 要添加到角色的用户的用户 ID。
+          channel_id (str): 您要在其中创建角色的频道的 ID。如果要删除的身份组ID是5-子频道管理员，需要增加channel对象来指定具体是哪个子频道
 
-        :param guild_id:
-            频道ID
-        :param role_id:
-            身份组ID
-        :param user_id:
-            用户ID
-        :param channel_id:
-            如果要删除的身份组ID是5-子频道管理员，需要增加channel对象来指定具体是哪个子频道
-
-        :return:删除正常返回空字符串
+        Returns:
+          返回值是一个字符串。
         """
         payload = {}
         if channel_id:
@@ -150,21 +159,18 @@ class BotAPI:
         return await self._http.request(route, json=payload)
 
     async def delete_guild_role_member(self, guild_id: str, role_id: str, user_id: str, channel_id: str = None) -> str:
-        """删除频道身份组成员
+        """
+        删除频道身份组成员。
 
-        注意：
-            如果是机器人，要求被添加为管理员。
-
-        :param guild_id:
-            频道ID
-        :param role_id:
-            身份组ID
-        :param user_id:
-            用户ID
-        :param channel_id:
+        Args:
+          guild_id (str): 频道 ID。
+          role_id (str): 身份组 ID。
+          user_id (str): 用户的标识。
+          channel_id (str): 您要从中删除角色的子频道的 ID。
             如果要删除的身份组ID是5-子频道管理员，需要增加channel对象来指定具体是哪个子频道
 
-        :return: 删除正常返回空字符串
+        Returns:
+          返回值是一个字符串。
         """
         payload = {}
         if channel_id:
@@ -181,14 +187,15 @@ class BotAPI:
 
     # 成员相关接口，添加成员到用户组等
     async def get_guild_member(self, guild_id: str, user_id: str) -> user.Member:
-        """获取频道指定成员
+        """
+        获取频道指定成员。
 
-        :param guild_id:
-            频道ID
-        :param user_id:
-            用户ID（一般从事件消息中获取）
+        Args:
+          guild_id (str): 频道 ID。
+          user_id (str): 用户 ID（一般从事件消息中获取。
 
-        :return:user.Member
+        Returns:
+          user.Member
         """
         route = Route(
             "GET",
@@ -199,19 +206,18 @@ class BotAPI:
         return await self._http.request(route)
 
     async def get_guild_members(self, guild_id: str, after: str = "0", limit: int = 1) -> List[user.Member]:
-        """获取成员列表
+        """
+        获取成员列表。
 
-        注意
-            该接口为私域机器人权限, 需要在管理端申请权限
+        注意:该接口为私域机器人权限, 需要在管理端申请权限
 
-        :param guild_id:
-            频道ID
-        :param after: str
-            上一次回包中最后一个member的user id， 如果是第一次请求填 0，默认为 0
-        :param limit: int
-            分页大小，1-400，默认是 1。成员较多的频道尽量使用较大的limit值，以减少请求数
+        Args:
+          guild_id (str): 频道 ID。
+          after (str): 上一批用户中最后一个用户的ID。如果这是第一个请求，请使用 0。. Defaults to 0
+          limit (int): 分页大小，1-400。成员较多的频道尽量使用较大的limit值，以减少请求数。. Defaults to 1
 
-        :return: List[user.Member]
+        Returns:
+          user.Member 对象的列表。
         """
         params: Dict[str, Any] = {}
 
@@ -229,11 +235,14 @@ class BotAPI:
 
     # 子频道相关接口
     async def get_channel(self, channel_id: str) -> channel.Channel:
-        """获取子频道信息
+        """
+        它获取频道信息。
 
-        :param channel_id:
-            子频道ID
-        :return:channel.Channel
+        Args:
+          channel_id (str): 子频道 ID。
+
+        Returns:
+          channel.Channel
         """
         route = Route(
             "GET",
@@ -243,12 +252,14 @@ class BotAPI:
         return await self._http.request(route)
 
     async def get_channels(self, guild_id: str) -> List[channel.Channel]:
-        """获取频道下的子频道列表
+        """
+        获取频道下的子频道列表
 
-        :param guild_id:
-            频道ID
+        Args:
+          guild_id (str): 频道 ID。
 
-        :return: List[channel.Channel]
+        Returns:
+          List[channel.Channel]
         """
         route = Route(
             "GET",
@@ -260,74 +271,78 @@ class BotAPI:
     async def create_channel(
         self, guild_id: str, name: str, type: channel.ChannelType, sub_type: channel.ChannelSubType, **fields
     ) -> channel.Channel:
-        """创建子频道
-
-        :param guild_id:
-            频道ID
-        :param name:
-            子频道名
-        :param type: channel.ChannelType
-            子频道类型
-        :param sub_type: channel.ChannelSubType
-            子频道子类型
-        :param 扩展参数，通过 `kwargs` 传入参数
-            position	number	否	排序，非必填
-            parent_id	string	否	分组 ID
-
-        :return:Dict: ChannelResponse 对象
         """
+        创建子频道
 
+        Args:
+          guild_id (str): 频道 ID。
+          name (str): 子频道名。
+          type (channel.ChannelType): 子频道类型
+          sub_type (channel.ChannelSubType): 子频道子类型
+
+        Kwargs（fields）:
+          position (int): 排序，非必填
+          parent_id (str): 否,分组 ID
+
+        Returns:
+          通道对象。
+        """
         payload = {
             "name": name,
             "type": type.value,
             "subtype": sub_type.value,
         }
         valid_keys = ("position", "parent_id")
-        payload.update({k: v for k, v in fields.items() if k in valid_keys and v is not None})
+        payload.update({k: v for k, v in fields.items() if k in valid_keys and v})
         route = Route("POST", "/guilds/{guild_id}/channels", guild_id=guild_id)
         return await self._http.request(route, json=payload)
 
     async def update_channel(self, channel_id: str, **fields) -> channel.Channel:
-        """修改子频道
-
-        :param channel_id:
-            频道ID
-        :**fields: 修改指定参数，通过`**kwargs` 传入:
-            name	            string	子频道名
-            position	        int	    排序
-            parent_id	        string	分组 id
-            private_type	    int	    子频道私密类型 PrivateType
-            speak_permission	int	    子频道发言权限 SpeakPermission
-
-        :return:Dict: channel.Channel
         """
+        更新子频道。
 
+        Args:
+          channel_id (str): 要修改的子频道ID。
+
+        Kwargs:
+          name	            string	子频道名
+          position	        int	    排序
+          parent_id	        string	分组 id
+          private_type	    int	    子频道私密类型 PrivateType
+          speak_permission	int	    子频道发言权限 SpeakPermission
+
+        Returns:Dict:
+          channel.Channel
+        """
         valid_keys = ("name", "position", "parent_id", "private_type", "speak_permission")
-        payload = {k: v for k, v in fields.items() if k in valid_keys and v is not None}
+        payload = {k: v for k, v in fields.items() if k in valid_keys and v}
         route = Route("PATCH", "/channels/{channel_id}", channel_id=channel_id)
         return await self._http.request(route, json=payload)
 
     async def delete_channel(self, channel_id: str) -> channel.Channel:
-        """删除子频道
+        """
+        删除子频道
 
-        :param channel_id:
-            频道ID
+        Args:
+          channel_id (str): 要删除的子频道 ID。
 
-        :return: Dict: 删除后的channel.Channel
+        Returns:Dict:
+          删除后的channel.Channel
         """
         route = Route("DELETE", "/channels/{channel_id}", channel_id=channel_id)
         return await self._http.request(route)
 
     # 子频道权限相关接口
     async def get_channel_user_permissions(self, channel_id: str, user_id: str) -> channel.ChannelPermissions:
-        """获取指定子频道用户的权限
+        """
+        获取指定子频道用户的权限。
 
-        :param channel_id:
-            子频道ID
-        :param user_id:
-            用户ID
+        Args:
+          channel_id (str): 子频道 ID。
+          user_id (str): 用户 ID。
 
-        :return:Dict:channel.ChannelPermissions
+        Returns:Dict
+          channel.ChannelPermissions
         """
         route = Route(
             "GET", "/channels/{channel_id}/members/{user_id}/permissions", channel_id=channel_id, user_id=user_id
@@ -337,23 +352,17 @@ class BotAPI:
     async def update_channel_user_permissions(
         self, channel_id: str, user_id: str, add: Permission = None, remove: Permission = None
     ) -> str:
-        """修改指定子频道用户的权限
+        """
+        修改指定子频道用户的权限。
 
-        注意
-            如果是公共频道不能进行添加和移除查看或发言权限
+        Args:
+          channel_id (str): 子频道 ID。
+          user_id (str): 您要更改其权限的用户的用户 ID。
+          add (Permission): 添加到用户的权限。使用示例：`add = Permission(view_permission=True)`
+          remove (Permission): 删除的权限类型，示例：`remove = Permission(view_permission=True,manager_permission=True)`
 
-        :param channel_id:
-            子频道ID
-        :param user_id:
-            用户ID
-        :param add:Permission
-            添加的权限类型，示例：
-            add = Permission(view_permission=True)
-        :param remove:Permission
-            删除的权限类型，示例：
-            remove = Permission(view_permission=True,manager_permission=True)
-
-        :return: 成功返回空字符串
+        Returns:
+          返回值是一个字符串。
         """
         payload = {}
         if add is not None:
@@ -367,14 +376,15 @@ class BotAPI:
         return await self._http.request(route, json=payload)
 
     async def get_channel_role_permissions(self, channel_id: str, role_id: str) -> channel.ChannelPermissions:
-        """获取指定子频道身份组的权限
+        """
+        获取指定子频道身份组的权限。
 
-        :param channel_id:
-            子频道ID
-        :param role_id:
-            身份组ID
+        Args:
+          channel_id (str): 您要获取权限的子频道的 ID。
+          role_id (str): 您要编辑的身份组 ID。
 
-        :return:Dict:channel.ChannelPermissions
+        Returns:Dict
+          channel.ChannelPermissions 的字典数据
         """
         route = Route(
             "GET", "/channels/{channel_id}/roles/{role_id}/permissions", channel_id=channel_id, role_id=role_id
@@ -384,20 +394,17 @@ class BotAPI:
     async def update_channel_role_permissions(
         self, channel_id: str, role_id: str, add: Permission = None, remove: Permission = None
     ) -> str:
-        """修改指定子频道身份组的权限
+        """
+        修改指定子频道身份组的权限
 
-        :param channel_id:
-            子频道ID
-        :param role_id:
-            身份组ID
-        :param add:Permission
-            添加的权限类型，示例：添加可读权限
-            add = Permission(view_permission=True)
-        :param remove:Permission
-            删除的权限类型，示例：删除可读和发言权限
-            remove = Permission(view_permission=True,speak_permission=True)
+        Args:
+          channel_id (str): 您要更改权限的子频道的 ID。
+          role_id (str): 要修改的身份组 ID。
+          add (Permission):  添加的权限类型，示例：添加可读权限，`add = Permission(view_permission=True)`
+          remove (Permission):  删除的权限类型，示例：删除可读和发言权限, `remove = Permission(view_permission=True,speak_permission=True)`
 
-        :return: 成功返回空字符串
+        Returns:
+          返回值是一个字符串。
         """
         payload = {}
         if add is not None:
@@ -454,31 +461,29 @@ class BotAPI:
         event_id: str = None,
         markdown: message.Markdown = None,
     ) -> message.Message:
-        """发送消息
+        """
+        发送消息。
 
-        注意
-            - 要求操作人在该子频道具有发送消息的权限。
-            - 发送成功之后，会触发一个创建消息的事件。
-            - 被动回复消息有效期为 5 分钟
-            - 主动推送消息每日每个子频道限 2 条
-            - 发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
+        注意:
+        - 要求操作人在该子频道具有发送消息的权限。
+        - 发送成功之后，会触发一个创建消息的事件。
+        - 被动回复消息有效期为 5 分钟
+        - 主动推送消息每日每个子频道限 2 条
+        - 发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
 
-        :param channel_id:
-            子频道ID
-        :param content:
-            消息内容，文本内容，支持内嵌格式
-        :param msg_id:
-            要回复的消息id(Message.id), 在 AT_CREATE_MESSAGE 事件中获取。带了 msg_id 视为被动回复消息，否则视为主动推送消息
-        :param embed:
-            embed 消息，一种特殊的 ark
-        :param ark:
-            ark 消息
-        :param image:
-            图片url地址
-        :param message_reference:
-            引用消息
+        Args:
+          channel_id (str): 您要将消息发送到的子频道的 ID。
+          content (str): 消息的文本内容。
+          embed (message.Embed): embed 消息，一种特殊的 ark
+          ark (message.Ark): ark 模版消息
+          message_reference (message.Reference): 对消息的引用。
+          image (str): 要发送的图像的 URL。
+          msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
+          event_id (str): 您要回复的消息的事件 ID。
+          markdown (message.Markdown): markdown 消息
 
-        :return: Message
+        Returns:
+          message.Message: 一个消息字典对象。
         """
         params = _handle_message_parameters(content, embed, ark, message_reference, image, msg_id, event_id, markdown)
         route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
@@ -568,7 +573,13 @@ class BotAPI:
     #     return json.loads(response, object_hook=Guild)
     #
     # WebsocketAPI
-    async def ws(self):
+    async def _get_ws_url(self):
+        """
+        返回机器人的 websocket URL
+
+        Returns:
+          url字典数据。通过 `data['urk']` 获取
+        """
         return await self._http.request(Route("GET", "/gateway/bot"))
 
     #

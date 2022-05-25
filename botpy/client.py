@@ -25,25 +25,24 @@ class _LoopSentinel:
 _loop: Any = _LoopSentinel()
 
 
-def _loop_exception_handler(loop, context):
-    # first, handle with default handler
-    loop.default_exception_handler(context)
-
-    exception = context.get("exception")
-    if isinstance(exception, ZeroDivisionError):
-        print(context)
-        loop.stop()
-
-
 class Client:
-    """botpy的机器人客户端"""
+    """``Client` 是一个用于与 QQ频道机器人 Websocket 和 API 交互的类。"""
 
-    def __init__(self, intents: Intents):
+    def __init__(self, intents: Intents, timeout: int = 5):
+        """
+        Parameters
+        ----------
+        intents : Intents, 通过 `client.Intents` 获取
+                您要使用的意图。
+        timeout : int, optional
+                等待用户响应的时间（以秒为单位）。
+
+        """
         self.intents: int = intents.value
         self.ret_coro: bool = False
-        # TODO loop的整体梳理
+        # TODO loop的整体梳理 @veehou
         self.loop = None
-        self.http: BotHttp = BotHttp(timeout=5)
+        self.http: BotHttp = BotHttp(timeout=timeout)
         self.api: BotAPI = BotAPI(http=self.http)
 
         self._connection: Optional[ConnectionSession] = None
@@ -82,11 +81,10 @@ class Client:
         await self.http.close()
 
     def is_closed(self) -> bool:
-        """:class:`bool`: Indicates if the websocket connection is closed."""
         return self._closed
 
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
-        print(f"Ignoring exception in {event_method}", file=sys.stderr)
+        _log.error(f"Ignoring exception in {event_method}", file=sys.stderr)
         traceback.print_exc()
 
     async def _async_setup_hook(self) -> None:
@@ -146,7 +144,7 @@ class Client:
         user = await self.http.login(token)
 
         # 通过api获取websocket链接
-        self._ws_ap = await self.api.ws()
+        self._ws_ap = await self.api._get_ws_url()
 
         # 实例一个session_pool
         self._connection = ConnectionSession(
@@ -174,6 +172,13 @@ class Client:
         return await self._pool_init(token.bot_token(), session_interval)
 
     async def _pool_init(self, token, session_interval):
+        def _loop_exception_handler(loop, context):
+            # first, handle with default handler
+            loop.default_exception_handler(context)
+
+            exception = context.get("exception")
+            if isinstance(exception, ZeroDivisionError):
+                loop.stop()
 
         for i in range(self._ws_ap["shards"]):
             session = {

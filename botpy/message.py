@@ -7,7 +7,7 @@ class Message:
 
     def __init__(self, api: BotAPI, data: gateway.MessagePayload):
         self._api = api
-        # TODO 创建一些实体类的数据缓存
+        # TODO 创建一些实体类的数据缓存 @veehou
         self.channel_id = data["channel_id"]
         self.message_id = data["id"]
         self.content = data["content"]

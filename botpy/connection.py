@@ -68,10 +68,10 @@ class ConnectionState:
         self.robot: Optional[Robot] = None
 
         self.parsers: Dict[str, Callable[[Any], None]]
-        self.parsers = parsers = {}
+        self.parsers = {}
         for attr, func in inspect.getmembers(self):
             if attr.startswith("parse_"):
-                parsers[attr[6:].lower()] = func
+                self.parsers[attr[6:].lower()] = func
 
         self._dispatch = dispatch
         self.api = api
@@ -83,4 +83,4 @@ class ConnectionState:
     def parse_ready(self, data: ReadyEvent):
         self._dispatch("ready")
 
-    # TODO 补全解析的所有事件
+    # TODO 补全解析的所有事件 @veehou

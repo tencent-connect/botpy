@@ -11,7 +11,7 @@ logger = new_logging.get_logger()
 
 class MyTestCase(unittest.TestCase):
     def test__getLevel(self):
-        level = new_logging._getLevel()
+        level = new_logging._get_level()
         logger.info("level: %d" % level)
         self.assertTrue(
             level
