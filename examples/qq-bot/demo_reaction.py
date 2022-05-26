@@ -4,7 +4,7 @@ import os.path
 
 import botpy
 from botpy.core.util.yaml_util import YamlUtil
-from botpy.model.emoji import EmojiType
+from botpy.types.emoji import EmojiType
 from botpy.model.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))

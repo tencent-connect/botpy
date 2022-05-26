@@ -22,7 +22,7 @@ async def _direct_message_handler(context: WsContext, message: botpy.Message):
     # 构造消息发送请求数据对象
     send = botpy.MessageSendRequest("收到你的私信消息了：%s" % message.content, message.id)
     # 通过api发送回复消息
-    await msg_api.post_direct_message(message.guild_id, send)
+    await msg_api.post_dms(message.guild_id, send)
 
 
 if __name__ == "__main__":

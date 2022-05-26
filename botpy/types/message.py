@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
 from typing import List, TypedDict
 
 from .gateway import MessagePayload
@@ -58,18 +59,17 @@ class Message(MessagePayload):
     message_reference: Reference
 
 
-class TypesEnum:
+class TypesEnum(Enum):
     around = "around"
     before = "before"
     after = "after"
     latest = ""
 
 
-class MessagesPager:
-    def __init__(self, type: TypesEnum, id: str, limit: str):
-        type = type
-        id = id
-        limit = limit
+class MessagesPager(TypedDict):
+    type: TypesEnum
+    id: str
+    limit: str
 
 
 class MessageMarkdownParams(TypedDict):
@@ -83,24 +83,13 @@ class Markdown(TypedDict):
     content: str
 
 
-class DirectMessageGuild(TypedDict):
+class DmsPayload(TypedDict):
     guild_id: str
     channel_id: str
     creat_time: str
 
 
-class CreateDirectMessageRequest(TypedDict):
-    """机器人发送私信时所传的数据对象
-
-    :param source_guild_id: 创建的私信频道ID
-    :param user_id: 私信接收人用户ID
-    """
-
-    recipient_id: str
-    source_guild_id: str
-
-
-class DeletedMessageOriginalAuthor(TypedDict):
+class DMOriginalAuthor(TypedDict):
     id: str
     username: str
     bot: bool
@@ -110,7 +99,7 @@ class DeletedMessage(TypedDict):
     guild_id: str
     channel_id: str
     id: str
-    author: DeletedMessageOriginalAuthor
+    author: DMOriginalAuthor
 
 
 class DeletionOperator(TypedDict):

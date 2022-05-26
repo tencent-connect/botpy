@@ -91,7 +91,7 @@ class BotWebSocket:
         if self._conn is None:
             raise Exception("websocket connection failed ")
         if self._session["session_id"] != "":
-            await self.ws_connect()
+            await self.resume()
         else:
             await self.identify()
         # 心跳检查

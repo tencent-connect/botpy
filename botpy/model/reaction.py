@@ -1,4 +1,4 @@
-from botpy.model.emoji import Emoji
+from botpy.types.emoji import Emoji
 
 
 class Reaction:

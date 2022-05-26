@@ -4,7 +4,7 @@ import os.path
 
 import botpy
 from botpy.utils import YamlUtil
-from botpy.model.api_permission import (
+from botpy.types.permission import (
     APIPermissionDemandIdentify,
     PermissionDemandToCreate,
 )

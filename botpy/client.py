@@ -139,12 +139,12 @@ class Client:
         return await self._bot_init(token)
 
     async def _bot_login(self, token: Token) -> None:
-        _log.info("[连接管理]登录机器人账号中...")
+        _log.info("[client]登录机器人账号中...")
 
         user = await self.http.login(token)
 
         # 通过api获取websocket链接
-        self._ws_ap = await self.api._get_ws_url()
+        self._ws_ap = await self.api.get_ws_url()
 
         # 实例一个session_pool
         self._connection = ConnectionSession(
@@ -158,7 +158,7 @@ class Client:
         self._connection.state.robot = Robot(user)
 
     async def _bot_init(self, token):
-        _log.info("[连接管理]程序启动...")
+        _log.info("[client]程序启动...")
         # 每个机器人创建的连接数不能超过remaining剩余连接数
         if self._ws_ap["shards"] > self._ws_ap["session_start_limit"]["remaining"]:
             raise Exception("session limit exceeded")
@@ -201,7 +201,7 @@ class Client:
             else:
                 await self._connection.run(session_interval)
         except KeyboardInterrupt:
-            _log.info("[连接管理]服务强行停止!")
+            _log.info("[client]服务强行停止!")
             # cancel all tasks lingering
 
     async def bot_connect(self, session):
@@ -213,7 +213,7 @@ class Client:
 
         param session: session对象
         """
-        _log.info("[连接管理]新会话启动中...")
+        _log.info("[client]会话启动中...")
 
         client = BotWebSocket(session, self._connection)
         try:

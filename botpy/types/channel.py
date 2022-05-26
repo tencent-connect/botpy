@@ -13,6 +13,9 @@ class ChannelType(Enum):
     APP_CHANNEL = 10006  # 应用子频道
     DISCUSSION_CHANNEL = 10007  # 论坛子频道
 
+    def __int__(self) -> int:
+        return self.value
+
 
 class ChannelSubType(Enum):
     TALK = 0  # 闲聊
@@ -20,17 +23,26 @@ class ChannelSubType(Enum):
     CHEAT = 2  # 攻略
     BLACK = 3  # 开黑
 
+    def __int__(self) -> int:
+        return self.value
+
 
 class PrivateType(Enum):
     PUBLIC = 0  # 公开频道
     ADMIN = 1  # 管理员和群主可见
     SPECIFIED_USER = 2  # 群主管理员+指定成员，可使用 修改子频道权限接口 指定成员
 
+    def __int__(self) -> int:
+        return self.value
+
 
 class SpeakPermission(Enum):
     INVALID = 0  # 无效类型
     EVERYONE = 1  # 所有人
     ADMIN = 2  # 群主管理员+指定成员，可使用 修改子频道权限接口 指定成员
+
+    def __int__(self) -> int:
+        return self.value
 
 
 class Channel(TypedDict):

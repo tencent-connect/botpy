@@ -11,12 +11,12 @@ from botpy.errors import (
     AuthenticationFailedError,
     ServerError,
 )
-from botpy.model.announce import RecommendChannel, RecommendChannelRequest
-from botpy.model.api_permission import (
+from botpy.types.announce import RecommendChannel, RecommendChannelRequest
+from botpy.types.permission import (
     APIPermissionDemandIdentify,
     PermissionDemandToCreate,
 )
-from botpy.model.emoji import EmojiType
+from botpy.types.emoji import EmojiType
 from botpy.types import guild, user, channel
 from botpy.types.channel import ChannelType, ChannelSubType
 from tests import test_config
@@ -154,7 +154,7 @@ class APITestCase(unittest.TestCase):
     def test_post_audio(self):
         audio = botpy.AudioControl("", "Test", botpy.STATUS.START)
         try:
-            result = self.loop.run_until_complete(self.api.post_audio(CHANNEL_ID, audio))
+            result = self.loop.run_until_complete(self.api.update_audio(CHANNEL_ID, audio))
             print(result)
         except AuthenticationFailedError as e:
             print(e)
@@ -165,15 +165,13 @@ class APITestCase(unittest.TestCase):
             request = botpy.CreateDirectMessageRequest(GUILD_ID, GUILD_OWNER_ID)
             direct_message_guild = self.loop.run_until_complete(self.api.create_direct_message(request))
             send_msg = botpy.MessageSendRequest("test")
-            message = self.loop.run_until_complete(
-                self.api.post_direct_message(direct_message_guild.guild_id, send_msg)
-            )
+            message = self.loop.run_until_complete(self.api.post_dms(direct_message_guild.guild_id, send_msg))
             print(message.content)
         except (Exception, ServerError) as e:
             print(e)
 
     def test_ws(self):
-        ws = self.loop.run_until_complete(self.api._get_ws_url())
+        ws = self.loop.run_until_complete(self.api.get_ws_url())
         self.assertEqual(ws["url"], "wss://api.sgroup.qq.com/websocket")
 
     def test_mute_all(self):

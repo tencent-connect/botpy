@@ -5,7 +5,7 @@ from typing import Any, List, Dict
 
 from .flags import Permission
 from .http import BotHttp, Route
-from .types import guild, user, channel, message
+from .types import guild, user, channel, message, audio, announce, permission, schedule, emoji, pins_message
 
 
 def _handle_message_parameters(
@@ -289,8 +289,8 @@ class BotAPI:
         """
         payload = {
             "name": name,
-            "type": type.value,
-            "subtype": sub_type.value,
+            "type": int(type),
+            "subtype": int(sub_type),
         }
         valid_keys = ("position", "parent_id")
         payload.update({k: v for k, v in fields.items() if k in valid_keys and v})
@@ -418,36 +418,21 @@ class BotAPI:
         return await self._http.request(route, json=payload)
 
     # 消息
-    # async def get_message(self, channel_id: str, message_id: str) -> MessageGet:
-    #     """
-    #     获取指定消息
-    #
-    #     :param channel_id: 频道ID
-    #     :param message_id: 消息ID
-    #     :return: Message 对象
-    #     """
-    #     url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
-    #     response = await self._http.get(url)
-    #     return json.loads(response, object_hook=MessageGet)
-    #
-    # async def get_messages(self, channel_id: str, pager: MessagesPager) -> List[Message]:
-    #     """
-    #     获取指定消息列表
-    #
-    #     :param channel_id: 频道ID
-    #     :param pager: MessagesPager对象
-    #     :return: Message 对象
-    #     """
-    #     url = get_url(APIConstant.messagesURI, self.is_sandbox).format(channel_id=channel_id)
-    #     query = {}
-    #     if pager.limit != "":
-    #         query["limit"] = pager.limit
-    #
-    #     if pager.type != "" and pager.id != "":
-    #         query[pager.type] = pager.id
-    #
-    #     response = await self._http.get(url, params=query)
-    #     return json.loads(response, object_hook=Message)
+    async def get_message(self, channel_id: str, message_id: str) -> message.MessagePayload:
+        """
+        获取指定消息。
+
+        Args:
+          channel_id (str): 您要从中获取消息的子频道的 ID。
+          message_id (str): 要删除的消息的 ID。
+
+        Returns:
+          一个消息字典对象。
+        """
+        route = Route(
+            "GET", "/channels/{channel_id}/messages/{message_id}", channel_id=channel_id, message_id=message_id
+        )
+        return await self._http.request(route)
 
     async def post_message(
         self,
@@ -485,398 +470,594 @@ class BotAPI:
         Returns:
           message.Message: 一个消息字典对象。
         """
-        params = _handle_message_parameters(content, embed, ark, message_reference, image, msg_id, event_id, markdown)
+        payload = _handle_message_parameters(content, embed, ark, message_reference, image, msg_id, event_id, markdown)
         route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
-        return await self._http.request(route, json=params)
+        return await self._http.request(route, json=payload)
 
-    # async def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False):
-    #     """
-    #     撤回消息
-    #
-    #     管理员可以撤回普通成员的消息
-    #     频道主可以撤回所有人的消息
-    #
-    #     :param channel_id: 子频道ID
-    #     :param message_id: 消息ID
-    #     :param hide_tip: 是否隐藏撤回提示小灰条
-    #     """
-    #     url = get_url(APIConstant.messageURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
-    #     response = await self._http.delete(url, params={"hidetip": str(hide_tip)})
-    #     return response == ""
-    #
-    # """私信消息"""
-    #
-    # async def create_direct_message(self, create_direct_message: CreateDirectMessageRequest) -> DirectMessageGuild:
-    #     """
-    #     创建私信频道
-    #
-    #     :param create_direct_message: 构造request数据
-    #     :return: 私信频道对象
-    #     """
-    #     url = get_url(APIConstant.userMeDMURI, self.is_sandbox)
-    #     request_json = JsonUtil.obj2json_serialize(create_direct_message)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=DirectMessageGuild)
-    #
-    # async def post_direct_message(self, guild_id: str, message_send: MessageSendRequest) -> Message:
-    #     """
-    #     发送私信
-    #
-    #     :param guild_id: 创建的私信频道id
-    #     :param message_send: 发送消息的数据请求对象 MessageSendRequest
-    #     :return Message对象
-    #     """
-    #     url = get_url(APIConstant.dmsURI, self.is_sandbox).format(guild_id=guild_id)
-    #     request_json = JsonUtil.obj2json_serialize(message_send)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=Message)
-    #
-    # """音频接口"""
-    #
-    # async def post_audio(self, channel_id: str, audio_control: AudioControl) -> bool:
-    #     """
-    #     音频控制
-    #
-    #     :param channel_id:频道ID
-    #     :param audio_control:AudioControl对象
-    #     :return:是否成功
-    #     """
-    #     url = get_url(APIConstant.audioControlURI, self.is_sandbox).format(channel_id=channel_id)
-    #     request_json = JsonUtil.obj2json_serialize(audio_control)
-    #     response = await self._http.post(url, request=request_json)
-    #     return response == ""
-    #
-    # """用户相关接口"""
-    #
-    # async def me(self) -> User:
-    #     """
-    #     :return:使用当前用户信息填充的 User 对象
-    #     """
-    #     url = get_url(APIConstant.userMeURI, self.is_sandbox)
-    #     response = await self._http.get(url)
-    #     return json.loads(response, object_hook=User)
-    #
-    # async def me_guilds(self, option: ReqOption = None) -> List[Guild]:
-    #     """
-    #     当前用户所加入的 Guild 对象列表
-    #
-    #     :param option: ReqOption对象
-    #     :return:Guild对象列表
-    #     """
-    #     url = get_url(APIConstant.userMeGuildsURI, self.is_sandbox)
-    #     if option is None:
-    #         query = {}
-    #     else:
-    #         query = option.__dict__
-    #
-    #     response = await self._http.get(url, params=query)
-    #     return json.loads(response, object_hook=Guild)
-    #
+    async def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False) -> str:
+        """
+        撤回消息。
+
+        注意:
+          管理员可以撤回普通成员的消息
+          频道主可以撤回所有人的消息
+
+        Args:
+          channel_id (str): 您要将消息发送到的频道的 ID。
+          message_id (str): 要撤回的消息的 ID。
+          hide_tip (bool): 是否隐藏撤回提示小灰条。. Defaults to False
+
+        Returns:
+          返回值是一个字符串。
+        """
+        params = {"hide_tip": hide_tip}
+
+        route = Route(
+            "DELETE",
+            "/channels/{channel_id}/messages/{message_id}",
+            channel_id=channel_id,
+            message_id=message_id,
+        )
+        return await self._http.request(route, params=params)
+
+    # 私信消息
+    async def post_dms(
+        self,
+        guild_id: str,
+        user_id: str,
+        content: str = None,
+        embed: message.Embed = None,
+        ark: message.Ark = None,
+        message_reference: message.Reference = None,
+        image: str = None,
+        msg_id: str = None,
+        event_id: str = None,
+        markdown: message.Markdown = None,
+    ) -> message.Message:
+        """
+        发送私信。
+
+        注意:
+        - 要求操作人在该子频道具有发送消息的权限。
+        - 发送成功之后，会触发一个创建消息的事件。
+        - 被动回复消息有效期为 5 分钟
+        - 主动推送消息每日每个子频道限 2 条
+        - 发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
+
+        Args:
+          guild_id (str): 您要将私信消息的来源频道 ID。
+          user_id (str): 你要发送私信的用户 ID
+          content (str): 消息的文本内容。
+          embed (message.Embed): embed 消息，一种特殊的 ark
+          ark (message.Ark): ark 模版消息
+          message_reference (message.Reference): 对消息的引用。
+          image (str): 要发送的图像的 URL。
+          msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
+          event_id (str): 您要回复的消息的事件 ID。
+          markdown (message.Markdown): markdown 消息
+
+        Returns:
+          message.Message: 一个消息字典对象。
+        """
+        # 创建私信频道
+        payload = {"recipient_id": user_id, "source_guild_id": guild_id}
+        route = Route("POST", "/users/@me/dms")
+        dm_payload: message.DmsPayload = await self._http.request(route, json=payload)
+        # 发送私信
+        send_payload = _handle_message_parameters(
+            content, embed, ark, message_reference, image, msg_id, event_id, markdown
+        )
+        route = Route("POST", "/dms/{guild_id}/messages", guild_id=dm_payload["guild_id"])
+        return await self._http.request(route, json=send_payload)
+
+    # 音频接口
+    async def update_audio(self, channel_id: str, audio_control: audio.AudioControl) -> str:
+        """
+        音频控制
+
+        用于控制子频道 channel_id 下的音频。
+        音频接口：仅限音频类机器人才能使用，后续会根据机器人类型自动开通接口权限，现如需调用，需联系平台申请权限。
+
+        Args:
+          channel_id (str): 要将音频发布到的频道的 ID。
+          audio_control (audio.AudioControl): 音频.AudioControl 字典类型数据
+
+        Returns:
+          一个字符串
+        """
+
+        payload = audio_control
+        route = Route("POST", "/channels/{channel_id}/audio", channel_id=channel_id)
+        return await self._http.request(route, json=payload)
+
+    # 用户相关接口
+    async def me(self) -> user.User:
+        """
+        它返回当前用户的信息。
+
+        Returns:
+          一个用户对象。字典类型数据
+        """
+        route = Route("GET", "/users/@me")
+        return await self._http.request(route)
+
+    async def me_guilds(self, guild_id: str = None, limit: int = 100, desc: bool = False) -> List[guild.Guild]:
+        """
+        它返回当前用户已加入的 Guild 对象列表。
+
+        Args:
+          guild_id (str): 列表的起始频道 ID。
+          limit (int): 返回的最大公会数（1-100）。. Defaults to 100
+          desc (bool): 如果为 True，则列表将按频道 ID 往前的数据并反序返回。. Defaults to False
+
+        Returns:
+          频道列表。
+        """
+        param = {"limit": limit}
+        if desc:
+            param.update({"before": guild_id})
+        else:
+            param.update({"after": guild_id})
+
+        route = Route("GET", "/users/@me/guilds")
+        return await self._http.request(route, param=param)
+
     # WebsocketAPI
-    async def _get_ws_url(self):
+    async def get_ws_url(self):
         """
         返回机器人的 websocket URL
 
         Returns:
-          url字典数据。通过 `data['urk']` 获取
+          url字典数据。通过 `data['url']` 获取
         """
-        return await self._http.request(Route("GET", "/gateway/bot"))
+        route = Route("GET", "/gateway/bot")
+        return await self._http.request(route)
 
-    #
-    # """禁言接口"""
-    #
-    # async def mute_all(self, guild_id: str, options: MuteOption):
-    #     """
-    #     禁言全员
-    #
-    #     :param guild_id: 频道ID
-    #     :param options: MuteOptions对象
-    #     """
-    #     url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(guild_id=guild_id)
-    #     request_json = JsonUtil.obj2json_serialize(options)
-    #     response = await self._http.patch(url, request=request_json)
-    #     return response == ""
-    #
-    # async def mute_member(self, guild_id: str, user_id: str, options: MuteOption):
-    #     """
-    #     禁言指定成员
-    #
-    #     :param guild_id: 频道ID
-    #     :param user_id: 用户ID
-    #     :param options: MuteOptions对象
-    #     """
-    #     url = get_url(APIConstant.guildMemberMuteURI, self.is_sandbox).format(guild_id=guild_id, user_id=user_id)
-    #     request_json = JsonUtil.obj2json_serialize(options)
-    #     response = await self._http.patch(url, request=request_json)
-    #     return response == ""
-    #
-    # async def mute_multi_member(self, guild_id: str, options: MultiMuteOption):
-    #     """
-    #     禁言指定用户
-    #
-    #     :param guild_id: 频道ID
-    #     :param options: MultiMuteOption对象
-    #     """
-    #     url = get_url(APIConstant.guildMuteURI, self.is_sandbox).format(guild_id=guild_id)
-    #     request_json = JsonUtil.obj2json_serialize(options)
-    #     response = await self._http.patch(url, request=request_json)
-    #     user_ids = json.loads(response, object_hook=UserIds)
-    #     return user_ids.user_ids
-    #
-    # """公告接口"""
-    #
-    # async def create_announce(self, guild_id: str, request: CreateAnnounceRequest) -> Announce:
-    #     """
-    #     创建频道全局公告
-    #
-    #     :param guild_id: 频道ID
-    #     :param request: CreateAnnounceRequest对象
-    #     """
-    #     url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
-    #     request_json = JsonUtil.obj2json_serialize(request)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=Announce)
-    #
-    # async def delete_announce(self, guild_id: str, message_id: str):
-    #     """
-    #     删除频道全局公告
-    #     message_id 有值时，会校验 message_id 合法性，若不校验校验 message_id，请将 message_id 设置为 all
-    #
-    #     :param guild_id: 频道ID
-    #     :param message_id: 消息ID
-    #     """
-    #     url = get_url(APIConstant.deleteGuildAnnounceURI, self.is_sandbox).format(
-    #         guild_id=guild_id, message_id=message_id
-    #     )
-    #     response = await self._http.delete(url)
-    #     return response == ""
-    #
-    # async def create_channel_announce(self, channel_id: str, request: CreateChannelAnnounceRequest) -> Announce:
-    #     """
-    #     设置消息为指定子频道公告
-    #
-    #     :param channel_id: 频道ID
-    #     :param request: CreateChannelAnnounceRequest对象
-    #     """
-    #     url = get_url(APIConstant.channelAnnounceURI, self.is_sandbox).format(channel_id=channel_id)
-    #     request_json = JsonUtil.obj2json_serialize(request)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=Announce)
-    #
-    # async def delete_channel_announce(self, channel_id: str, message_id: str):
-    #     """
-    #     删除子频道公告
-    #     message_id 有值时，会校验 message_id 合法性，若不校验校验 message_id，请将 message_id 设置为 all
-    #
-    #     :param channel_id: 频道ID
-    #     :param message_id: 消息ID
-    #     """
-    #     url = get_url(APIConstant.deleteChannelAnnounceURI, self.is_sandbox).format(
-    #         channel_id=channel_id, message_id=message_id
-    #     )
-    #     response = await self._http.delete(url)
-    #     return response == ""
-    #
-    # async def post_recommended_channels(self, guild_id: str, request: RecommendChannelRequest) -> Announce:
-    #     """
-    #     创建子频道类型的频道全局公告
-    #
-    #     :param guild_id: 频道ID
-    #     :param request: RecommendChannelRequest 对象
-    #     """
-    #     url = get_url(APIConstant.guildAnnounceURI, self.is_sandbox).format(guild_id=guild_id)
-    #     request_json = JsonUtil.obj2json_serialize(request)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=Announce)
-    #
-    # """接口权限接口"""
-    #
-    # async def get_permissions(self, guild_id: str) -> List[APIPermission]:
-    #     """
-    #     获取机器人在频道 guild_id 内可以使用的权限列表
-    #
-    #     :param guild_id: 频道ID
-    #     """
-    #     url = get_url(APIConstant.guildAPIPermissionURL, self.is_sandbox).format(guild_id=guild_id)
-    #     response = await self._http.get(url)
-    #     apis = json.loads(response, object_hook=APIs)
-    #     return apis.apis
-    #
-    # async def post_permission_demand(self, guild_id: str, request: PermissionDemandToCreate) -> APIPermissionDemand:
-    #     """
-    #     用于创建 API 接口权限授权链接，该链接指向guild_id对应的频道 。
-    #     每天只能在一个频道内发 3 条（默认值）频道权限授权链接，如需调整，请联系平台申请权限。
-    #
-    #     :param guild_id: 频道ID
-    #     :param request: PermissionDemandToCreate对象
-    #     """
-    #     url = get_url(APIConstant.guildAPIPermissionDemandURL, self.is_sandbox).format(guild_id=guild_id)
-    #     request_json = JsonUtil.obj2json_serialize(request)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=APIPermissionDemand)
-    #
-    # """日程接口"""
-    #
-    # async def get_schedules(self, channel_id: str, since: str = "") -> List[Schedule]:
-    #     """
-    #     获取某个日程子频道里中当天的日程列表。
-    #     若带了参数 since，则返回结束时间在 since 之后的日程列表；若未带参数 since，则默认返回当天的日程列表。
-    #
-    #     :param channel_id: 子频道ID
-    #     :param since: 起始时间戳(ms)
-    #     """
-    #     url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(channel_id=channel_id)
-    #     if since == "":
-    #         request = None
-    #     else:
-    #         request = GetSchedulesRequest(int(since))
-    #     request_json = JsonUtil.obj2json_serialize(request)
-    #     response = await self._http.get(url, request_json)
-    #     return json.loads(response, object_hook=Schedule)
-    #
-    # async def get_schedule(self, channel_id: str, schedule_id: str) -> Schedule:
-    #     """
-    #     获取日程子频道的某个日程详情
-    #
-    #     :param channel_id: 子频道ID
-    #     :param schedule_id: 日程ID
-    #     """
-    #     url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
-    #         channel_id=channel_id, schedule_id=schedule_id
-    #     )
-    #     response = await self._http.get(url)
-    #     return json.loads(response, object_hook=Schedule)
-    #
-    # async def create_schedule(self, channel_id: str, schedule_to_create: ScheduleToCreate) -> Schedule:
-    #     """
-    #     用于在日程子频道创建一个日程。
-    #     要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
-    #     创建成功后，返回创建成功的日程对象。
-    #     创建操作频次限制
-    #     单个管理员每天限10次
-    #     单个频道每天100次
-    #
-    #     :param channel_id: 子频道ID
-    #     :param schedule_to_create: 没有ID的日程对象
-    #     """
-    #     url = get_url(APIConstant.channelSchedulesURI, self.is_sandbox).format(channel_id=channel_id)
-    #     request_json = JsonUtil.obj2json_serialize(schedule_to_create)
-    #     response = await self._http.post(url, request_json)
-    #     return json.loads(response, object_hook=Schedule)
-    #
-    # async def update_schedule(self, channel_id: str, schedule_id: str, schedule_to_patch: ScheduleToPatch)
-    # -> Schedule:
-    #     """
-    #     要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
-    #     修改成功后，返回修改后的日程对象。
-    #
-    #     :param channel_id: 子频道ID
-    #     :param schedule_id: 日程ID
-    #     :param schedule_to_patch: 修改前的日程对象
-    #     """
-    #     url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
-    #         channel_id=channel_id, schedule_id=schedule_id
-    #     )
-    #     request_json = JsonUtil.obj2json_serialize(schedule_to_patch)
-    #     response = await self._http.patch(url, request_json)
-    #     return json.loads(response, object_hook=Schedule)
-    #
-    # async def delete_schedule(self, channel_id: str, schedule_id: str):
-    #     """
-    #     要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
-    #
-    #     :param channel_id: 子频道ID
-    #     :param schedule_id: 日程ID
-    #     """
-    #     url = get_url(APIConstant.channelSchedulesIdURI, self.is_sandbox).format(
-    #         channel_id=channel_id, schedule_id=schedule_id
-    #     )
-    #     response = await self._http.delete(url)
-    #     return response == ""
-    #
-    # """异步表情表态接口"""
-    #
-    # async def put_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
-    #     """
-    #     对一条消息进行表情表态
-    #
-    #     :param channel_id: 子频道ID
-    #     :param message_id: 该条消息对应的id
-    #     :param emo_type: 表情类型
-    #     :param emo_id: 表情ID
-    #     """
-    #     url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
-    #         channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
-    #     )
-    #     response = await self._http.put(url)
-    #     return response == ""
-    #
-    # async def delete_reaction(self, channel_id: str, message_id: str, emo_type: int, emo_id: str):
-    #     """
-    #     删除自己对消息的进行表情表态
-    #
-    #     :param channel_id: 子频道ID
-    #     :param message_id: 该条消息对应的id
-    #     :param emo_type: 表情类型
-    #     :param emo_id: 表情ID
-    #     """
-    #     url = get_url(APIConstant.reactionURI, self.is_sandbox).format(
-    #         channel_id=channel_id, message_id=message_id, type=emo_type, id=emo_id
-    #     )
-    #     response = await self._http.delete(url)
-    #     return response == ""
-    #
-    # """精华消息API"""
-    #
-    # async def put_pin(self, channel_id: str, message_id: str) -> PinsMessage:
-    #     """
-    #     在子频道内添加一条精华消息，
-    #     每个子频道最多20条精华消息
-    #     只有可见的消息才能被设置为精华消息
-    #     返回对象中 message_ids 为当前请求后子频道内所有精华消息数组
-    #
-    #     :param channel_id: 子频道ID
-    #     :param message_id: 该条消息对应的id
-    #     """
-    #     url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
-    #     try:
-    #         response = await self._http.put(url)
-    #         return json.loads(response, object_hook=PinsMessage)
-    #     except (Exception, JSONDecodeError):
-    #         return PinsMessage()
-    #
-    # async def delete_pin(self, channel_id: str, message_id: str):
-    #     """
-    #     用于移除子频道下的一条精华消息
-    #
-    #     :param channel_id: 子频道ID
-    #     :param message_id: 该条消息对应的id
-    #     """
-    #     url = get_url(APIConstant.changePinsURI, self.is_sandbox).format(channel_id=channel_id, message_id=message_id)
-    #     response = await self._http.delete(url)
-    #     return response == ""
-    #
-    # async def get_pins(self, channel_id: str) -> PinsMessage:
-    #     """
-    #     用于获取子频道内的所有精华消息
-    #     成功后返回 PinsMessage 对象
-    #
-    #     :param channel_id: 子频道ID
-    #     """
-    #     url = get_url(APIConstant.getPinsURI, self.is_sandbox).format(channel_id=channel_id)
-    #     response = await self._http.get(url)
-    #     return json.loads(response, object_hook=PinsMessage)
-    #
-    # """互动回调API"""
-    #
-    # async def put_interaction(self, interaction_id: str, interaction_data: InteractionData):
-    #     """
-    #     对 interaction_id 进行互动回调数据异步回复更新
-    #
-    #     :param interaction_id: 互动事件的ID
-    #     :param interaction_data: 互动事件数据体
-    #     """
-    #     url = get_url(APIConstant.interactionURI, self.is_sandbox).format(interaction_id=interaction_id)
-    #     request_json = JsonUtil.obj2json_serialize(interaction_data)
-    #     response = await self._http.put(url, request_json)
-    #     return response == ""
+    # 禁言接口
+    async def mute_all(self, guild_id: str, mute_end_timestamp: str = None, mute_seconds: str = None) -> str:
+        """
+        使频道中的所有成员禁言。
+
+        用于将频道的全体成员（非管理员）禁言。
+        需要使用的 token 对应的用户具备管理员权限。如果是机器人，要求被添加为管理员。
+
+        Args:
+          guild_id (str): 要禁言的频道 ID。
+          mute_end_timestamp (str): 禁言结束的时间。该值是自 1970 年 1 月 1 日 00:00:00 UTC 以来经过的毫秒数。
+          mute_seconds (str): 禁言的秒数。两个字段二选一，默认以 mute_end_timestamp 为准
+
+        Returns:
+          返回值是一个字符串。
+        """
+        payload = {k: v for k, v in locals().items() if k not in ["guild_id"] and v}
+        route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
+        return await self._http.request(route, json=payload)
+
+    async def cancel_mute_all(self, guild_id: str) -> str:
+        """
+        取消频道中所有成员的禁言。
+
+        Args:
+          guild_id (str): 要取消禁言的频道 ID。
+
+        Returns:
+          返回值是一个字符串。
+        """
+        payload = {
+            "mute_end_timestamp": "0",
+            "mute_seconds": "0",
+        }
+        route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
+        return await self._http.request(route, json=payload)
+
+    async def mute_member(
+        self, guild_id: str, user_id: str, mute_end_timestamp: str = None, mute_seconds: str = None
+    ) -> str:
+        """
+        使频道中的所有成员禁言。
+
+        用于将频道的全体成员（非管理员）禁言。
+        需要使用的 token 对应的用户具备管理员权限。如果是机器人，要求被添加为管理员。
+
+        Args:
+          guild_id (str): 要禁言的频道 ID。
+          user_id (str): 要禁言的成员 ID
+          mute_end_timestamp (str): 禁言结束的时间。该值是自 1970 年 1 月 1 日 00:00:00 UTC 以来经过的毫秒数。
+          mute_seconds (str): 禁言的秒数。两个字段二选一，默认以 mute_end_timestamp 为准
+
+        Returns:
+          返回值是一个字符串。
+        """
+        payload = {k: v for k, v in locals().items() if k not in ["guild_id"] and v}
+        route = Route("PATCH", "/guilds/{guild_id}/members/{user_id}/mute", guild_id=guild_id, user_id=user_id)
+        return await self._http.request(route, json=payload)
+
+    async def mute_multi_member(
+        self, guild_id: str, user_ids: List[str], mute_end_timestamp: str = None, mute_seconds: str = None
+    ) -> str:
+        """
+        使频道中的多个成员禁言
+
+        Args:
+          guild_id (str): 将用户禁言的频道 ID。
+          user_ids (List[str]): 要禁言的用户 ID 列表。
+          mute_end_timestamp (str): 禁言结束的时间。该值是自 1970 年 1 月 1 日 00:00:00 UTC 以来经过的毫秒数。
+          mute_seconds (str): 将用户禁言的秒数。两个字段二选一，默认以 mute_end_timestamp 为准
+
+        Returns:
+          返回值是一个字符串。
+        """
+        payload = {k: v for k, v in locals().items() if k not in ["guild_id", "user_ids"] and v}
+        payload.update({"user_ids": user_ids})
+        route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
+        return await self._http.request(route, json=payload)
+
+    async def cancel_mute_multi_member(self, guild_id: str, user_ids: List[str]) -> str:
+        """
+        取消多个成员的禁言。
+
+        Args:
+          guild_id (str): 您想将用户禁言的频道 ID。
+          user_ids (List[str]): 您要禁言的用户 ID 列表。
+
+        Returns:
+          返回值是一个字符串。
+        """
+        payload = {"mute_end_timestamp": "0", "mute_seconds": "0", "user_ids": user_ids}
+        route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
+        return await self._http.request(route, json=payload)
+
+    # 公告接口
+    async def create_announce(self, guild_id: str, channel_id: str, message_id: str) -> announce.Announce:
+        """
+        创建消息类型的频道公告。
+
+        注意:
+          推荐子频道和消息类型全局公告不能同时存在，会互相顶替设置。
+          同频道内推荐子频道最多只能创建 3 条。
+          只有子频道权限为全体成员可见才可设置为推荐子频道。
+
+        Args:
+          guild_id (str): 创建频道的频道ID。
+          channel_id (str): 您要将通知发送到的频道的子频道 ID。
+          message_id (str): 公告的消息 ID。
+
+        Returns:
+          一个新的 Announce 对象。字典类型数据
+        """
+        payload = {"channel_id": channel_id, "message_id": message_id}
+        route = Route("POST", "/guilds/{guild_id}/announces", guild_id=guild_id)
+        return await self._http.request(route, json=payload)
+
+    async def create_recommend_announce(
+        self, guild_id: str, announces_type: announce.AnnouncesType, recommend_channels: List[announce.RecommendChannel]
+    ) -> announce.Announce:
+        """
+        创建推荐子频道类型的频道公告
+
+        注意:
+          推荐子频道和消息类型全局公告不能同时存在，会互相顶替设置。
+          同频道内推荐子频道最多只能创建 3 条。
+          只有子频道权限为全体成员可见才可设置为推荐子频道。
+
+        Args:
+          guild_id (str): 发公告的频道 ID
+          announces_type (announce.AnnouncesType): 公告的类型。
+          recommend_channels (List[announce.RecommendChannel]): 列表[announce.RecommendChannel]
+
+        Returns:
+          一个新的 Announce 对象。字典类型数据
+        """
+        payload = {"announces_type": announces_type, "recommend_channels": recommend_channels}
+        route = Route("POST", "/guilds/{guild_id}/announces", guild_id=guild_id)
+        return await self._http.request(route, json=payload)
+
+    async def delete_announce(self, guild_id: str, message_id: str = "all") -> str:
+        """
+        删除消息类型和推荐子频道类型的频道公告。
+
+        注意:
+          message_id 有值时，会校验 message_id 合法性，若不校验校验 message_id，请将 message_id 设置为 all
+
+        Args:
+          guild_id (str): 您要从中获取公告的频道的 ID。
+          message_id (str): 要删除的公告消息的 ID。
+
+        Returns:
+          返回值是一个字符串。
+        """
+        route = Route("DELETE", "/guilds/{guild_id}/announces/{message_id}", guild_id=guild_id, message_id=message_id)
+        return await self._http.request(route)
+
+    # 接口权限接口
+    async def get_permissions(self, guild_id: str) -> List[permission.APIPermission]:
+        """
+        返回 bot 可以在具有给定 ID 的频道中使用的权限列表
+
+        Args:
+          guild_id (str): 获取权限的频道 ID。
+
+        Returns:
+          APIPermission 字典数据对象的列表。
+        """
+        route = Route("GET", "/guilds/{guild_id}/api_permission", guild_id=guild_id)
+        # 多一层级
+        data = await self._http.request(route)
+        return data["apis"]
+
+    async def post_permission_demand(
+        self, guild_id: str, channel_id: str, api_identify: permission.APIPermissionDemandIdentify, desc: str
+    ) -> permission.APIPermissionDemand:
+        """
+        用于创建 API 接口权限授权链接，该链接指向guild_id对应的频道
+
+        Args:
+          guild_id (str): 创建权限需求的频道ID。
+          channel_id (str): 需要发送权限请求的通道的子频道ID。
+          api_identify (permission.APIPermissionDemandIdentify): API 权限需求标识。
+          desc (str): 权限需求的描述。
+
+        Returns:
+          一个 permission.APIPermissionDemand 字典数据对象。
+        """
+        payload = {"channel_id": channel_id, "api_identify": api_identify, "desc": desc}
+        route = Route("POST", "/guilds/{guild_id}/api_permission/demand", guild_id=guild_id)
+        return await self._http.request(route, json=payload)
+
+    # 日程接口
+    async def get_schedules(self, channel_id: str, since: str = None) -> List[schedule.Schedule]:
+        """
+        获取某个日程子频道里中当天的日程列表。
+
+        注意:
+          若带了参数 since，则返回结束时间在 since 之后的日程列表；若未带参数 since，则默认返回当天的日程列表。
+
+        Args:
+          channel_id (str): 您要从中获取计划的子频道的 ID。
+          since (str): 这个时间后的日程列表。如果不指定此参数，则默认值为当天的日程列表。
+
+        Returns:
+          列表[schedule.Schedule]
+        """
+        payload = {}
+        if since:
+            payload = {"since": since}
+        route = Route("GET", "/channels/{channel_id}/schedules", channel_id=channel_id)
+        return await self._http.request(route, json=payload)
+
+    async def get_schedule(self, channel_id: str, schedule_id: str) -> schedule.Schedule:
+        """
+        获取日程子频道指定的的日程的详情
+
+        Args:
+          channel_id (str): 您要从中获取计划的频道的 ID。
+          schedule_id (str): 要删除的计划的 ID。
+        Returns:
+          schedule.Schedule 字典数据
+        """
+        route = Route(
+            "GET", "/channels/{channel_id}/schedules/{schedule_id}", channel_id=channel_id, schedule_id=schedule_id
+        )
+        return await self._http.request(route)
+
+    async def create_schedule(
+        self,
+        channel_id: str,
+        name: str,
+        start_timestamp: str,
+        end_timestamp: str,
+        jump_channel_id: str,
+        remind_type: schedule.RemindType,
+    ) -> schedule.Schedule:
+        """
+        用于在日程子频道创建一个日程。
+
+        注意:
+          要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+          创建成功后，返回创建成功的日程对象。
+          创建操作频次限制
+
+        频率限制:
+          单个管理员每天限10次
+          单个频道每天100次
+
+        Args:
+          channel_id (str): 创建计划的通道的 ID。
+          name (str): 计划的名称。
+          start_timestamp (str): 事件的开始时间，格式为 Unix 时间戳。
+          end_timestamp (str): 事件的结束时间，格式为 Unix 时间戳。
+          jump_channel_id (str): 要跳转到的频道的频道 ID。
+          remind_type (str): 0：无提醒，1：5分钟前，2：15分钟前，3：30分钟前，4：1小时前，5：2小时前，6：1天前，7：2天前
+
+        Returns:
+          创建好的schedule.Schedule对象
+        """
+        payload = {
+            "schedule": {
+                "name": name,
+                "start_timestamp": start_timestamp,
+                "end_timestamp": end_timestamp,
+                "jump_channel_id": jump_channel_id,
+                "reminder_id": remind_type,
+            }
+        }
+
+        route = Route("POST", "/channels/{channel_id}/schedules", channel_id=channel_id)
+        return await self._http.request(route, json=payload)
+
+    async def update_schedule(
+        self,
+        channel_id: str,
+        schedule_id: str,
+        name: str,
+        start_timestamp: str,
+        end_timestamp: str,
+        jump_channel_id: str,
+        remind_type: schedule.RemindType,
+    ) -> schedule.Schedule:
+        """
+        修改日程。
+
+        注意:
+          要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+
+
+        Args:
+          channel_id (str): 修改日程的子频道的 ID。
+          schedule_id (str): 日程ID
+          name (str): 日程的名称。
+          start_timestamp (str): 事件的开始时间，格式为 Unix 时间戳。
+          end_timestamp (str): 事件的结束时间，格式为 Unix 时间戳。
+          jump_channel_id (str): 要跳转到的频道的频道 ID。
+          remind_type (str): 0：无提醒，1：5分钟前，2：15分钟前，3：30分钟前，4：1小时前，5：2小时前，6：1天前，7：2天前
+
+        Returns:
+          更新好的schedule.Schedule对象
+        """
+        payload = {
+            "schedule": {
+                "name": name,
+                "start_timestamp": start_timestamp,
+                "end_timestamp": end_timestamp,
+                "jump_channel_id": jump_channel_id,
+                "reminder_id": remind_type,
+            }
+        }
+
+        route = Route(
+            "PATCH", "/channels/{channel_id}/schedules/{schedule_id}", channel_id=channel_id, schedule_id=schedule_id
+        )
+        return await self._http.request(route, json=payload)
+
+    async def delete_schedule(self, channel_id: str, schedule_id: str) -> str:
+        """
+        删除日程
+
+        注意:
+            要求操作人具有管理频道的权限，如果是机器人，则需要将机器人设置为管理员。
+
+        Args:
+          channel_id (str): 日程所属子频道的 ID。
+          schedule_id (str): 要删除的日程的 ID。
+
+        Returns:
+          成功的话回复一个字符串
+        """
+        route = Route(
+            "DELETE", "/channels/{channel_id}/schedules/{schedule_id}", channel_id=channel_id, schedule_id=schedule_id
+        )
+        return await self._http.request(route)
+
+    # 异步表情表态接口
+    async def put_reaction(self, channel_id: str, message_id: str, emoji_type: emoji.EmojiType, emoji_id: str) -> str:
+        """
+        对一条消息进行表情表态。
+
+        Args:
+          channel_id (str): 消息发送的子频道的 ID。
+          message_id (str): 表态的消息 ID。
+          emoji_type (int): EmojiType 1: 系统表情 2: emoji表情
+          emoji_id (str): 表情符号的 ID。
+            参考: https://bot.q.qq.com/wiki/develop/api/openapi/emoji/model.html#emoji-%E5%88%97%E8%A1%A8
+
+        Returns:
+          成功返回空字符串。
+        """
+        route = Route(
+            "PUT",
+            "/channels/{channel_id}/messages/{message_id}/reactions/{type}/{id}",
+            channel_id=channel_id,
+            message_id=message_id,
+            emoji_type=emoji_type,
+            emoji_id=emoji_id,
+        )
+        return await self._http.request(route)
+
+    async def delete_reaction(self, channel_id: str, message_id: str, emoji_type: int, emoji_id: str):
+        """
+        删除消息的表情表态。
+
+        Args:
+          channel_id (str): 消息发送的子频道的 ID。
+          message_id (str): 表态的消息 ID。
+          emoji_type (int): EmojiType 1: 系统表情 2: emoji表情
+          emoji_id (str): 表情符号的 ID。
+            参考: https://bot.q.qq.com/wiki/develop/api/openapi/emoji/model.html#emoji-%E5%88%97%E8%A1%A8
+
+        Returns:
+          成功返回空字符串。
+        """
+        route = Route(
+            "DELETE",
+            "/channels/{channel_id}/messages/{message_id}/reactions/{type}/{id}",
+            channel_id=channel_id,
+            message_id=message_id,
+            emoji_type=emoji_type,
+            emoji_id=emoji_id,
+        )
+        return await self._http.request(route)
+
+    # 精华消息API
+    async def put_pin(self, channel_id: str, message_id: str) -> pins_message.PinsMessage:
+        """
+        在子频道内添加精华消息。
+
+        注意:
+          每个子频道最多20条精华消息
+          只有可见的消息才能被设置为精华消息
+          返回对象中 message_ids 为当前请求后子频道内所有精华消息数组
+
+        Args:
+          channel_id (str): 用于固定消息的子频道 ID。
+          message_id (str): 要固定的消息的 ID。
+
+        Returns:
+          频道中所有固定消息的列表。
+        """
+        route = Route(
+            "PUT",
+            "/channels/{channel_id}/pins/{message_id}",
+            channel_id=channel_id,
+            message_id=message_id,
+        )
+        return await self._http.request(route)
+
+    async def delete_pin(self, channel_id: str, message_id: str):
+        """
+        删除精华消息。
+
+        注意:
+          用于删除子频道 channel_id 下指定 message_id 的精华消息。
+          删除子频道内全部精华消息，请将 message_id 设置为 all
+
+        Args:
+          channel_id (str): 用于固定消息的子频道 ID。
+          message_id (str): 要固定的消息的 ID。
+
+        Returns:
+          成功返回空字符串。
+        """
+        route = Route(
+            "DELETE",
+            "/channels/{channel_id}/pins/{message_id}",
+            channel_id=channel_id,
+            message_id=message_id,
+        )
+        return await self._http.request(route)
+
+    async def get_pins(self, channel_id: str) -> pins_message.PinsMessage:
+        """
+        用于获取子频道内的所有精华消息。
+
+        Args:
+          channel_id (str): 需要获取精华消息的子频道 ID
+
+        Returns:
+          频道中的精华消息。pins_message.PinsMessage 字典数据
+        """
+        route = Route(
+            "GET",
+            "/channels/{channel_id}/pins",
+            channel_id=channel_id,
+        )
+        return await self._http.request(route)
