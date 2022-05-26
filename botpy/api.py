@@ -587,20 +587,20 @@ class BotAPI:
 
         Args:
           guild_id (str): 列表的起始频道 ID。
-          limit (int): 返回的最大公会数（1-100）。. Defaults to 100
+          limit (int): 返回的最大频道数（1-100）。. Defaults to 100
           desc (bool): 如果为 True，则列表将按频道 ID 往前的数据并反序返回。. Defaults to False
 
         Returns:
           频道列表。
         """
-        param = {"limit": limit}
-        if desc:
-            param.update({"before": guild_id})
-        else:
-            param.update({"after": guild_id})
+        params = {"limit": limit}
+        if desc and guild_id:
+            params.update({"before": guild_id})
+        elif guild_id:
+            params.update({"after": guild_id})
 
         route = Route("GET", "/users/@me/guilds")
-        return await self._http.request(route, param=param)
+        return await self._http.request(route, params=params)
 
     # WebsocketAPI
     async def get_ws_url(self):
@@ -629,7 +629,7 @@ class BotAPI:
         Returns:
           返回值是一个字符串。
         """
-        payload = {k: v for k, v in locals().items() if k not in ["guild_id"] and v}
+        payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
 
@@ -668,7 +668,7 @@ class BotAPI:
         Returns:
           返回值是一个字符串。
         """
-        payload = {k: v for k, v in locals().items() if k not in ["guild_id"] and v}
+        payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
         route = Route("PATCH", "/guilds/{guild_id}/members/{user_id}/mute", guild_id=guild_id, user_id=user_id)
         return await self._http.request(route, json=payload)
 
@@ -687,7 +687,7 @@ class BotAPI:
         Returns:
           返回值是一个字符串。
         """
-        payload = {k: v for k, v in locals().items() if k not in ["guild_id", "user_ids"] and v}
+        payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
         payload.update({"user_ids": user_ids})
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
@@ -748,7 +748,7 @@ class BotAPI:
         Returns:
           一个新的 Announce 对象。字典类型数据
         """
-        payload = {"announces_type": announces_type, "recommend_channels": recommend_channels}
+        payload = {"announces_type": int(announces_type), "recommend_channels": recommend_channels}
         route = Route("POST", "/guilds/{guild_id}/announces", guild_id=guild_id)
         return await self._http.request(route, json=payload)
 
@@ -968,8 +968,8 @@ class BotAPI:
             "/channels/{channel_id}/messages/{message_id}/reactions/{type}/{id}",
             channel_id=channel_id,
             message_id=message_id,
-            emoji_type=emoji_type,
-            emoji_id=emoji_id,
+            type=emoji_type,
+            id=emoji_id,
         )
         return await self._http.request(route)
 
@@ -992,8 +992,8 @@ class BotAPI:
             "/channels/{channel_id}/messages/{message_id}/reactions/{type}/{id}",
             channel_id=channel_id,
             message_id=message_id,
-            emoji_type=emoji_type,
-            emoji_id=emoji_id,
+            type=emoji_type,
+            id=emoji_id,
         )
         return await self._http.request(route)
 
@@ -1020,7 +1020,7 @@ class BotAPI:
             channel_id=channel_id,
             message_id=message_id,
         )
-        return await self._http.request(route)
+        return await self._http.request(route, json={})
 
     async def delete_pin(self, channel_id: str, message_id: str):
         """

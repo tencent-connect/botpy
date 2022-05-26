@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
+from typing import TypedDict, Literal
 
 
-class STATUS:
-    START = 0
-    PAUSE = 1
-    RESUME = 2
-    STOP = 3
+"""
+START = 0
+PAUSE = 1
+RESUME = 2
+STOP = 3
+"""
+AudioStatus = Literal[0, 1, 2, 3]
 
 
-class AudioControl:
+class AudioControl(TypedDict):
     audio_url: str
     text: str
-    status: STATUS
+    status: AudioStatus
 
 
-class AudioAction:
+class AudioAction(TypedDict):
     guild_id: str
     channel_id: str
     audio_url: str

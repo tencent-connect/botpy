@@ -11,13 +11,8 @@ from botpy.errors import (
     AuthenticationFailedError,
     ServerError,
 )
-from botpy.types.announce import RecommendChannel, RecommendChannelRequest
-from botpy.types.permission import (
-    APIPermissionDemandIdentify,
-    PermissionDemandToCreate,
-)
-from botpy.types.emoji import EmojiType
 from botpy.types import guild, user, channel
+from botpy.types.announce import AnnouncesType
 from botpy.types.channel import ChannelType, ChannelSubType
 from tests import test_config
 
@@ -141,31 +136,26 @@ class APITestCase(unittest.TestCase):
 
     def test_me(self):
         user = self.loop.run_until_complete(self.api.me())
-        self.assertEqual(ROBOT_NAME, user.username)
+        self.assertEqual(ROBOT_NAME, user["username"])
 
     def test_me_guilds(self):
         guilds = self.loop.run_until_complete(self.api.me_guilds())
-        self.assertNotEqual(0, len(guilds))
-
-        option = botpy.ReqOption(limit=1)
-        guilds = self.loop.run_until_complete(self.api.me_guilds(option))
         self.assertEqual(1, len(guilds))
 
+        guilds = self.loop.run_until_complete(self.api.me_guilds(GUILD_ID, limit=1, desc=True))
+        self.assertEqual(0, len(guilds))
+
     def test_post_audio(self):
-        audio = botpy.AudioControl("", "Test", botpy.STATUS.START)
+        payload = {"audio_url": "test", "text": "test", "status": 0}
         try:
-            result = self.loop.run_until_complete(self.api.update_audio(CHANNEL_ID, audio))
+            result = self.loop.run_until_complete(self.api.update_audio(CHANNEL_ID, payload))
             print(result)
         except AuthenticationFailedError as e:
             print(e)
 
     def test_create_and_send_dms(self):
         try:
-            # 私信接口需要链接ws，单元测试无法测试可以在run_websocket测试
-            request = botpy.CreateDirectMessageRequest(GUILD_ID, GUILD_OWNER_ID)
-            direct_message_guild = self.loop.run_until_complete(self.api.create_direct_message(request))
-            send_msg = botpy.MessageSendRequest("test")
-            message = self.loop.run_until_complete(self.api.post_dms(direct_message_guild.guild_id, send_msg))
+            message = self.loop.run_until_complete(self.api.post_dms(GUILD_ID, GUILD_OWNER_ID, content="test"))
             print(message.content)
         except (Exception, ServerError) as e:
             print(e)
@@ -175,48 +165,49 @@ class APITestCase(unittest.TestCase):
         self.assertEqual(ws["url"], "wss://api.sgroup.qq.com/websocket")
 
     def test_mute_all(self):
-        option = botpy.MuteOption(mute_seconds="20")
-        result = self.loop.run_until_complete(self.api.mute_all(GUILD_ID, option))
-        self.assertEqual(True, result)
+        result = self.loop.run_until_complete(self.api.mute_all(GUILD_ID, mute_seconds="20"))
+        self.assertEqual("", result)
 
     def test_mute_member(self):
-        option = botpy.MuteOption(mute_seconds="20")
-        result = self.loop.run_until_complete(self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, option))
-        self.assertEqual(True, result)
+        result = self.loop.run_until_complete(self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, mute_seconds="20"))
+        self.assertEqual("", result)
 
     def test_mute_multi_member(self):
-        option = botpy.MultiMuteOption(mute_seconds="120", user_ids=[GUILD_TEST_MEMBER_ID])
-        result: List[str] = self.loop.run_until_complete(self.api.mute_multi_member(GUILD_ID, option))
+        result: List[str] = self.loop.run_until_complete(
+            self.api.mute_multi_member(GUILD_ID, mute_seconds="120", user_ids=[GUILD_TEST_MEMBER_ID])
+        )
         self.assertEqual(1, len(result))
 
     def test_post_recommend_channel(self):
-        channel_list = [RecommendChannel(CHANNEL_ID, "introduce")]
-        request = RecommendChannelRequest(0, channel_list)
-        result = self.loop.run_until_complete(self.api.post_recommended_channels(GUILD_ID, request))
-        self.assertEqual(len(channel_list), len(result.recommend_channels))
+        channel_list = [{"channel_id": CHANNEL_ID, "introduce": "introduce"}]
+        result = self.loop.run_until_complete(
+            self.api.create_recommend_announce(GUILD_ID, AnnouncesType.MEMBER, channel_list)
+        )
+        self.assertEqual(len(channel_list), len(result["recommend_channels"]))
 
     def test_get_permissions(self):
         result = self.loop.run_until_complete(self.api.get_permissions(GUILD_ID))
         self.assertNotEqual(0, len(result))
 
     def test_post_permissions_demand(self):
-        demand_identity = APIPermissionDemandIdentify("/guilds/{guild_id}/members/{user_id}", "GET")
-        permission_demand_to_create = PermissionDemandToCreate(CHANNEL_ID, demand_identity)
-        result = self.loop.run_until_complete(self.api.post_permission_demand(GUILD_ID, permission_demand_to_create))
-        print(result.title)
+        demand_identity = {"path": "/guilds/{guild_id}/members/{user_id}", "method": "GET"}
+        result = self.loop.run_until_complete(
+            self.api.post_permission_demand(GUILD_ID, CHANNEL_ID, api_identify=demand_identity, desc="test")
+        )
+        print(result["title"])
 
     def test_get_schedules(self):
         schedules = self.loop.run_until_complete(self.api.get_schedules(CHANNEL_SCHEDULE_ID))
         self.assertEqual(None, schedules)
 
     def test_delete_reaction(self):
-        result = self.loop.run_until_complete(self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4"))
-        self.assertEqual(True, result)
+        result = self.loop.run_until_complete(self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, 1, "4"))
+        self.assertEqual("", result)
 
         time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
 
-        result = self.loop.run_until_complete(self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, EmojiType.system, "4"))
-        self.assertEqual(True, result)
+        result = self.loop.run_until_complete(self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, 1, "4"))
+        self.assertEqual("", result)
 
     def test_put_pin(self):
         result = self.loop.run_until_complete(self.api.put_pin(CHANNEL_ID, MESSAGE_ID))
@@ -224,11 +215,11 @@ class APITestCase(unittest.TestCase):
 
     def test_delete_pin(self):
         result = self.loop.run_until_complete(self.api.delete_pin(CHANNEL_ID, MESSAGE_ID))
-        self.assertEqual(True, result)
+        self.assertEqual("", result)
 
     def test_get_pins(self):
         result = self.loop.run_until_complete(self.api.get_pins(CHANNEL_ID))
-        self.assertTrue(len(result.message_ids) >= 0)
+        self.assertTrue(len(result["message_ids"]) >= 0)
 
 
 if __name__ == "__main__":

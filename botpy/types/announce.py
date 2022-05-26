@@ -12,6 +12,9 @@ class AnnouncesType(Enum):
     MEMBER = 0  # 成员公告
     WELCOME = 1  # 欢迎公告
 
+    def __int__(self) -> int:
+        return self.value
+
 
 class Announce(TypedDict):
     guild_id: str
