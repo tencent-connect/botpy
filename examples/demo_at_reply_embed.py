@@ -2,7 +2,6 @@ import os
 
 import botpy
 from botpy import logging
-from botpy.channel import Channel
 from botpy.message import Message
 from botpy.utils import YamlUtil
 
@@ -15,11 +14,19 @@ class MyClient(botpy.Client):
     async def on_ready(self):
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
-    async def on_channel_create(self, channel: Channel):
-        await channel.reply(f"机器人{self.robot.name}发现你创建频道了！")
-
     async def on_at_message_create(self, message: Message):
-        await message.reply(f"机器人{self.robot.name}收到你的@消息了: {message.content}")
+        # 构造消息发送请求数据对象
+        embed = {
+            "title": "embed消息",
+            "prompt": "消息透传显示",
+            "fields": [
+                {"name": "<@!1234>hello world", "value": "通知提醒"},
+                {"name": "<@!1234>hello world", "value": "标题"},
+            ],
+        }
+
+        await self.api.post_message(channel_id=message.channel_id, embed=embed)
+        # await message.reply(embed=embed) # 这样也可以
 
 
 if __name__ == "__main__":

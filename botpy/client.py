@@ -1,5 +1,4 @@
 import asyncio
-import sys
 import traceback
 from types import TracebackType
 from typing import Any, Callable, Coroutine, Dict, List, Tuple, Optional, Type
@@ -84,7 +83,6 @@ class Client:
         return self._closed
 
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
-        _log.error(f"Ignoring exception in {event_method}", file=sys.stderr)
         traceback.print_exc()
 
     async def _async_setup_hook(self) -> None:

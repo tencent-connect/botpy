@@ -1,5 +1,3 @@
-requests
-websocket-client
 pre-commit
 PyYAML
 aiohttp>=3.6.0,<3.8.0

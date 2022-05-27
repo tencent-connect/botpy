@@ -37,7 +37,7 @@ class ArkObj(TypedDict):
 class ArkKv(TypedDict):
     key: str
     value: str
-    obj: List[ArkObj]
+    # obj: List[ArkObj]
 
 
 class Ark(TypedDict):
