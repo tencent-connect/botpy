@@ -150,13 +150,13 @@ class APITestCase(unittest.TestCase):
         try:
             result = self.loop.run_until_complete(self.api.update_audio(CHANNEL_ID, payload))
             print(result)
-        except AuthenticationFailedError as e:
+        except (AuthenticationFailedError, ServerError) as e:
             print(e)
 
     def test_create_and_send_dms(self):
         try:
             message = self.loop.run_until_complete(self.api.post_dms(GUILD_ID, GUILD_OWNER_ID, content="test"))
-            print(message.content)
+            print(message["content"])
         except (Exception, ServerError) as e:
             print(e)
 

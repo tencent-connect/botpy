@@ -792,10 +792,10 @@ class BotAPI:
         用于创建 API 接口权限授权链接，该链接指向guild_id对应的频道
 
         Args:
-          guild_id (str): 创建权限需求的频道ID。
+          guild_id (str): 创建权限请求的频道ID。
           channel_id (str): 需要发送权限请求的通道的子频道ID。
           api_identify (permission.APIPermissionDemandIdentify): API 权限需求标识。
-          desc (str): 权限需求的描述。
+          desc (str): 权限请求的描述。
 
         Returns:
           一个 permission.APIPermissionDemand 字典数据对象。
