@@ -84,7 +84,7 @@ class BotWebSocket:
             except KeyError:
                 _log.debug("_parser unknown event %s.", event)
             else:
-                ctx: gateway.WsContext = {"id": msg.get("id", "")}
+                ctx = gateway.WsContext(id=msg.get("id", ""))
                 func(ctx, msg.get("d"))
 
     async def on_connected(self, ws: ClientWebSocketResponse):

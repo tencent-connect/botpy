@@ -26,13 +26,11 @@ class ConnectionSession:
 
         self._connect = connect
         self._max_async = max_async
-        self._loop: asyncio.AbstractEventLoop = asyncio.get_event_loop() if loop is None else loop
+        self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop() if loop is None else loop
         # session链接同时最大并发数
         self._session_list: List[session.Session] = []
 
     async def run(self, session_interval=5):
-        loop = self._loop
-
         # 根据并发数同时建立多个future
         index = 0
         session_list = self._session_list
@@ -46,7 +44,7 @@ class ConnectionSession:
             for i in range(self._max_async):
                 if len(session_list) == 0:
                     break
-                tasks.append(asyncio.ensure_future(self._runner(session_list.pop(i), time_interval), loop=loop))
+                tasks.append(asyncio.ensure_future(self._runner(session_list.pop(i), time_interval), loop=self.loop))
             index += self._max_async
 
         await asyncio.wait(tasks)

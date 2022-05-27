@@ -40,7 +40,7 @@ class Client:
         self.intents: int = intents.value
         self.ret_coro: bool = False
         # TODO loop的整体梳理 @veehou
-        self.loop = None
+        self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
         self.http: BotHttp = BotHttp(timeout=timeout)
         self.api: BotAPI = BotAPI(http=self.http)
 
@@ -87,15 +87,16 @@ class Client:
 
     async def _async_setup_hook(self) -> None:
         # Called whenever the client needs to initialise asyncio objects with a running loop
-        loop = asyncio.get_running_loop()
-        self.loop = loop
+        self.loop = asyncio.get_running_loop()
         self._ready = asyncio.Event()
 
     def run(self, *args: Any, **kwargs: Any) -> None:
-        """机器人服务开始执行
-        注意: 这里会阻塞后面的执行代码
+        """
+        机器人服务开始执行
 
-        如果想获取协程对象，可以使用`start`方法执行服务, 如:
+        注意:
+          这个函数必须是最后一个调用的函数，因为它是阻塞的。这意味着事件的注册或在此函数调用之后调用的任何内容在它返回之前不会执行。
+          如果想获取协程对象，可以使用`start`方法执行服务, 如:
         ```
         async with Client as c:
             c.start()
@@ -107,11 +108,9 @@ class Client:
                 await self.start(*args, **kwargs)
 
         try:
-            asyncio.run(runner())
+            self.loop.run_until_complete(runner())
+            self.loop.run_forever()
         except KeyboardInterrupt:
-            # nothing to do here
-            # `asyncio.run` handles the loop cleanup
-            # and `self.start` closes all sockets and the HTTPClient instance.
             return
 
     async def start(self, appid: str, token: str, ret_coro: bool = False) -> Optional[Coroutine]:
@@ -170,13 +169,13 @@ class Client:
         return await self._pool_init(token.bot_token(), session_interval)
 
     async def _pool_init(self, token, session_interval):
-        def _loop_exception_handler(loop, context):
+        def _loop_exception_handler(_loop, context):
             # first, handle with default handler
-            loop.default_exception_handler(context)
+            _loop.default_exception_handler(context)
 
             exception = context.get("exception")
             if isinstance(exception, ZeroDivisionError):
-                loop.stop()
+                _loop.stop()
 
         for i in range(self._ws_ap["shards"]):
             session = {
@@ -189,7 +188,7 @@ class Client:
             }
             self._connection.add(session)
 
-        loop = self._connection._loop
+        loop = self._connection.loop
         loop.set_exception_handler(_loop_exception_handler)
 
         try:
