@@ -3,6 +3,7 @@ import os
 import botpy
 from botpy import logging
 from botpy.message import Message
+from botpy.types.message import Ark, ArkKv
 from botpy.utils import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
@@ -15,16 +16,25 @@ class MyClient(botpy.Client):
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
     async def on_at_message_create(self, message: Message):
-        # 构造消息发送请求数据对象
-        payload = {
-            "template_id": 37,
-            "kv": [
-                {"key": "#METATITLE#", "value": "通知提醒"},
-                {"key": "#PROMPT#", "value": "标题"},
-                {"key": "#TITLE#", "value": "标题"},
-                {"key": "#METACOVER#", "value": "https://vfiles.gtimg.cn/vupload/20211029/bf0ed01635493790634.jpg"},
+        # 两种方式构造消息发送请求数据对象
+        payload: Ark = Ark(
+            template_id=37,
+            kv=[
+                ArkKv(key="#METATITLE#", value="通知提醒"),
+                ArkKv(key="#PROMPT#", value="标题"),
+                ArkKv(key="#TITLE#", value="标题"),
+                ArkKv(key="#METACOVER#", value="https://vfiles.gtimg.cn/vupload/20211029/bf0ed01635493790634.jpg"),
             ],
-        }
+        )
+        # payload = {
+        #     "template_id": 37,
+        #     "kv": [
+        #         {"key": "#METATITLE#", "value": "通知提醒"},
+        #         {"key": "#PROMPT#", "value": "标题"},
+        #         {"key": "#TITLE#", "value": "标题"},
+        #         {"key": "#METACOVER#", "value": "https://vfiles.gtimg.cn/vupload/20211029/bf0ed01635493790634.jpg"},
+        #     ],
+        # }
 
         await self.api.post_message(channel_id=message.channel_id, ark=payload)
         # await message.reply(ark=payload) # 这样也可以

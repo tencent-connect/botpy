@@ -3,6 +3,7 @@ import os
 import botpy
 from botpy import logging
 from botpy.message import Message
+from botpy.types.message import Embed, EmbedField
 from botpy.utils import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
@@ -16,14 +17,23 @@ class MyClient(botpy.Client):
 
     async def on_at_message_create(self, message: Message):
         # 构造消息发送请求数据对象
-        embed = {
-            "title": "embed消息",
-            "prompt": "消息透传显示",
-            "fields": [
-                {"name": "<@!1234>hello world", "value": "通知提醒"},
-                {"name": "<@!1234>hello world", "value": "标题"},
+        embed = Embed(
+            title="embed消息",
+            prompt="消息透传显示",
+            fields=[
+                EmbedField(name="<@!1234>hello world", value="通知提醒"),
+                EmbedField(name="<@!1234>hello world", value="通知提醒"),
             ],
-        }
+        )
+
+        # embed = {
+        #     "title": "embed消息",
+        #     "prompt": "消息透传显示",
+        #     "fields": [
+        #         {"name": "<@!1234>hello world", "value": "通知提醒"},
+        #         {"name": "<@!1234>hello world", "value": "标题"},
+        #     ],
+        # }
 
         await self.api.post_message(channel_id=message.channel_id, embed=embed)
         # await message.reply(embed=embed) # 这样也可以

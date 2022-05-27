@@ -18,7 +18,7 @@ class EmbedField(TypedDict):
     value: str
 
 
-class Embed(TypedDict):
+class Embed(TypedDict, total=False):
     title: str  # 标题
     prompt: str  # 消息弹窗内容
     thumbnail: Thumbnail  # 缩略图
@@ -34,10 +34,10 @@ class ArkObj(TypedDict):
     obj_kv: List[ArkObjKv]
 
 
-class ArkKv(TypedDict):
+class ArkKv(TypedDict, total=False):
     key: str
     value: str
-    # obj: List[ArkObj]
+    obj: List[ArkObj]
 
 
 class Ark(TypedDict):
