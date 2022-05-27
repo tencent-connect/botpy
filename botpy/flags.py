@@ -103,8 +103,6 @@ class Flag:
 
 @fill_with_flags()
 class Intents(BaseFlags):
-    # TODO 补全所有事件的注释 @veehou
-
     __slots__ = ()
 
     def __init__(self, **kwargs: bool) -> None:
@@ -154,27 +152,34 @@ class Intents(BaseFlags):
             `执行相关的任务`
         `
 
-
-        - :func:`on_guild_create`: 当机器人加入新guild时
-        - :func:`on_guild_update`: 当guild资料发生变更时
-        - :func:`on_guild_delete`: 当机器人退出guild时
-        - :func:`on_channel_create`: 当channel被创建时
-        - :func:`on_channel_update`: 当channel被更新时
-        - :func:`on_channel_delete`: 当channel被删除时
+        - :func:`on_guild_create(self, guild: Guild)`: 当机器人加入新guild时
+        - :func:`on_guild_update(self, guild: Guild)`: 当guild资料发生变更时
+        - :func:`on_guild_delete(self, guild: Guild)`: 当机器人退出guild时
+        - :func:`on_channel_create(self, channel: Channel)`: 当channel被创建时
+        - :func:`on_channel_update(self, channel: Channel)`: 当channel被更新时
+        - :func:`on_channel_delete(self, channel: Channel)`: 当channel被删除时
 
         """
         return 1 << 0
 
     @Flag
     def guild_members(self):
-        """:class:`bool`: 是否打开频道成员事件的监听."""
+        """:class:`bool`: 是否打开频道成员事件的监听.
+
+        - :func:`guild_member_add(self, member:Member)`: 当成员加入时
+        - :func:`guild_member_update(self, member:Member)`: 当成员资料变更时
+        - :func:`guild_member_remove(self, member:Member)`: 当成员被移除时
+
+        """
         return 1 << 1
 
     @Flag
     def guild_messages(self):
         """:class:`bool`: 是否打开消息事件的监听.
 
-        通过增加`client`的`on_xx`事件可以获取事件下发的数据:
+        - :func:`message_create(self,message:Message)`:
+            发送消息事件，代表频道内的全部消息，而不只是 at 机器人的消息。内容与 AT_MESSAGE_CREATE 相同
+        - :func:`message_delete(self,message:Message)`: 删除（撤回）消息事件
 
         注意：仅 *私域* 机器人能够设置此 intents
         """
@@ -182,22 +187,41 @@ class Intents(BaseFlags):
 
     @Flag
     def guild_message_reactions(self):
-        """:class:`bool`: 是否打开消息相关互动事件的监听."""
+        """:class:`bool`: 是否打开消息相关互动事件的监听.
+
+        - :func:`message_reaction_add`: 为消息添加表情表态
+        - :func:`message_reaction_remove`: 为消息删除表情表态
+
+        """
         return 1 << 10
 
     @Flag
     def direct_message(self):
-        """:class:`bool`: 是否打开私信事件的监听."""
+        """:class:`bool`: 是否打开私信事件的监听.
+
+        - :func:`direct_message_create`: 当收到用户发给机器人的私信消息时
+        - :func:`direct_message_delete `: 删除（撤回）消息事件
+
+        """
         return 1 << 12
 
     @Flag
     def interaction(self):
-        """:class:`bool`: 是否打开互动事件的监听."""
+        """:class:`bool`: 是否打开互动事件的监听.
+
+        - :func:`interaction_create`: 互动事件创建时
+
+        """
         return 1 << 26
 
     @Flag
     def message_audit(self):
-        """:class:`bool`: 是否打开消息审核事件的监听."""
+        """:class:`bool`: 是否打开消息审核事件的监听.
+
+        - :func:`message_audit_pass`: 消息审核通过
+        - :func:`message_audit_reject`: 消息审核不通过
+
+        """
         return 1 << 27
 
     @Flag
@@ -210,7 +234,14 @@ class Intents(BaseFlags):
 
     @Flag
     def audio_action(self):
-        """:class:`bool`: 是否打开音频事件的监听."""
+        """:class:`bool`: 是否打开音频事件的监听.
+
+        - :func:`audio_start`: 音频开始播放时
+        - :func:`audio_finish`: 音频播放结束时
+        - :func:`audio_on_mic`: 上麦时
+        - :func:``audio_off_mic`: 下麦时
+
+        """
         return 1 << 29
 
     @Flag

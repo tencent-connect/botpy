@@ -1,10 +1,10 @@
-from typing import TypedDict, List, Any
+from typing import TypedDict, List
 
 from .user import Member
 
 
 class WsContext(TypedDict):
-    id: Any  # 被动事件里携带的上下文信息，目前仅有部分事件支持
+    id: str  # 被动事件里携带的上下文信息，目前仅有部分事件支持
 
 
 class UserPayload(TypedDict):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Literal
+from typing import Literal, TypedDict
 
 """
 EmojiType
@@ -8,3 +8,8 @@ EmojiType
 2	emoji表情
 """
 EmojiType = Literal[1, 2]
+
+
+class Emoji(TypedDict):
+    id: str
+    type: EmojiType

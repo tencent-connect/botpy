@@ -4,7 +4,7 @@ from typing import TypedDict, List
 from botpy.types.user import User
 
 
-class Guild(TypedDict):
+class GuildPayload(TypedDict):
     id: str
     name: str
     icon: str

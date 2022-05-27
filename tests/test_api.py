@@ -47,7 +47,7 @@ class APITestCase(unittest.TestCase):
         self.loop.run_until_complete(self.http.close())
 
     def test_guild(self):
-        result: guild.Guild = self.loop.run_until_complete(self.api.get_guild(GUILD_ID))
+        result: guild.GuildPayload = self.loop.run_until_complete(self.api.get_guild(GUILD_ID))
         self.assertNotEqual("", result["name"])
 
     def test_guild_roles(self):
@@ -91,24 +91,24 @@ class APITestCase(unittest.TestCase):
             print(e.args)
 
     def test_channel(self):
-        result: channel.channel = self.loop.run_until_complete(self.api.get_channel(CHANNEL_ID))
+        result: channel.ChannelPayload = self.loop.run_until_complete(self.api.get_channel(CHANNEL_ID))
         self.assertEqual(CHANNEL_NAME, result["name"])
 
     def test_channels(self):
-        result: List[channel.channel] = self.loop.run_until_complete(self.api.get_channels(GUILD_ID))
+        result: List[channel.ChannelPayload] = self.loop.run_until_complete(self.api.get_channels(GUILD_ID))
         self.assertNotEqual(0, len(result))
 
     def test_create_update_delete_channel(self):
         # create
         coro = self.api.create_channel(GUILD_ID, "channel_test", ChannelType.TEXT_CHANNEL, ChannelSubType.TALK)
-        result: channel.channel = self.loop.run_until_complete(coro)
+        result: channel.ChannelPayload = self.loop.run_until_complete(coro)
         # patch
         coro = self.api.update_channel(result["id"], name="update_channel")
-        result: channel.channel = self.loop.run_until_complete(coro)
+        result: channel.ChannelPayload = self.loop.run_until_complete(coro)
         self.assertEqual("update_channel", result["name"])
         # delete
         coro = self.api.delete_channel(result["id"])
-        delete_channel: channel.channel = self.loop.run_until_complete(coro)
+        delete_channel: channel.ChannelPayload = self.loop.run_until_complete(coro)
         self.assertTrue(result["name"], delete_channel["name"])
 
     def test_channel_permissions(self):

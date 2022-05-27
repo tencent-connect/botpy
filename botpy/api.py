@@ -41,10 +41,8 @@ class BotAPI:
         """
         self._http = http
 
-    # TODO 重写所有的api及单测 @veehou
-
     # 频道相关接口
-    async def get_guild(self, guild_id: str) -> guild.Guild:
+    async def get_guild(self, guild_id: str) -> guild.GuildPayload:
         """
         获取频道信息。
 
@@ -581,7 +579,7 @@ class BotAPI:
         route = Route("GET", "/users/@me")
         return await self._http.request(route)
 
-    async def me_guilds(self, guild_id: str = None, limit: int = 100, desc: bool = False) -> List[guild.Guild]:
+    async def me_guilds(self, guild_id: str = None, limit: int = 100, desc: bool = False) -> List[guild.GuildPayload]:
         """
         它返回当前用户已加入的 Guild 对象列表。
 

@@ -6,7 +6,7 @@ class InteractionData:
     resolved: object
 
 
-class Interaction:
+class InteractionPayload:
     id: str
     application_id: int
     type: int

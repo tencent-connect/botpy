@@ -15,7 +15,7 @@ from .types import robot
 
 X_TPS_TRACE_ID = "X-Tps-trace-Id"
 
-logger = logging.getLogger()
+_log = logging.getLogger()
 
 
 # 请求成功的返回码
@@ -25,11 +25,11 @@ HTTP_OK_STATUS = [200, 202, 204]
 async def _handle_response(url, response: ClientResponse) -> Union[Dict[str, Any], str]:
     data = await _json_or_text(response)
     if response.status in HTTP_OK_STATUS:
-        logger.debug(f"[HTTP]请求成功, 请求连接: {url}, 返回内容: {data}")
+        _log.debug(f"[botpy]请求成功, 请求连接: {url}, 返回内容: {data}")
         return data
     else:
-        logger.error(
-            f"[HTTP]接口请求异常，请求连接: {url},"
+        _log.error(
+            f"[botpy]接口请求异常，请求连接: {url},"
             f" error code: {response.status}, 返回内容: {data}, trace_id:{response.headers.get(X_TPS_TRACE_ID)}"
             # trace_id 用于定位接口问题
         )
@@ -110,7 +110,7 @@ class BotHttp:
 
         kwargs["headers"] = headers
 
-        logger.debug(f"[HTTP] request headers: {headers}, method: {route.method}, api_url: {route.url}")
+        _log.debug(f"[botpy] request headers: {headers}, method: {route.method}, api_url: {route.url}")
         async with self._session.request(method=route.method, url=route.url, **kwargs) as response:
             return await _handle_response(route.url, response)
 

@@ -18,5 +18,5 @@ class Member(TypedDict):
     joined_at: str
 
 
-class GuildMember(Member):
+class GuildMemberPayload(Member):
     guild_id: str
