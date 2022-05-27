@@ -146,14 +146,21 @@ class Intents(BaseFlags):
     def guilds(self):
         """:class:`bool`: 是否打开频道事件的监听.
 
-        通过增加`client`的`on_xx`事件可以获取事件下发的数据:
+        通过增加`client`的`on_xx`成员方法可以获取事件下发的数据:
+        `py
+        from botpy.guild import Guild
 
-        - :func:`on_guild_create`               // 当机器人加入新guild时
-        - :func:`on_guild_update`               // 当guild资料发生变更时
-        - :func:`on_guild_delete`               // 当机器人退出guild时
-        - :func:`on_channel_create`             // 当channel被创建时
-        - :func:`on_channel_update`             // 当channel被更新时
-        - :func:`on_channel_delete`             // 当channel被删除时
+        async def on_guild_create(self, guild: Guild):
+            `执行相关的任务`
+        `
+
+
+        - :func:`on_guild_create`: 当机器人加入新guild时
+        - :func:`on_guild_update`: 当guild资料发生变更时
+        - :func:`on_guild_delete`: 当机器人退出guild时
+        - :func:`on_channel_create`: 当channel被创建时
+        - :func:`on_channel_update`: 当channel被更新时
+        - :func:`on_channel_delete`: 当channel被删除时
 
         """
         return 1 << 0

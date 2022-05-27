@@ -45,7 +45,7 @@ class SpeakPermission(Enum):
         return self.value
 
 
-class Channel(TypedDict):
+class ChannelPayload(TypedDict):
     id: str
     guild_id: str
     name: str

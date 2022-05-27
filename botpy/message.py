@@ -12,5 +12,5 @@ class Message:
         self.message_id = data["id"]
         self.content = data["content"]
 
-    async def reply(self, content: str):
-        await self._api.post_message(content=content, channel_id=self.channel_id, msg_id=self.message_id)
+    async def reply(self, content: str, **kwargs):
+        await self._api.post_message(content=content, channel_id=self.channel_id, msg_id=self.message_id, **kwargs)

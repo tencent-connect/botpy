@@ -9,7 +9,7 @@ from aiohttp import WSMessage, ClientWebSocketResponse
 
 from . import logging
 from .connection import ConnectionSession
-from .types.gateway import ReadyEvent
+from .types import gateway
 from .types.session import Session
 from .utils import JsonUtil
 
@@ -84,7 +84,8 @@ class BotWebSocket:
             except KeyError:
                 _log.debug("unknown event %s.", event)
             else:
-                func(msg.get("d"))
+                ctx: gateway.WsContext = {"id": msg.get("id", "")}
+                func(ctx, msg.get("d"))
 
     async def on_connected(self, ws: ClientWebSocketResponse):
         self._conn = ws
@@ -173,7 +174,7 @@ class BotWebSocket:
 
         await self.send_msg(JsonUtil.dict2json(payload))
 
-    async def _ready_handler(self, message_event) -> ReadyEvent:
+    async def _ready_handler(self, message_event) -> gateway.ReadyEvent:
         data = message_event["d"]
         self.version = data["version"]
         self._session["session_id"] = data["session_id"]

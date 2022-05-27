@@ -10,7 +10,7 @@ from botpy.types.announce import (
     RecommendChannelRequest,
     CreateChannelAnnounceRequest,
 )
-from botpy.model.ws_context import WsContext
+from botpy.types.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 

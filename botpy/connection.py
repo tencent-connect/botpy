@@ -3,11 +3,11 @@ import inspect
 from typing import List, Callable, Dict, Any, Optional
 
 from .api import BotAPI
+from .channel import Channel
 from .message import Message
 from .robot import Robot
 from .logging import logging
-from .types import gateway
-from .types.gateway import ReadyEvent
+from .types import gateway, channel
 from .types.session import Session
 
 _log = logging.getLogger()
@@ -23,7 +23,7 @@ class ConnectionSession:
     def __init__(self, max_async, connect: Callable, dispatch: Callable, loop=None, api: BotAPI = None):
         self.dispatch = dispatch
         self.state = ConnectionState(dispatch, api)
-        self.parser: Dict[str, Callable[[Any], None]] = self.state.parsers
+        self.parser: Dict[str, Callable[[gateway.WsContext, Any], None]] = self.state.parsers
 
         self._connect = connect
         self._max_async = max_async
@@ -76,11 +76,22 @@ class ConnectionState:
         self._dispatch = dispatch
         self.api = api
 
-    def parse_at_message_create(self, data: gateway.MessagePayload):
+    def parse_guild_create(self, ctx: gateway.WsContext, data: channel.ChannelPayload):
+        self._dispatch("guild_create", data)
+
+    def parse_channel_create(self, ctx: gateway.WsContext, data: channel.ChannelPayload):
+        _channel = Channel(self.api, ctx, data)
+        self._dispatch("channel_create", _channel)
+
+    def parse_channel_delete(self, ctx: gateway.WsContext, data: channel.ChannelPayload):
+        _channel = Channel(self.api, ctx, data)
+        self._dispatch("channel_delete", _channel)
+
+    def parse_at_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
         message = Message(self.api, data)
         self._dispatch("at_message_create", message)
 
-    def parse_ready(self, data: ReadyEvent):
+    def parse_ready(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
         self._dispatch("ready")
 
     # TODO 补全解析的所有事件 @veehou

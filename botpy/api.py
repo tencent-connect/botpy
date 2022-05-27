@@ -234,7 +234,7 @@ class BotAPI:
         return await self._http.request(route, params=params)
 
     # 子频道相关接口
-    async def get_channel(self, channel_id: str) -> channel.Channel:
+    async def get_channel(self, channel_id: str) -> channel.ChannelPayload:
         """
         它获取频道信息。
 
@@ -251,7 +251,7 @@ class BotAPI:
         )
         return await self._http.request(route)
 
-    async def get_channels(self, guild_id: str) -> List[channel.Channel]:
+    async def get_channels(self, guild_id: str) -> List[channel.ChannelPayload]:
         """
         获取频道下的子频道列表
 
@@ -270,7 +270,7 @@ class BotAPI:
 
     async def create_channel(
         self, guild_id: str, name: str, type: channel.ChannelType, sub_type: channel.ChannelSubType, **fields
-    ) -> channel.Channel:
+    ) -> channel.ChannelPayload:
         """
         创建子频道
 
@@ -278,7 +278,7 @@ class BotAPI:
           guild_id (str): 频道 ID。
           name (str): 子频道名。
           type (channel.ChannelType): 子频道类型
-          sub_type (channel.ChannelSubType): 子频道子类型
+          sub_type (channelpayload.ChannelSubType): 子频道子类型
 
         Kwargs（fields）:
           position (int): 排序，非必填
@@ -297,7 +297,7 @@ class BotAPI:
         route = Route("POST", "/guilds/{guild_id}/channels", guild_id=guild_id)
         return await self._http.request(route, json=payload)
 
-    async def update_channel(self, channel_id: str, **fields) -> channel.Channel:
+    async def update_channel(self, channel_id: str, **fields) -> channel.ChannelPayload:
         """
         更新子频道。
 
@@ -319,7 +319,7 @@ class BotAPI:
         route = Route("PATCH", "/channels/{channel_id}", channel_id=channel_id)
         return await self._http.request(route, json=payload)
 
-    async def delete_channel(self, channel_id: str) -> channel.Channel:
+    async def delete_channel(self, channel_id: str) -> channel.ChannelPayload:
         """
         删除子频道
 

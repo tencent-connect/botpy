@@ -8,7 +8,7 @@ from botpy.types.permission import (
     APIPermissionDemandIdentify,
     PermissionDemandToCreate,
 )
-from botpy.model.ws_context import WsContext
+from botpy.types.ws_context import WsContext
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 

@@ -1,6 +1,10 @@
-from typing import TypedDict, List
+from typing import TypedDict, List, Any
 
 from .user import Member
+
+
+class WsContext(TypedDict):
+    id: Any  # 被动事件里携带的上下文信息，目前仅有部分事件支持
 
 
 class UserPayload(TypedDict):
@@ -8,6 +12,13 @@ class UserPayload(TypedDict):
     username: str
     bot: bool
     status: int
+
+
+class ReadyEvent(TypedDict):
+    version: int
+    session_id: str
+    user: UserPayload
+    shard: List[int]
 
 
 class WsUrlPayload(TypedDict):
@@ -25,10 +36,3 @@ class MessagePayload(TypedDict):
     seq: int
     seq_in_channel: str
     timestamp: str
-
-
-class ReadyEvent(TypedDict):
-    version: int
-    session_id: str
-    user: UserPayload
-    shard: List[int]
