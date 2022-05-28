@@ -8,7 +8,7 @@ setup(
     version=os.getenv("VERSION_NAME"),
     author="veehou",
     author_email="veehou@tencent.com",
-    description="qq robot sdk with python3",
+    description="qq robot client with python3",
     long_description=open("README.rst").read(),
     # 项目主页
     url="https://github.com/tencent-connect/botpy",

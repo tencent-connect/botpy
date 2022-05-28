@@ -14,7 +14,7 @@ pip install qq-botpy
 
 需要使用的地方`import botpy`
 
-```python
+```python 
 import botpy
 ```
 
@@ -42,18 +42,18 @@ class MyClient(botpy.Client):
         await self.api.post_message(channel_id=message.channel_id, content="content")
 ```
 
-3. 设置机器人关注的事件，并启动`client`
+3. 设置机器人需要监听的事件通道，并启动`client`
 ```python
-# 通过预设置的类型，设置需要监听的事件通道
-# intents = botpy.Intents.none()
-# intents.public_guild_messages=True
-
-# 通过kwargs，设置需要监听的事件通道
-intents = botpy.Intents(public_guild_messages=True)
+intents = botpy.Intents(public_guild_messages=True) 
 client = MyClient(intents=intents)
 client.run(appid="12345", token="xxxx")
 ```
 
+也可以通过预设置的类型，设置需要监听的事件通道
+```python
+intents = botpy.Intents.none()
+intents.public_guild_messages=True
+```
 
 ## 示例机器人
 
