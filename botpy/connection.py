@@ -19,7 +19,14 @@ class ConnectionSession:
     这里通过设置session_id=""空则任务session需要重连
     """
 
-    def __init__(self, max_async, connect: Callable, dispatch: Callable, loop=None, api: BotAPI = None):
+    def __init__(
+        self,
+        max_async,
+        connect: Callable,
+        dispatch: Callable,
+        loop=None,
+        api: BotAPI = None,
+    ):
         self.dispatch = dispatch
         self.state = ConnectionState(dispatch, api)
         self.parser: Dict[str, Callable[[gateway.WsContext, Any], None]] = self.state.parsers
@@ -31,6 +38,8 @@ class ConnectionSession:
         self._session_list: List[session.Session] = []
 
     async def run(self, session_interval=5):
+        if len(self._session_list) == 0:
+            return
         # 根据并发数同时建立多个future
         index = 0
         session_list = self._session_list
@@ -163,3 +172,6 @@ class ConnectionState:
 
     def parse_ready(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
         self._dispatch("ready")
+
+    def parse_resumed(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
+        self._dispatch("resumed")

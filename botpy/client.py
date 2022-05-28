@@ -148,7 +148,7 @@ class Client:
             max_async=self._ws_ap["session_start_limit"]["max_concurrency"],
             connect=self.bot_connect,
             dispatch=self.dispatch,
-            loop=asyncio.get_event_loop(),
+            loop=self.loop,
             api=self.api,
         )
 
@@ -191,15 +191,18 @@ class Client:
         loop = self._connection.loop
         loop.set_exception_handler(_loop_exception_handler)
 
-        try:
-            # 返回协程对象，交由开发者自行调控
-            if self.ret_coro:
-                return self._connection.run(session_interval)
-            else:
-                await self._connection.run(session_interval)
-        except KeyboardInterrupt:
-            _log.info("[botpy]服务强行停止!")
-            # cancel all tasks lingering
+        while not self._closed:
+            _log.debug("session loop check")
+            try:
+                # 返回协程对象，交由开发者自行调控
+                coroutine = self._connection.run(session_interval)
+                if self.ret_coro:
+                    return coroutine
+                else:
+                    await coroutine
+            except KeyboardInterrupt:
+                _log.info("[botpy]服务强行停止!")
+                # cancel all tasks lingering
 
     async def bot_connect(self, session):
         """

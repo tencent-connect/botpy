@@ -51,7 +51,7 @@ class BotWebSocket:
         _log.error("on_error: websocket connection: %s, exception : %s" % (self._conn, exception))
         traceback.print_exc()
 
-    async def on_close(self, close_status_code, close_msg):
+    async def on_closed(self, close_status_code, close_msg):
         _log.info("[botpy]关闭, 返回码: %s" % close_status_code + ", 返回信息: %s" % close_msg)
         # 这种不能重新链接
         if close_status_code in self._INVALID_RECONNECT_CODE or not self._can_reconnect:
@@ -60,7 +60,6 @@ class BotWebSocket:
             self._session["last_seq"] = 0
         # 断连后启动一个新的链接并透传当前的session，不使用内部重连的方式，避免死循环
         self._connection.add(self._session)
-        asyncio.ensure_future(self._connection.run())
 
     async def on_message(self, ws, message):
         _log.debug("[botpy]接收消息: %s" % message)
@@ -69,20 +68,29 @@ class BotWebSocket:
         if await self._is_system_event(msg, ws):
             return
 
-        if "t" in msg.keys() and msg["t"] == "READY":
-            _log.info("[botpy]鉴权成功")
-            event_seq = msg["s"]
-            if event_seq > 0:
-                self._session["last_seq"] = event_seq
-            ready = await self._ready_handler(msg)
-            _log.info(f"[botpy]机器人「{ready['user']['username']}」 启动成功！")
+        event = msg.get("t")
+        opcode = msg.get("op")
+        event_seq = msg["s"]
+        if event_seq > 0:
+            self._session["last_seq"] = event_seq
 
-        if "t" in msg.keys():
+        if event == "READY":
+            # 心跳检查
+            self._connection.loop.create_task(self._send_heart(interval=30))
+            ready = await self._ready_handler(msg)
+            _log.info(f"[botpy]机器人「{ready['user']['username']}」启动成功！")
+
+        if event == "RESUMED":
+            # 心跳检查
+            self._connection.loop.create_task(self._send_heart(interval=30))
+            _log.info("[botpy]机器人重连成功✅")
+
+        if event and opcode == self.WS_DISPATCH_EVENT:
             event = msg["t"].lower()
             try:
                 func = self._parser[event]
             except KeyError:
-                _log.debug("_parser unknown event %s.", event)
+                _log.error("_parser unknown event %s.", event)
             else:
                 ctx = gateway.WsContext(id=msg.get("id", ""))
                 func(ctx, msg.get("d"))
@@ -92,11 +100,9 @@ class BotWebSocket:
         if self._conn is None:
             raise Exception("websocket connection failed ")
         if self._session["session_id"] != "":
-            await self.resume()
+            await self.ws_resume()
         else:
-            await self.identify()
-        # 心跳检查
-        asyncio.ensure_future(self._send_heart(interval=30))
+            await self.ws_identify()
 
     async def ws_connect(self):
         """
@@ -118,12 +124,12 @@ class BotWebSocket:
                     elif msg.type == aiohttp.WSMsgType.ERROR:
                         await self.on_error(ws_conn.exception())
                     elif msg.type == aiohttp.WSMsgType.CLOSED or msg.type == aiohttp.WSMsgType.CLOSE:
-                        await self.on_close(ws_conn.close_code, msg.extra)
+                        await self.on_closed(ws_conn.close_code, msg.extra)
                     if ws_conn.closed:
                         _log.debug("ws is closed, stop circle receive msg")
                         break
 
-    async def identify(self):
+    async def ws_identify(self):
         """websocket鉴权"""
         if self._session["intent"] == 0:
             self._session["intent"] = 1
@@ -157,7 +163,7 @@ class BotWebSocket:
             else:
                 await self._conn.send_str(data=send_msg)
 
-    async def resume(self):
+    async def ws_resume(self):
         """
         websocket重连
         """
@@ -209,7 +215,7 @@ class BotWebSocket:
         心跳包
         :param interval: 间隔时间
         """
-        _log.info("[botpy]心跳检测启动...")
+        _log.info("[botpy]心跳维持启动...")
         while True:
             payload = {
                 "op": self.WS_HEARTBEAT,
@@ -219,10 +225,9 @@ class BotWebSocket:
             if self._conn is None:
                 _log.debug("[botpy]连接已关闭!")
                 return
-            else:
-                if self._conn.closed:
-                    _log.debug("[botpy]ws连接已关闭, 心跳检测停止，ws对象: %s" % self._conn)
-                    return
-                else:
-                    await asyncio.sleep(interval)
-                    await self.send_msg(JsonUtil.dict2json(payload))
+            if self._conn.closed:
+                _log.debug("[botpy]ws连接已关闭, 心跳检测停止，ws对象: %s" % self._conn)
+                return
+
+            await asyncio.sleep(interval)
+            await self.send_msg(JsonUtil.dict2json(payload))
