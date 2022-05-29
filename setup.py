@@ -17,7 +17,7 @@ setup(
     # 执照
     license="Tencent",
     # 安装依赖
-    install_requires=["aiohttp>=3.6.0,<3.8.0"],
+    install_requires=["aiohttp>=3.7.4,<4", "PyYAML"],
     # 分类
     classifiers=[
         # 发展时期,常见的如下
