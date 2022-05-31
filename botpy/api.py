@@ -5,7 +5,19 @@ from typing import Any, List, Dict
 
 from .flags import Permission
 from .http import BotHttp, Route
-from .types import guild, user, channel, message, audio, announce, permission, schedule, emoji, pins_message, reaction
+from .types import (
+    guild,
+    user,
+    channel,
+    message,
+    audio,
+    announce,
+    permission,
+    schedule,
+    emoji,
+    pins_message,
+    reaction,
+)
 
 
 def _handle_message_parameters(
@@ -16,7 +28,8 @@ def _handle_message_parameters(
     image: str = None,
     msg_id: str = None,
     event_id: str = None,
-    markdown: message.Markdown = None,
+    markdown: message.MarkdownPayload = None,
+    keyboard: message.Keyboard = None,
 ) -> Dict:
     payload = {}
     params = locals()
@@ -442,7 +455,8 @@ class BotAPI:
         image: str = None,
         msg_id: str = None,
         event_id: str = None,
-        markdown: message.Markdown = None,
+        markdown: message.MarkdownPayload = None,
+        keyboard: message.Keyboard = None,
     ) -> message.Message:
         """
         发送消息。
@@ -463,12 +477,15 @@ class BotAPI:
           image (str): 要发送的图像的 URL。
           msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
           event_id (str): 您要回复的消息的事件 ID。
-          markdown (message.Markdown): markdown 消息
+          markdown (message.MarkdownPayload): markdown 消息
+          keyboard (message.Keyboard): keyboard 消息
 
         Returns:
           message.Message: 一个消息字典对象。
         """
-        payload = _handle_message_parameters(content, embed, ark, message_reference, image, msg_id, event_id, markdown)
+        payload = _handle_message_parameters(
+            content, embed, ark, message_reference, image, msg_id, event_id, markdown, keyboard
+        )
         route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
         return await self._http.request(route, json=payload)
 
@@ -498,6 +515,31 @@ class BotAPI:
         )
         return await self._http.request(route, params=params)
 
+    async def post_keyboard_message(
+        self,
+        channel_id: str,
+        keyboard: message.KeyboardPayload = None,
+        markdown: message.MarkdownPayload = None,
+    ) -> message.Message:
+        """
+        `post_keyboard_message` 使用内联键盘发送消息
+
+        Args:
+          channel_id (str): 您要将消息发送到的频道的 ID。
+          keyboard (message.KeyboardPayload): keyboard 消息的构建参数
+          markdown (message.MarkdownPayload): markdown 消息的构建参数。
+
+        Returns:
+          一个消息的字典数据对象。
+        """
+        payload = {"keyboard": keyboard, "markdown": markdown}
+        route = Route(
+            "POST",
+            "/channels/{channel_id}/messages",
+            channel_id=channel_id,
+        )
+        return await self._http.request(route, json=payload)
+
     # 私信消息
     async def create_dms(self, guild_id: str, user_id: str) -> message.DmsPayload:
         """
@@ -526,7 +568,8 @@ class BotAPI:
         image: str = None,
         msg_id: str = None,
         event_id: str = None,
-        markdown: message.Markdown = None,
+        markdown: message.MarkdownPayload = None,
+        keyboard: message.Keyboard = None,
     ) -> message.Message:
         """
         发送私信。
@@ -547,13 +590,14 @@ class BotAPI:
           image (str): 要发送的图像的 URL。
           msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
           event_id (str): 您要回复的消息的事件 ID。
-          markdown (message.Markdown): markdown 消息
+          markdown (message.MarkdownPayload): markdown 消息
+          keyboard (message.Keyboard): keyboard 消息
 
         Returns:
           message.Message: 一个消息字典对象。
         """
         send_payload = _handle_message_parameters(
-            content, embed, ark, message_reference, image, msg_id, event_id, markdown
+            content, embed, ark, message_reference, image, msg_id, event_id, markdown, keyboard
         )
         route = Route("POST", "/dms/{guild_id}/messages", guild_id=guild_id)
         return await self._http.request(route, json=send_payload)

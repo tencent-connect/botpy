@@ -3,6 +3,7 @@ from enum import Enum
 from typing import List, TypedDict
 
 from .gateway import MessagePayload
+from .inline import Keyboard
 
 
 class Attachment(TypedDict):
@@ -50,6 +51,22 @@ class Reference(TypedDict):
     ignore_get_message_error: bool
 
 
+class MessageMarkdownParams(TypedDict):
+    key: str
+    values: List[str]
+
+
+class MarkdownPayload(TypedDict, total=False):
+    template_id: int
+    params: MessageMarkdownParams
+    content: str
+
+
+class KeyboardPayload(TypedDict, total=False):
+    id: str
+    content: Keyboard
+
+
 class Message(MessagePayload):
     edited_timestamp: str
     mention_everyone: str
@@ -57,6 +74,8 @@ class Message(MessagePayload):
     embeds: List[Embed]
     ark: Ark
     message_reference: Reference
+    markdown: MarkdownPayload
+    keyboard: KeyboardPayload
 
 
 class TypesEnum(Enum):
@@ -70,17 +89,6 @@ class MessagesPager(TypedDict):
     type: TypesEnum
     id: str
     limit: str
-
-
-class MessageMarkdownParams(TypedDict):
-    key: str
-    values: List[str]
-
-
-class Markdown(TypedDict):
-    template_id: int
-    params: MessageMarkdownParams
-    content: str
 
 
 class DmsPayload(TypedDict):
