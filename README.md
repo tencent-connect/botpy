@@ -18,7 +18,7 @@ pip install qq-botpy
 import botpy
 ```
 
-### 使用方法
+## 使用方式
 
 1. 通过继承实现`bot.Client`, 实现自己的机器人Client 
 2. 实现机器人相关事件的处理方法,如 `on_at_message_create`，具体方法定义可以参考`botpy.flags::Intents`
