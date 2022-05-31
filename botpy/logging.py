@@ -2,6 +2,7 @@
 
 import logging
 import os
+import platform
 import sys
 from logging.handlers import TimedRotatingFileHandler
 
@@ -69,15 +70,10 @@ def get_logger(name=None):
     if name is None:
         name = "botpy"
     log_file = log_path % {"name": name}
-    file_handler = None
-    # do not use RotatingFileHandler under Windows
-    # due to multi-process issue
+
     # save last 7 days log
-    file_handler = TimedRotatingFileHandler(
-        filename=log_file,
-        when="D",
-        backupCount=7,
-    )
+    file_handler = TimedRotatingFileHandler(filename=log_file, when="D", backupCount=7, encoding="utf-8")
+
     if len(logger.handlers) == 0:
         file_handler.setLevel(level=logging.DEBUG)
         file_handler.setFormatter(formatter)

@@ -1,5 +1,5 @@
 # botpy
-**botpy** 是基于[机器人开放平台API](https://bot.q.qq.com/wiki/develop/api/) 实现的机器人框架，目的提供一个易使用、开发效率高的开发框架。
+**botpy** 是基于[机器人开放平台API](https://bot.q.qq.com/wiki/develop/api/) 实现的机器人框架，目的提供一个易使用、开发效率高地开发框架。
 
 ![PyPI](https://img.shields.io/pypi/v/qq-botpy)
 [![BK Pipelines Status](https://api.bkdevops.qq.com/process/api/external/pipelines/projects/qq-guild-open/p-f17c900164974f5785c436b359876877/badge?X-DEVOPS-PROJECT-ID=qq-guild-open)](http://devops.oa.com/process/api-html/user/builds/projects/qq-guild-open/pipelines/p-f17c900164974f5785c436b359876877/latestFinished?X-DEVOPS-PROJECT-ID=qq-guild-open)
@@ -18,7 +18,7 @@ pip install qq-botpy
 import botpy
 ```
 
-### 使用方法
+## 使用方式
 
 1. 通过继承实现`bot.Client`, 实现自己的机器人Client 
 2. 实现机器人相关事件的处理方法,如 `on_at_message_create`，具体方法定义可以参考`botpy.flags::Intents`
