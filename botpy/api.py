@@ -5,7 +5,7 @@ from typing import Any, List, Dict
 
 from .flags import Permission
 from .http import BotHttp, Route
-from .types import guild, user, channel, message, audio, announce, permission, schedule, emoji, pins_message
+from .types import guild, user, channel, message, audio, announce, permission, schedule, emoji, pins_message, forum, rich_text
 
 
 def _handle_message_parameters(
@@ -1057,5 +1057,63 @@ class BotAPI:
             "GET",
             "/channels/{channel_id}/pins",
             channel_id=channel_id,
+        )
+        return await self._http.request(route)
+
+    async def get_threads(self, channel_id: str) -> forum.ForumRsp:
+        """
+        该接口用于获取子频道下的帖子列表。
+
+        Args:
+          channel_id (str): 需要获取帖子列表的子频道 ID
+
+        Returns:
+          帖子列表数据
+        """
+        route = Route(
+            "GET",
+            "/channels/{channel_id}/threads",
+            channel_id=channel_id,
+        )
+        return await self._http.request(route)
+
+    async def get_thread_detail(self, channel_id: str, thread_id: str) -> forum.ThreadInfo:
+        """
+        该接口用于获取子频道下的帖子详情。
+        """
+        route = Route(
+            "GET",
+            "/channels/{channel_id}/threads/{thread_id}",
+            channel_id=channel_id,
+            thread_id=thread_id,
+        )
+        return await self._http.request(route)
+
+    async def post_thread(self, channel_id: str, title: str, content: str, format: forum.Format) -> forum.PostThreadRsp:
+        """
+        该接口用于发表帖子。
+        """
+        route = Route(
+            "PUT",
+            "PUT /channels/{channel_id}/threads",
+            channel_id=channel_id,
+        )
+
+        payload = {
+            "title": title,
+            "content": content,
+            "format": format
+        }
+        return await self._http.request(route, json=payload)
+
+    async def delete_thread(self, channel_id: str, thread_id: str) -> str:
+        """
+        该接口用于删除指定子频道下的某个帖子。
+        """
+        route = Route(
+            "DELETE",
+            "DELETE /channels/{channel_id}/threads/{thread_id}",
+            channel_id=channel_id,
+            thread_id=thread_id
         )
         return await self._http.request(route)

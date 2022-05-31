@@ -7,7 +7,7 @@ from .channel import Channel
 from .message import Message
 from .robot import Robot
 from .logging import logging
-from .types import gateway, channel, guild, user, session, reaction, interaction
+from .types import gateway, channel, guild, user, session, reaction, interaction, forum
 
 _log = logging.getLogger()
 
@@ -175,3 +175,27 @@ class ConnectionState:
 
     def parse_resumed(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
         self._dispatch("resumed")
+
+    def parse_forum_thread_create(self, ctx: gateway.WsContext, data: forum.Thread):
+        self._dispatch("forum_thread_create", data)
+
+    def parse_forum_thread_update(self, ctx: gateway.WsContext, data: forum.Thread):
+        self._dispatch("forum_thread_update", data)
+
+    def parse_forum_thread_delete(self, ctx: gateway.WsContext, data: forum.Thread):
+        self._dispatch("forum_thread_delete", data)
+
+    def parse_forum_post_create(self, ctx: gateway.WsContext, data: forum.Post):
+        self._dispatch("forum_post_create", data)
+
+    def parse_forum_post_delete(self, ctx: gateway.WsContext, data: forum.Post):
+        self._dispatch("forum_post_delete", data)
+
+    def parse_forum_reply_create(self, ctx: gateway.WsContext, data: forum.Reply):
+        self._dispatch("forum_reply_create", data)
+
+    def parse_forum_reply_delete(self, ctx: gateway.WsContext, data: forum.Reply):
+        self._dispatch("forum_reply_delete", data)
+
+    def parse_forum_publish_audit_result(self, ctx: gateway.WsContext, data: forum.AuditResult):
+        self._dispatch("forum_publish_audit_result", data)

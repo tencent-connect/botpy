@@ -228,6 +228,14 @@ class Intents(BaseFlags):
     def forums(self):
         """:class:`bool`: 是否打开论坛事件的监听.
 
+        - :func:`forum_thread_create`         当用户创建主题时
+        - :func:`forum_thread_update`         当用户更新主题时
+        - :func:`forum_thread_delete`         当用户删除主题时
+        - :func:`forum_post_create`           当用户创建帖子时
+        - :func:`forum_post_delete`           当用户删除帖子时
+        - :func:`forum_reply_create`          当用户回复评论时
+        - :func:`forum_reply_delete`          当用户删除评论时
+        - :func:`forum_publish_audit_result`  当用户发表审核通过时
         注意：仅 *私域* 机器人能够设置此 intents
         """
         return 1 << 28
