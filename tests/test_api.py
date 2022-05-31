@@ -198,7 +198,7 @@ class APITestCase(unittest.TestCase):
         schedules = self.loop.run_until_complete(self.api.get_schedules(CHANNEL_SCHEDULE_ID))
         self.assertEqual(None, schedules)
 
-    def test_delete_reaction(self):
+    def test_put_and_delete_reaction(self):
         result = self.loop.run_until_complete(self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, 1, "4"))
         self.assertEqual("", result)
 
@@ -206,6 +206,10 @@ class APITestCase(unittest.TestCase):
 
         result = self.loop.run_until_complete(self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, 1, "4"))
         self.assertEqual("", result)
+
+    def test_get_reaction_users(self):
+        result = self.loop.run_until_complete(self.api.get_reaction_users(CHANNEL_ID, MESSAGE_ID, 1, "4"))
+        self.assertEqual(result["is_end"], True)
 
     def test_put_pin(self):
         result = self.loop.run_until_complete(self.api.put_pin(CHANNEL_ID, MESSAGE_ID))

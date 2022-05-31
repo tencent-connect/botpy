@@ -20,7 +20,7 @@ examples/
 ## 环境安装
 
 ``` bash
-pip install qq-bot
+pip install qq-botpy
 ```
 
 ## 使用方法
