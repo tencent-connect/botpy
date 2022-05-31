@@ -84,7 +84,7 @@ class Markdown(TypedDict):
 
 
 class DmsPayload(TypedDict):
-    guild_id: str
+    guild_id: str  # 注意，这里是私信会话的guild_id， 每个私信会话居然是个单独的guild
     channel_id: str
     creat_time: str
 

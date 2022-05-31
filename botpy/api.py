@@ -499,10 +499,27 @@ class BotAPI:
         return await self._http.request(route, params=params)
 
     # 私信消息
+    async def create_dms(self, guild_id: str, user_id: str) -> message.DmsPayload:
+        """
+        创建私信会话。
+
+
+        Args:
+          guild_id (str): 您要将私信消息的来源频道 ID。
+          user_id (str): 你要发送私信的用户 ID
+
+        Returns:
+          message.DmsPayload: 一个私信会话的字典对象。
+        """
+        # 创建私信频道
+        payload = {"recipient_id": user_id, "source_guild_id": guild_id}
+        route = Route("POST", "/users/@me/dms")
+        return await self._http.request(route, json=payload)
+
+    # 私信消息
     async def post_dms(
         self,
         guild_id: str,
-        user_id: str,
         content: str = None,
         embed: message.Embed = None,
         ark: message.Ark = None,
@@ -523,8 +540,7 @@ class BotAPI:
         - 发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
 
         Args:
-          guild_id (str): 您要将私信消息的来源频道 ID。
-          user_id (str): 你要发送私信的用户 ID
+          guild_id (str): 您要将私信会话的 ID, 从`create_dms`的返回可以获取。
           content (str): 消息的文本内容。
           embed (message.Embed): embed 消息，一种特殊的 ark
           ark (message.Ark): ark 模版消息
@@ -537,15 +553,10 @@ class BotAPI:
         Returns:
           message.Message: 一个消息字典对象。
         """
-        # 创建私信频道
-        payload = {"recipient_id": user_id, "source_guild_id": guild_id}
-        route = Route("POST", "/users/@me/dms")
-        dm_payload: message.DmsPayload = await self._http.request(route, json=payload)
-        # 发送私信
         send_payload = _handle_message_parameters(
             content, embed, ark, message_reference, image, msg_id, event_id, markdown
         )
-        route = Route("POST", "/dms/{guild_id}/messages", guild_id=dm_payload["guild_id"])
+        route = Route("POST", "/dms/{guild_id}/messages", guild_id=guild_id)
         return await self._http.request(route, json=send_payload)
 
     # 音频接口

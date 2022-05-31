@@ -24,9 +24,8 @@ class MyClient(botpy.Client):
     async def on_direct_message_create(self, message: Message):
         await self.api.post_dms(
             guild_id=message.guild_id,
-            user_id=message.user_id,
             content=f"机器人{self.robot.name}收到你的私信了: {message.content}",
-            msg_id=message.message_id
+            msg_id=message.message_id,
         )
 
 

@@ -11,7 +11,7 @@ from botpy.errors import (
     AuthenticationFailedError,
     ServerError,
 )
-from botpy.types import guild, user, channel
+from botpy.types import guild, user, channel, message
 from botpy.types.announce import AnnouncesType
 from botpy.types.channel import ChannelType, ChannelSubType
 from tests import test_config
@@ -154,11 +154,9 @@ class APITestCase(unittest.TestCase):
             print(e)
 
     def test_create_and_send_dms(self):
-        try:
-            message = self.loop.run_until_complete(self.api.post_dms(GUILD_ID, GUILD_OWNER_ID, content="test"))
-            print(message["content"])
-        except (Exception, ServerError) as e:
-            print(e)
+        payload: message.DmsPayload = self.loop.run_until_complete(self.api.create_dms(GUILD_ID, GUILD_OWNER_ID))
+        _message = self.loop.run_until_complete(self.api.post_dms(payload["guild_id"], content="test"))
+        self.assertTrue("test", _message["content"])
 
     def test_ws(self):
         ws = self.loop.run_until_complete(self.api.get_ws_url())
