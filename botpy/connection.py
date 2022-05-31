@@ -146,24 +146,24 @@ class ConnectionState:
     # botpy.flags.Intents.message_audit
     def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
         message = Message(self.api, data)
-        self._dispatch("direct_message_create", message)
+        self._dispatch("message_audit_pass", message)
 
     def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
         message = Message(self.api, data)
-        self._dispatch("direct_message_delete", message)
+        self._dispatch("message_audit_reject", message)
 
     # botpy.flags.Intents.audio_action
     def parse_audio_start(self, ctx: gateway.WsContext, data):
-        self._dispatch("direct_message_create", data)
+        self._dispatch("audio_start", data)
 
     def parse_audio_finish(self, ctx: gateway.WsContext, data):
-        self._dispatch("direct_message_delete", data)
+        self._dispatch("audio_finish", data)
 
     def parse_on_mic(self, ctx: gateway.WsContext, data):
-        self._dispatch("direct_message_create", data)
+        self._dispatch("on_mic", data)
 
     def parse_off_mic(self, ctx: gateway.WsContext, data):
-        self._dispatch("direct_message_delete", data)
+        self._dispatch("off_mic", data)
 
     # botpy.flags.Intents.public_guild_messages
     def parse_at_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
