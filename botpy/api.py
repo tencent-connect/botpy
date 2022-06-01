@@ -1155,10 +1155,10 @@ class BotAPI:
         该接口用于获取子频道下的帖子列表。
 
         Args:
-          channel_id (str): 需要获取帖子列表的子频道 ID
+          channel_id (str): 要获取其帖子列表的子频道的 ID。
 
         Returns:
-          帖子列表数据
+          返回值是一个 ForumRsp 对象。
         """
         route = Route(
             "GET",
@@ -1170,6 +1170,13 @@ class BotAPI:
     async def get_thread_detail(self, channel_id: str, thread_id: str) -> forum.ThreadInfo:
         """
         该接口用于获取子频道下的帖子详情。
+
+        Args:
+          channel_id (str): 子频道的 ID。
+          thread_id (str): 要查询的帖子的 ID。
+
+        Returns:
+          返回值是一个ThreadInfo 对象。
         """
         route = Route(
             "GET",
@@ -1182,6 +1189,15 @@ class BotAPI:
     async def post_thread(self, channel_id: str, title: str, content: str, format: forum.Format) -> forum.PostThreadRsp:
         """
         该接口用于发表帖子。
+
+        Args:
+          channel_id (str): 子频道 ID。
+          title (str): 线程的标题。
+          content (str): 帖子的内容。
+          format (forum.Format): 内容的格式。
+
+        Returns:
+          返回PostThreadRsp 对象。
         """
         route = Route(
             "PUT",
@@ -1198,7 +1214,14 @@ class BotAPI:
 
     async def delete_thread(self, channel_id: str, thread_id: str) -> str:
         """
-        该接口用于删除指定子频道下的某个帖子。
+        `该接口用于删除指定子频道下的某个帖子
+
+        Args:
+          channel_id (str): 要从中删除帖子的子频道的 ID。
+          thread_id (str): 要删除的帖子的 ID。
+
+        Returns:
+          成功返回空字符串。
         """
         route = Route(
             "DELETE",
