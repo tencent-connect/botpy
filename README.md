@@ -67,17 +67,17 @@ intents.public_guild_messages=True
 
 引用模块，并获取 `logger` 实例：
 
-``` py
-from core.util import logging
+``` python
+from botpy import logging
 
-logger = logging.getLogger()
+logger = logging.get_logger()
 ```
 
-或者通过`qqbot.logger`也可以获取logger对象
+或者通过`botpy.logger`也可以获取logger对象
 
 然后就可以愉快地使用 logger 进行打印。例如：
 
-``` py
+``` python
 logger.info("hello world!")
 ```
 
@@ -111,7 +111,7 @@ export QQBOT_LOG_LEVEL=10  # 10表示DEBUG级别
 
 ### 禁用日志文件输出
 
-默认情况下 qqbot 会在当前执行目录下生成格式为 `qqbot.log.*` 的日志文件。如果想禁用这些日志文件，可以通过设置 `QQBOT_DISABLE_LOG` 环境变量为 1 来关闭。
+默认情况下 botpy 会在当前执行目录下生成格式为 `botpy.log.*` 的日志文件。如果想禁用这些日志文件，可以通过设置 `QQBOT_DISABLE_LOG` 环境变量为 1 来关闭。
 
 ``` bash
 export QQBOT_DISABLE_LOG=1  # 1表示禁用日志
