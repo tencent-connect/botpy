@@ -17,8 +17,8 @@ from .types import (
     emoji,
     pins_message,
     reaction,
+    forum
 )
-
 
 def _handle_message_parameters(
     content: str = None,
@@ -1147,5 +1147,86 @@ class BotAPI:
             "GET",
             "/channels/{channel_id}/pins",
             channel_id=channel_id,
+        )
+        return await self._http.request(route)
+
+    async def get_threads(self, channel_id: str) -> forum.ForumRsp:
+        """
+        该接口用于获取子频道下的帖子列表。
+
+        Args:
+          channel_id (str): 要获取其帖子列表的子频道的 ID。
+
+        Returns:
+          返回值是一个 ForumRsp 对象。
+        """
+        route = Route(
+            "GET",
+            "/channels/{channel_id}/threads",
+            channel_id=channel_id,
+        )
+        return await self._http.request(route)
+
+    async def get_thread_detail(self, channel_id: str, thread_id: str) -> forum.ThreadInfo:
+        """
+        该接口用于获取子频道下的帖子详情。
+
+        Args:
+          channel_id (str): 子频道的 ID。
+          thread_id (str): 要查询的帖子的 ID。
+
+        Returns:
+          返回值是一个ThreadInfo 对象。
+        """
+        route = Route(
+            "GET",
+            "/channels/{channel_id}/threads/{thread_id}",
+            channel_id=channel_id,
+            thread_id=thread_id,
+        )
+        return await self._http.request(route)
+
+    async def post_thread(self, channel_id: str, title: str, content: str, format: forum.Format) -> forum.PostThreadRsp:
+        """
+        该接口用于发表帖子。
+
+        Args:
+          channel_id (str): 子频道 ID。
+          title (str): 线程的标题。
+          content (str): 帖子的内容。
+          format (forum.Format): 内容的格式。
+
+        Returns:
+          返回PostThreadRsp 对象。
+        """
+        route = Route(
+            "PUT",
+            "PUT /channels/{channel_id}/threads",
+            channel_id=channel_id,
+        )
+
+        payload = {
+            "title": title,
+            "content": content,
+            "format": format
+        }
+        return await self._http.request(route, json=payload)
+
+    async def delete_thread(self, channel_id: str, thread_id: str) -> str:
+        """
+        `该接口用于删除指定子频道下的某个帖子
+
+        Args:
+          channel_id (str): 要从中删除帖子的子频道的 ID。
+          thread_id (str): 要删除的帖子的 ID。
+
+        Returns:
+          成功返回空字符串。
+        """
+        route = Route(
+            "DELETE",
+            "DELETE /channels/{channel_id}/threads/{thread_id}",
+            channel_id=channel_id,
+            thread_id=thread_id
         )
         return await self._http.request(route)
