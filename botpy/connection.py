@@ -5,6 +5,7 @@ from typing import List, Callable, Dict, Any, Optional
 from .api import BotAPI
 from .channel import Channel
 from .message import Message
+from .interaction import Interaction
 from .robot import Robot
 from .logging import logging
 from .types import gateway, channel, guild, user, session, reaction, interaction, forum
@@ -141,7 +142,8 @@ class ConnectionState:
 
     # botpy.flags.Intents.interaction
     def parse_interaction_create(self, ctx: gateway.WsContext, data: interaction.InteractionPayload):
-        self._dispatch("interaction_create", data)
+        _interaction = Interaction(self.api, data)
+        self._dispatch("interaction_create", _interaction)
 
     # botpy.flags.Intents.message_audit
     def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
