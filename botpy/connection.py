@@ -4,8 +4,11 @@ from typing import List, Callable, Dict, Any, Optional
 
 from .api import BotAPI
 from .channel import Channel
-from .message import Message
+
+from .message import Message, MessageAudit
+from .interaction import Interaction
 from .guild import Guild
+
 from .robot import Robot
 from .logging import logging
 from .types import gateway, channel, guild, user, session, reaction, interaction, forum
@@ -136,25 +139,24 @@ class ConnectionState:
 
     # botpy.flags.Intents.direct_message
     def parse_direct_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
         self._dispatch("direct_message_create", message)
 
     def parse_direct_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
         self._dispatch("direct_message_delete", message)
 
     # botpy.flags.Intents.interaction
     def parse_interaction_create(self, ctx: gateway.WsContext, data: interaction.InteractionPayload):
-        self._dispatch("interaction_create", data)
+        _interaction = Interaction(self.api, data)
+        self._dispatch("interaction_create", _interaction)
 
     # botpy.flags.Intents.message_audit
-    def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
-        self._dispatch("message_audit_pass", message)
+    def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
+        message_audit = MessageAudit(self.api, data)
+        self._dispatch("message_audit_pass", message_audit)
 
-    def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
-        self._dispatch("message_audit_reject", message)
+    def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
+        message_audit = MessageAudit(self.api, data)
+        self._dispatch("message_audit_reject", message_audit)
 
     # botpy.flags.Intents.audio_action
     def parse_audio_start(self, ctx: gateway.WsContext, data):
