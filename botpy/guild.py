@@ -11,5 +11,3 @@ class Guild:
         self.id = data["id"]
         self.name = data["name"]
         
-    async def reply(self, content: str, **kwargs):
-        await self._api.post_message(content=content, guild_id=self.id, msg_id=self._ctx["id"], **kwargs)
