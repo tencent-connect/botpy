@@ -10,6 +10,3 @@ class Interaction:
         self._ctx = ctx
         self.id = data["id"]
         self.type = data["type"]
-    
-    async def reply(self, content: str, **kwargs):
-        await self._api.post_message(content=content, channel_id=self.id, msg_id=self._ctx["id"], **kwargs)
