@@ -132,11 +132,9 @@ class ConnectionState:
 
     # botpy.flags.Intents.direct_message
     def parse_direct_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
         self._dispatch("direct_message_create", message)
 
     def parse_direct_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
         self._dispatch("direct_message_delete", message)
 
     # botpy.flags.Intents.interaction
@@ -144,11 +142,11 @@ class ConnectionState:
         self._dispatch("interaction_create", data)
 
     # botpy.flags.Intents.message_audit
-    def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
+    def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
         message = Message(self.api, data)
         self._dispatch("message_audit_pass", message)
 
-    def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
+    def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
         message = Message(self.api, data)
         self._dispatch("message_audit_reject", message)
 
