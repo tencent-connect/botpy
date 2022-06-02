@@ -16,14 +16,3 @@ class Message:
 
     async def reply(self, **kwargs):
         await self._api.post_message(channel_id=self.channel_id, msg_id=self.message_id, **kwargs)
-
-class MessageAudit:
-    __slots__ = ("_api", "audit_id", "message_id", "channel_id", "guild_id")
-    
-    def __init__ = (self, api: BotAPI, data: gateway.MessageAuditPayload):
-        self._api = api
-        self.audit_id = data["audit_id"]
-        self.channel_id = data["channel_id"]
-        self.message_id = data["message_id"]
-        self.guild_id = data["guild_id"]
- 
