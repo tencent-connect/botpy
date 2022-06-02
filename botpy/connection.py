@@ -142,8 +142,8 @@ class ConnectionState:
 
     # botpy.flags.Intents.interaction
     def parse_interaction_create(self, ctx: gateway.WsContext, data: interaction.InteractionPayload):
-        interaction = Interaction(self.api, data)
-        self._dispatch("interaction_create", interaction)
+        _interaction = Interaction(self.api, data)
+        self._dispatch("interaction_create", _interaction)
 
     # botpy.flags.Intents.message_audit
     def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
