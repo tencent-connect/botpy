@@ -7,6 +7,7 @@ from .channel import Channel
 
 from .message import Message, MessageAudit
 from .interaction import Interaction
+from .guild import Guild
 
 from .robot import Robot
 from .logging import logging
@@ -87,13 +88,16 @@ class ConnectionState:
 
     # botpy.flags.Intents.guilds
     def parse_guild_create(self, ctx: gateway.WsContext, data: guild.GuildPayload):
-        self._dispatch("guild_create", data)
+        _guild = Guild(self.api, ctx, data)
+        self._dispatch("guild_create", _guild)
 
     def parse_guild_update(self, ctx: gateway.WsContext, data: guild.GuildPayload):
-        self._dispatch("guild_update", data)
+        _guild = Guild(self.api, ctx, data)
+        self._dispatch("guild_update", _guild)
 
     def parse_guild_delete(self, ctx: gateway.WsContext, data: guild.GuildPayload):
-        self._dispatch("guild_delete", data)
+        _guild = Guild(self.api, ctx, data)
+        self._dispatch("guild_delete", _guild)
 
     def parse_channel_create(self, ctx: gateway.WsContext, data: channel.ChannelPayload):
         _channel = Channel(self.api, ctx, data)
