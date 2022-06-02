@@ -4,7 +4,7 @@ from typing import List, Callable, Dict, Any, Optional
 
 from .api import BotAPI
 from .channel import Channel
-from .message import Message
+from .message import Message, MessageAudit
 from .robot import Robot
 from .logging import logging
 from .types import gateway, channel, guild, user, session, reaction, interaction, forum
@@ -143,10 +143,12 @@ class ConnectionState:
 
     # botpy.flags.Intents.message_audit
     def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        self._dispatch("message_audit_pass", data)
+        message_audit = MessageAudit(self.api, data)
+        self._dispatch("message_audit_pass", message_audit)
 
     def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        self._dispatch("message_audit_reject", data)
+        message_audit = MessageAudit(self.api, data)
+        self._dispatch("message_audit_reject", message_audit)
 
     # botpy.flags.Intents.audio_action
     def parse_audio_start(self, ctx: gateway.WsContext, data):
