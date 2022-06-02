@@ -37,7 +37,7 @@ class MessagePayload(TypedDict):
     seq_in_channel: str
     timestamp: str
 
-class MessageAudit(TypeDict):
+class MessageAuditPayload(TypeDict):
     audit_id: str
     message_id: str
     guild_id: str
