@@ -143,12 +143,10 @@ class ConnectionState:
 
     # botpy.flags.Intents.message_audit
     def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        message = Message(self.api, data)
-        self._dispatch("message_audit_pass", message)
+        self._dispatch("message_audit_pass", data)
 
     def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        message = Message(self.api, data)
-        self._dispatch("message_audit_reject", message)
+        self._dispatch("message_audit_reject", data)
 
     # botpy.flags.Intents.audio_action
     def parse_audio_start(self, ctx: gateway.WsContext, data):
