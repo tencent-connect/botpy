@@ -26,7 +26,6 @@ def _handle_message_parameters(
     ark: message.Ark = None,
     message_reference: message.Reference = None,
     image: str = None,
-    file_image: bytes = None,
     msg_id: str = None,
     event_id: str = None,
     markdown: message.MarkdownPayload = None,
@@ -454,6 +453,7 @@ class BotAPI:
         ark: message.Ark = None,
         message_reference: message.Reference = None,
         image: str = None,
+        file_image: bytes = None,
         msg_id: str = None,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
@@ -476,6 +476,7 @@ class BotAPI:
           ark (message.Ark): ark 模版消息
           message_reference (message.Reference): 对消息的引用。
           image (str): 要发送的图像的 URL。
+          file_image (bytes): 要发送的本地图像在rb类阅读后的数据。
           msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
           event_id (str): 您要回复的消息的事件 ID。
           markdown (message.MarkdownPayload): markdown 消息
@@ -485,7 +486,7 @@ class BotAPI:
           message.Message: 一个消息字典对象。
         """
         payload = _handle_message_parameters(
-            content, embed, ark, message_reference, image, msg_id, event_id, markdown, keyboard
+            content, embed, ark, message_reference, image, file_image, msg_id, event_id, markdown, keyboard
         )
         route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
         return await self._http.request(route, json=payload)
