@@ -26,6 +26,7 @@ def _handle_message_parameters(
     ark: message.Ark = None,
     message_reference: message.Reference = None,
     image: str = None,
+    file_image: bytes = None,
     msg_id: str = None,
     event_id: str = None,
     markdown: message.MarkdownPayload = None,
