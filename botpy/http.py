@@ -5,7 +5,7 @@ from typing import Any, Optional, ClassVar, Union, Dict
 from urllib.parse import quote
 
 import aiohttp
-from aiohttp import ClientResponse
+from aiohttp import ClientResponse, FormData
 
 from .utils import JsonUtil
 from .errors import HttpErrorDict, ServerError
@@ -105,8 +105,12 @@ class BotHttp:
         }
         # some checking if it's a JSON request
         if "json" in kwargs:
-            headers["Content-Type"] = "application/json"
-            kwargs["data"] = JsonUtil.dict2json(kwargs.pop("json"))
+            if :
+                kwargs["data"] = FormData()
+                for k, v in kwargs.pop("json").items():
+                    kwargs["data"].add_field(k, v)
+            else:
+                kwargs["json"] = JsonUtil.dict2json(kwargs.pop("json"))
 
         kwargs["headers"] = headers
 
