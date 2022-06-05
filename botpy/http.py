@@ -105,7 +105,7 @@ class BotHttp:
         }
         # some checking if it's a JSON request
         if "json" in kwargs:
-            if :
+            if "file_image" in kwargs["json"] and kwargs["json"]["file_image"] is not None:
                 kwargs["data"] = FormData()
                 for k, v in kwargs.pop("json").items():
                     kwargs["data"].add_field(k, v)
