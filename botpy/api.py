@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 # 异步api
-from typing import Any, List, Dict, Union, BinaryIO
-from os import PathLike
+
 from io import BufferedReader
+from typing import Any, List, Dict, Union, BinaryIO
 
 from .flags import Permission
 from .http import BotHttp, Route
@@ -19,8 +19,9 @@ from .types import (
     emoji,
     pins_message,
     reaction,
-    forum
+    forum,
 )
+
 
 def _handle_message_parameters(
     content: str = None,
@@ -28,7 +29,7 @@ def _handle_message_parameters(
     ark: message.Ark = None,
     message_reference: message.Reference = None,
     image: str = None,
-    file_image: Union[bytes, BinaryIO, str, PathLike[str]] = None,
+    file_image: Union[bytes, BinaryIO, str] = None,
     msg_id: str = None,
     event_id: str = None,
     markdown: message.MarkdownPayload = None,
@@ -456,7 +457,7 @@ class BotAPI:
         ark: message.Ark = None,
         message_reference: message.Reference = None,
         image: str = None,
-        file_image: Union[bytes, BinaryIO, str, PathLike[str]] = None,
+        file_image: Union[bytes, BinaryIO, str] = None,
         msg_id: str = None,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
@@ -491,7 +492,7 @@ class BotAPI:
         if isinstance(file_image, BufferedReader):
             file_image = file_image.read()
         elif isinstance(file_image, str):
-            with open(file_image, 'rb') as img:
+            with open(file_image, "rb") as img:
                 file_image = img.read()
         payload = _handle_message_parameters(
             content, embed, ark, message_reference, image, file_image, msg_id, event_id, markdown, keyboard
@@ -576,7 +577,7 @@ class BotAPI:
         ark: message.Ark = None,
         message_reference: message.Reference = None,
         image: str = None,
-        file_image: Union[bytes, BinaryIO, str, PathLike[str]] = None,
+        file_image: Union[bytes, BinaryIO, str] = None,
         msg_id: str = None,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
@@ -611,7 +612,7 @@ class BotAPI:
         if isinstance(file_image, BufferedReader):
             file_image = file_image.read()
         elif isinstance(file_image, str):
-            with open(file_image, 'rb') as img:
+            with open(file_image, "rb") as img:
                 file_image = img.read()
         send_payload = _handle_message_parameters(
             content, embed, ark, message_reference, image, file_image, msg_id, event_id, markdown, keyboard
@@ -1222,11 +1223,7 @@ class BotAPI:
             channel_id=channel_id,
         )
 
-        payload = {
-            "title": title,
-            "content": content,
-            "format": format
-        }
+        payload = {"title": title, "content": content, "format": format}
         return await self._http.request(route, json=payload)
 
     async def delete_thread(self, channel_id: str, thread_id: str) -> str:
@@ -1241,9 +1238,6 @@ class BotAPI:
           成功返回空字符串。
         """
         route = Route(
-            "DELETE",
-            "DELETE /channels/{channel_id}/threads/{thread_id}",
-            channel_id=channel_id,
-            thread_id=thread_id
+            "DELETE", "DELETE /channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
         )
         return await self._http.request(route)
