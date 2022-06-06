@@ -16,7 +16,6 @@ X_TPS_TRACE_ID = "X-Tps-trace-Id"
 
 _log = logging.getLogger()
 
-
 # 请求成功的返回码
 HTTP_OK_STATUS = [200, 202, 204]
 
@@ -104,9 +103,9 @@ class BotHttp:
         }
         # some checking if it's a JSON request
         if "json" in kwargs:
-            # TODO 上传本地文件 @GLGDLY
-            if "file_image" in kwargs["json"] and kwargs["json"]["file_image"] is not None \
-                    and isinstance(kwargs["json"]["file_image"], bytes):
+            json_ = kwargs["json"]
+            json__get = json_.get("file_image")
+            if json__get and isinstance(json__get, bytes):
                 kwargs["data"] = FormData()
                 for k, v in kwargs.pop("json").items():
                     kwargs["data"].add_field(k, v)

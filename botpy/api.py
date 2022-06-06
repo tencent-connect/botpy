@@ -640,6 +640,38 @@ class BotAPI:
         route = Route("POST", "/channels/{channel_id}/audio", channel_id=channel_id)
         return await self._http.request(route, json=payload)
 
+    async def on_microphone(self, channel_id) -> str:
+        """
+        机器人在 channel_id 对应的语音子频道上麦。
+
+        注意:
+          音频接口：仅限音频类机器人才能使用，后续会根据机器人类型自动开通接口权限，现如需调用，需联系平台申请权限。
+
+        Args:
+          channel_id: 子频道 ID。
+
+        Returns:
+          返回值是一个字符串。成功执行返回空字符串
+        """
+        route = Route("PUT", "/channels/{channel_id}/mic", channel_id=channel_id)
+        return await self._http.request(route)
+
+    async def off_microphone(self, channel_id) -> str:
+        """
+        机器人在 channel_id 对应的语音子频道下麦。
+
+        注意:
+          音频接口：仅限音频类机器人才能使用，后续会根据机器人类型自动开通接口权限，现如需调用，需联系平台申请权限。
+
+        Args:
+          channel_id: 子频道 ID。
+
+        Returns:
+          返回值是一个字符串。成功执行返回空字符串
+        """
+        route = Route("DELETE", "/channels/{channel_id}/mic", channel_id=channel_id)
+        return await self._http.request(route)
+
     # 用户相关接口
     async def me(self) -> user.User:
         """
