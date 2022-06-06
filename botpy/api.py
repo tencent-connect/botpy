@@ -248,6 +248,23 @@ class BotAPI:
         )
         return await self._http.request(route, params=params)
 
+    async def get_voice_members(self, channel_id: str) -> List[user.Member]:
+        """
+        返回语音频道中的成员列表（暂未开放，内部测试使用）
+
+        注意:
+          公域机器人暂不支持申请，仅私域机器人可用，选择私域机器人后默认开通。
+          注意: 开通后需要先将机器人从频道移除，然后重新添加，方可生效。
+
+        Args:
+          channel_id (str): 要获取其语音成员的频道的 ID。查询的子频道不是语音子频道，返回的status code为400
+
+        Returns:
+          user.Member 对象的列表。
+        """
+        route = Route("GET", "/channels/{channel_id}/voice/members", channel_id=channel_id)
+        return await self._http.request(route)
+
     # 子频道相关接口
     async def get_channel(self, channel_id: str) -> channel.ChannelPayload:
         """
@@ -293,7 +310,7 @@ class BotAPI:
           guild_id (str): 频道 ID。
           name (str): 子频道名。
           type (channel.ChannelType): 子频道类型
-          sub_type (channelpayload.ChannelSubType): 子频道子类型
+          sub_type (channel.ChannelSubType): 子频道子类型
 
         Kwargs（fields）:
           position (int): 排序，非必填
