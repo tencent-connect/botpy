@@ -5,7 +5,7 @@ from typing import Any, Optional, ClassVar, Union, Dict
 from urllib.parse import quote
 
 import aiohttp
-from aiohttp import ClientResponse
+from aiohttp import ClientResponse, FormData
 
 from .utils import JsonUtil
 from .errors import HttpErrorDict, ServerError
@@ -103,10 +103,12 @@ class BotHttp:
             "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
             "User-Agent": "botpy/v1",
         }
-        # some checking if it's a JSON request
-        if "json" in kwargs:
-            headers["Content-Type"] = "application/json"
-            kwargs["data"] = JsonUtil.dict2json(kwargs.pop("json"))
+        # some checking if file_image in JSON request, if Ture, change to a form-data request
+        if "json" in kwargs and "file_image" in kwargs["json"] and kwargs["json"]["file_image"] is not None \
+                and isinstance(kwargs["json"]["file_image"], bytes):
+            kwargs["data"] = FormData()
+            for k, v in kwargs.pop("json").items():
+                kwargs["data"].add_field(k, v)
 
         kwargs["headers"] = headers
 
