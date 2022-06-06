@@ -5,12 +5,11 @@ from typing import Any, Optional, ClassVar, Union, Dict
 from urllib.parse import quote
 
 import aiohttp
-from aiohttp import ClientResponse
+from aiohttp import ClientResponse, FormData
 
-from .utils import JsonUtil
 from .errors import HttpErrorDict, ServerError
-from .robot import Token
 from .logging import logging
+from .robot import Token
 from .types import robot
 
 X_TPS_TRACE_ID = "X-Tps-trace-Id"
@@ -105,8 +104,12 @@ class BotHttp:
         }
         # some checking if it's a JSON request
         if "json" in kwargs:
-            headers["Content-Type"] = "application/json"
-            kwargs["data"] = JsonUtil.dict2json(kwargs.pop("json"))
+            # TODO 上传本地文件 @GLGDLY
+            if "file_image" in kwargs["json"] and kwargs["json"]["file_image"] is not None \
+                    and isinstance(kwargs["json"]["file_image"], bytes):
+                kwargs["data"] = FormData()
+                for k, v in kwargs.pop("json").items():
+                    kwargs["data"].add_field(k, v)
 
         kwargs["headers"] = headers
 

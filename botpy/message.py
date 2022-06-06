@@ -20,7 +20,7 @@ class Message:
 class MessageAudit:
     __slots__ = ("_api", "audit_id", "message_id", "channel_id", "guild_id")
 
-    def __init__ = (self, api: BotAPI, data: gateway.MessageAuditPayload):
+    def __init__(self, api: BotAPI, data: gateway.MessageAuditPayload):
         self._api = api
         self.audit_id = data["audit_id"]
         self.channel_id = data["channel_id"]
