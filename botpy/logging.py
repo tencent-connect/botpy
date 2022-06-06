@@ -2,7 +2,6 @@
 
 import logging
 import os
-import platform
 import sys
 from logging.handlers import TimedRotatingFileHandler
 
@@ -16,7 +15,6 @@ LOG_COLORS_CONFIG = {
 # 解决Windows系统cmd运行日志输出不会显示颜色问题
 os.system("")
 
-log_path = os.getenv("QQBOT_LOG_PATH", os.path.join(os.getcwd(), "%(name)s.log"))
 
 print_format = os.getenv(
     "QQBOT_LOG_PRINT_FORMAT", "\033[1;33m[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t\033[0m%(message)s"
@@ -47,7 +45,7 @@ def _get_level():
     return level
 
 
-def get_logger(name=None):
+def get_logger(name=None, log_path="log"):
     if not name:
         name = "botpy"
     logger = logging.getLogger(name)
@@ -69,14 +67,17 @@ def get_logger(name=None):
     formatter = logging.Formatter(file_format)
     if name is None:
         name = "botpy"
-    log_file = log_path % {"name": name}
+    log_file = f"{log_path}/{name}.log"
 
     # save last 7 days log
-    file_handler = TimedRotatingFileHandler(filename=log_file, when="D", backupCount=7, encoding="utf-8")
-
-    if len(logger.handlers) == 0:
-        file_handler.setLevel(level=logging.DEBUG)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+    try:
+        file_handler = TimedRotatingFileHandler(filename=log_file, when="D", backupCount=7, encoding="utf-8")
+        if len(logger.handlers) == 0:
+            file_handler.setLevel(level=logging.DEBUG)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+    except FileNotFoundError:
+        os.makedirs("log" if log_path is None else log_path)
+        logger.warning("未找到存储日志的文件夹, 尝试重新创建成功")
 
     return logger

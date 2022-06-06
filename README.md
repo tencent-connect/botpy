@@ -25,6 +25,9 @@ import botpy
 
 如下，是定义机器人被@的后自动回复:
 ```python
+import botpy
+from botpy.types.message import Message
+
 class MyClient(botpy.Client):
     async def on_ready(self):
         print(f"robot 「{self.robot.name}」 on_ready!")
@@ -37,6 +40,9 @@ class MyClient(botpy.Client):
 
 如果要使用`api`方法，可以参考如下方式:
 ```python
+import botpy
+from botpy.types.message import Message
+
 class MyClient(botpy.Client):
     async def on_at_message_create(self, message: Message):
         await self.api.post_message(channel_id=message.channel_id, content="content")
@@ -44,6 +50,13 @@ class MyClient(botpy.Client):
 
 3. 设置机器人需要监听的事件通道，并启动`client`
 ```python
+import botpy
+from botpy.types.message import Message
+
+class MyClient(botpy.Client):
+    async def on_at_message_create(self, message: Message):
+        await self.api.post_message(channel_id=message.channel_id, content="content")
+
 intents = botpy.Intents(public_guild_messages=True) 
 client = MyClient(intents=intents)
 client.run(appid="12345", token="xxxx")
@@ -51,6 +64,8 @@ client.run(appid="12345", token="xxxx")
 
 也可以通过预设置的类型，设置需要监听的事件通道
 ```python
+import botpy
+
 intents = botpy.Intents.none()
 intents.public_guild_messages=True
 ```
@@ -122,9 +137,11 @@ export QQBOT_DISABLE_LOG=1  # 1表示禁用日志
 SDK也支持修改日志输出路径，由于实际路径不尽相同，所以此处使用 `os` 模块来设置临时环境变量。
 
 ```python
-import os
+from botpy import logging
 
-os.environ["QQBOT_LOG_PATH"] = os.path.join(os.getcwd(), "log", "%(name)s.log") # 日志将生成在执行目录下log文件夹内
+# 默认输出到log文件夹
+logger = logging.get_logger('logs')
+
 ```
 
 ### 修改日志格式
