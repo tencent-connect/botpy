@@ -27,21 +27,18 @@ _loop: Any = _LoopSentinel()
 class Client:
     """``Client` 是一个用于与 QQ频道机器人 Websocket 和 API 交互的类。"""
 
-    def __init__(self, intents: Intents, timeout: int = 5):
+    def __init__(self, intents: Intents, timeout: int = 5, is_sandbox=False):
         """
-        Parameters
-        ----------
-        intents : Intents, 通过 `client.Intents` 获取
-                您要使用的意图。
-        timeout : int, optional
-                等待用户响应的时间（以秒为单位）。
-
+        Args:
+          intents (Intents): 通道：机器人需要注册的通道事件code，通过Intents提供的方法获取。
+          timeout (int): 机器人 HTTP 请求的超时时间。. Defaults to 5
+          is_sandbox: 是否使用沙盒环境。. Defaults to False
         """
         self.intents: int = intents.value
         self.ret_coro: bool = False
         # TODO loop的整体梳理 @veehou
         self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-        self.http: BotHttp = BotHttp(timeout=timeout)
+        self.http: BotHttp = BotHttp(timeout=timeout, is_sandbox=is_sandbox)
         self.api: BotAPI = BotAPI(http=self.http)
 
         self._connection: Optional[ConnectionSession] = None

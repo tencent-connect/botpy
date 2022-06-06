@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import TypedDict
 
 
 class InteractionData:
@@ -6,7 +7,7 @@ class InteractionData:
     resolved: object
 
 
-class InteractionPayload:
+class InteractionPayload(TypedDict):
     id: str
     application_id: int
     type: int

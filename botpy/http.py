@@ -7,14 +7,14 @@ from urllib.parse import quote
 import aiohttp
 from aiohttp import ClientResponse, FormData
 
+from . import logging
 from .errors import HttpErrorDict, ServerError
-from .logging import logging
 from .robot import Token
 from .types import robot
 
 X_TPS_TRACE_ID = "X-Tps-trace-Id"
 
-_log = logging.getLogger()
+_log = logging.get_logger()
 
 # 请求成功的返回码
 HTTP_OK_STATUS = [200, 202, 204]
@@ -58,20 +58,20 @@ class Route:
         self.method: str = method
         self.path: str = path
         self.is_sandbox = is_sandbox
+        self.parameters = parameters
 
+    @property
+    def url(self):
         if self.is_sandbox:
             d = self.SANDBOX_DOMAIN
         else:
             d = self.DOMAIN
-        self._url = "{}://{}{}".format(self.SCHEME, d, self.path)
+        _url = "{}://{}{}".format(self.SCHEME, d, self.path)
 
         # path的参数:
-        if parameters:
-            self._url = self._url.format_map({k: quote(v) if isinstance(v, str) else v for k, v in parameters.items()})
-
-    @property
-    def url(self):
-        return self._url
+        if self.parameters:
+            _url = _url.format_map({k: quote(v) if isinstance(v, str) else v for k, v in self.parameters.items()})
+        return _url
 
 
 class BotHttp:
@@ -83,7 +83,7 @@ class BotHttp:
     def __init__(
         self,
         timeout: int,
-        is_sandbox: str = False,
+        is_sandbox: bool = False,
     ):
         self.timeout = timeout
         self.is_sandbox = is_sandbox
@@ -111,8 +111,9 @@ class BotHttp:
                     kwargs["data"].add_field(k, v)
 
         kwargs["headers"] = headers
-
+        route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] request headers: {headers}, method: {route.method}, api_url: {route.url}")
+
         async with self._session.request(method=route.method, url=route.url, **kwargs) as response:
             return await _handle_response(route.url, response)
 
