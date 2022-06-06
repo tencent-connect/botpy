@@ -11,7 +11,6 @@ from . import logging
 from .connection import ConnectionSession
 from .types import gateway
 from .types.session import Session
-from .utils import JsonUtil
 
 _log = logging.get_logger()
 
@@ -148,7 +147,7 @@ class BotWebSocket:
             },
         }
 
-        await self.send_msg(JsonUtil.dict2json(payload))
+        await self.send_msg(json.dumps(payload))
 
     async def send_msg(self, event_json):
         """
@@ -178,7 +177,7 @@ class BotWebSocket:
             },
         }
 
-        await self.send_msg(JsonUtil.dict2json(payload))
+        await self.send_msg(json.dumps(payload))
 
     async def _ready_handler(self, message_event) -> gateway.ReadyEvent:
         data = message_event["d"]
@@ -230,4 +229,4 @@ class BotWebSocket:
                 return
 
             await asyncio.sleep(interval)
-            await self.send_msg(JsonUtil.dict2json(payload))
+            await self.send_msg(json.dumps(payload))

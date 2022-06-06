@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 # 异步api
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Union, BinaryIO
+from os import PathLike
+from io import BufferedReader
 
 from .flags import Permission
 from .http import BotHttp, Route
@@ -26,6 +28,7 @@ def _handle_message_parameters(
     ark: message.Ark = None,
     message_reference: message.Reference = None,
     image: str = None,
+    file_image: Union[bytes, BinaryIO, str, PathLike[str]] = None,
     msg_id: str = None,
     event_id: str = None,
     markdown: message.MarkdownPayload = None,
@@ -453,6 +456,7 @@ class BotAPI:
         ark: message.Ark = None,
         message_reference: message.Reference = None,
         image: str = None,
+        file_image: Union[bytes, BinaryIO, str, PathLike[str]] = None,
         msg_id: str = None,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
@@ -475,6 +479,7 @@ class BotAPI:
           ark (message.Ark): ark 模版消息
           message_reference (message.Reference): 对消息的引用。
           image (str): 要发送的图像的 URL。
+          file_image (bytes): 要发送的本地图像的本地路径或数据。
           msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
           event_id (str): 您要回复的消息的事件 ID。
           markdown (message.MarkdownPayload): markdown 消息
@@ -483,8 +488,13 @@ class BotAPI:
         Returns:
           message.Message: 一个消息字典对象。
         """
+        if isinstance(file_image, BufferedReader):
+            file_image = file_image.read()
+        elif isinstance(file_image, str):
+            with open(file_image, 'rb') as img:
+                file_image = img.read()
         payload = _handle_message_parameters(
-            content, embed, ark, message_reference, image, msg_id, event_id, markdown, keyboard
+            content, embed, ark, message_reference, image, file_image, msg_id, event_id, markdown, keyboard
         )
         route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
         return await self._http.request(route, json=payload)
@@ -566,6 +576,7 @@ class BotAPI:
         ark: message.Ark = None,
         message_reference: message.Reference = None,
         image: str = None,
+        file_image: Union[bytes, BinaryIO, str, PathLike[str]] = None,
         msg_id: str = None,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
@@ -588,6 +599,7 @@ class BotAPI:
           ark (message.Ark): ark 模版消息
           message_reference (message.Reference): 对消息的引用。
           image (str): 要发送的图像的 URL。
+          file_image (bytes): 本地图片
           msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
           event_id (str): 您要回复的消息的事件 ID。
           markdown (message.MarkdownPayload): markdown 消息
@@ -596,8 +608,13 @@ class BotAPI:
         Returns:
           message.Message: 一个消息字典对象。
         """
+        if isinstance(file_image, BufferedReader):
+            file_image = file_image.read()
+        elif isinstance(file_image, str):
+            with open(file_image, 'rb') as img:
+                file_image = img.read()
         send_payload = _handle_message_parameters(
-            content, embed, ark, message_reference, image, msg_id, event_id, markdown, keyboard
+            content, embed, ark, message_reference, image, file_image, msg_id, event_id, markdown, keyboard
         )
         route = Route("POST", "/dms/{guild_id}/messages", guild_id=guild_id)
         return await self._http.request(route, json=send_payload)
