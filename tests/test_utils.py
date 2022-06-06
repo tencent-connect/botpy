@@ -4,8 +4,6 @@
 import json
 import unittest
 
-from botpy.utils import JsonUtil
-
 
 class JsonUtilTestCase(unittest.TestCase):
     def test_json2obj(self):
@@ -52,7 +50,7 @@ class JsonUtilTestCase(unittest.TestCase):
         person = Person()
         person.name = "Hello"
         person.surname = "World"
-        json_str = JsonUtil.obj2json_str(person)
+        json_str = json.dumps(person)
 
         person2 = json.loads(json_str, object_hook=Person)
         self.assertEqual("Hello", person2.name)  # add assertion
