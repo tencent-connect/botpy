@@ -4,17 +4,25 @@
 
 ```
 examples/
- ┣ README.md
- ┣ config.example.yaml           # 示例配置文件（需要修改为config.yaml）
- ┣ demo_announce                 # 机器人公告API使用示例
- ┣ demo_api_permissions          # 机器人授权查询API使用示例
- ┣ demo_at_reply                 # 机器人at被动回复async示例
- ┣ demo_at_reply_ark             # 机器人at被动回复ark消息示例
- ┣ demo_at_reply_sync            # 机器人at被动回复sync示例
- ┣ demo_at_reply_embed           # 机器人at被动回复embed消息示例
- ┣ demo_direct_message_reply     # 机器人私信被动回复示例
- ┣ demo_recall                   # 消息API撤回示例
- ┗ demo_schedule                 # 日常API示例
+.
+├── README.md
+├── config.example.yaml          # 示例配置文件（需要修改为config.yaml）
+├── demo_announce.py             # 机器人公告API使用示例
+├── demo_api_permission.py       # 机器人授权查询API使用示例
+├── demo_at_reply.py             # 机器人at被动回复async示例
+├── demo_at_reply_ark.py         # 机器人at被动回复ark消息示例
+├── demo_at_reply_embed.py       # 机器人at被动回复embed消息示例
+├── demo_at_reply_file_data.py   # 机器人at被动回复本地图片消息示例
+├── demo_at_reply_keyboard.py    # 机器人at被动回复md带内嵌键盘的示例
+├── demo_at_reply_markdown.py    # 机器人at被动回复md消息示例
+├── demo_at_reply_reference.py   # 机器人at被动回复消息引用示例
+├── demo_dms_reply.py            # 机器人私信被动回复示例
+├── demo_get_reaction_users.py   # 机器人获取表情表态成员列表示例
+├── demo_guild_member_event.py   # 机器人频道成员变化事件示例
+├── demo_interaction.py          # 机器人互动事件示例（未启用）
+├── demo_pins_message.py         # 机器人消息置顶示例
+├── demo_recall.py               # 机器人消息撤回示例
+├── demo_schedule.py             # 机器人日程相关示例
 ```
 
 ## 环境安装
