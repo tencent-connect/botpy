@@ -43,7 +43,7 @@ class BotWebSocket:
         self._session = session
         self._connection = _connection
         self._parser = _connection.parser
-        self._can_reconnect = False
+        self._can_reconnect = True
         self._INVALID_RECONNECT_CODE = [9001, 9005]
 
     async def on_error(self, exception: BaseException):
