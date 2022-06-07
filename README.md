@@ -30,7 +30,7 @@ import botpy
 通过继承实现`bot.Client`, 实现自己的机器人Client 
 
 #### 步骤2
-实现机器人相关事件的处理方法,如 `on_at_message_create`，具体方法定义可以参考`botpy.flags::Intents`
+实现机器人相关事件的处理方法,如 `on_at_message_create`， 详细的事件监听列表，请参考 [事件监听.md](./docs/事件监听.md)
 
 如下，是定义机器人被@的后自动回复:
 ```python
