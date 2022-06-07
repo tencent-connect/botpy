@@ -6,7 +6,7 @@ import botpy
 from botpy import logging
 from botpy.message import Message
 from botpy.types.message import MarkdownPayload, MessageMarkdownParams
-from botpy.utils import YamlUtil
+from botpy.ext.yaml_util import YamlUtil
 
 _log = logging.get_logger()
 

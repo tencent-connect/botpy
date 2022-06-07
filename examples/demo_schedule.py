@@ -6,7 +6,7 @@ import time
 import botpy
 from botpy import logging
 from botpy.message import Message
-from botpy.utils import YamlUtil
+from botpy.ext.yaml_util import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 _log = logging.get_logger()
