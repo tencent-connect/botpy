@@ -4,13 +4,11 @@ from typing import List, Callable, Dict, Any, Optional
 
 from .api import BotAPI
 from .channel import Channel
-
-from .message import Message, MessageAudit
-from .interaction import Interaction
 from .guild import Guild
-
-from .robot import Robot
+from .interaction import Interaction
 from .logging import logging
+from .message import Message, MessageAudit
+from .robot import Robot
 from .types import gateway, channel, guild, user, session, reaction, interaction, forum
 
 _log = logging.getLogger()
@@ -24,12 +22,12 @@ class ConnectionSession:
     """
 
     def __init__(
-        self,
-        max_async,
-        connect: Callable,
-        dispatch: Callable,
-        loop=None,
-        api: BotAPI = None,
+            self,
+            max_async,
+            connect: Callable,
+            dispatch: Callable,
+            loop=None,
+            api: BotAPI = None,
     ):
         self.dispatch = dispatch
         self.state = ConnectionState(dispatch, api)
@@ -148,7 +146,7 @@ class ConnectionState:
 
     # botpy.flags.Intents.interaction
     def parse_interaction_create(self, ctx: gateway.WsContext, data: interaction.InteractionPayload):
-        _interaction = Interaction(self.api, data)
+        _interaction = Interaction(self.api, ctx, data)
         self._dispatch("interaction_create", _interaction)
 
     # botpy.flags.Intents.message_audit
