@@ -8,7 +8,7 @@ class Message:
         "author",
         "content",
         "channel_id",
-        "message_id",
+        "id",
         "guild_id",
         "author_id",
         "member",
@@ -25,7 +25,7 @@ class Message:
         self.author = data.get("author")
         self.author_id = self.author.get("id")
         self.channel_id = data.get("channel_id")
-        self.message_id = data.get("id")
+        self.id = data.get("id")
         self.content = data.get("content")
         self.guild_id = data.get("guild_id")
         self.member = data.get("member")
@@ -35,7 +35,7 @@ class Message:
         self.timestamp = data.get("timestamp")
 
     async def reply(self, **kwargs):
-        await self._api.post_message(channel_id=self.channel_id, msg_id=self.message_id, **kwargs)
+        return await self._api.post_message(channel_id=self.channel_id, msg_id=self.id, **kwargs)
 
 
 class MessageAudit:

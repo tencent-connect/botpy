@@ -58,7 +58,7 @@ class MessageMarkdownParams(TypedDict):
 
 class MarkdownPayload(TypedDict, total=False):
     template_id: int
-    params: MessageMarkdownParams
+    params: List[MessageMarkdownParams]
     content: str
 
 

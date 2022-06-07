@@ -533,7 +533,7 @@ class BotAPI:
         Returns:
           返回值是一个字符串。
         """
-        params = {"hide_tip": hide_tip}
+        params = {"hide_tip": "true" if hide_tip else "false"}
 
         route = Route(
             "DELETE",

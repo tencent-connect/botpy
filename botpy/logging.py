@@ -67,7 +67,7 @@ def get_logger(name=None, log_path="log"):
     formatter = logging.Formatter(file_format)
     if name is None:
         name = "botpy"
-    log_file = os.path.join(os.getcwd(), log_path, f"{name}s.log")
+    log_file = os.path.join(os.getcwd(), log_path, f"{name}.log")
 
     # save last 7 days log
     try:
