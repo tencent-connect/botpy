@@ -37,6 +37,7 @@ class MessagePayload(TypedDict):
     seq_in_channel: str
     timestamp: str
 
+
 class MessageAuditPayload(TypedDict):
     audit_id: str
     message_id: str
