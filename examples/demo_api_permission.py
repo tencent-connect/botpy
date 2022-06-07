@@ -5,7 +5,7 @@ import os.path
 import botpy
 from botpy import logging
 from botpy.message import Message
-from botpy.utils import YamlUtil
+from botpy.ext.yaml_util import YamlUtil
 from botpy.types.permission import APIPermissionDemandIdentify
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))

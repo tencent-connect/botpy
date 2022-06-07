@@ -7,7 +7,7 @@ from botpy import BotAPI
 from botpy.message import Message
 from botpy.types.inline import Keyboard, Button, RenderData, Action, Permission, KeyboardRow
 from botpy.types.message import MarkdownPayload, KeyboardPayload
-from botpy.utils import YamlUtil
+from botpy.ext.yaml_util import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
