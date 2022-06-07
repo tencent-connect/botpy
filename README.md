@@ -227,7 +227,7 @@ pytest
 
 ## 致谢
 
-感谢参与内测试用、开发和提出宝贵意见的开发者们（排名不分先后）：
+感谢参与内测、开发和提出宝贵意见的开发者们（排名不分先后）：
 
 [小念](https://github.com/ReadSmall), [Neutron](https://github.com/Huang1220), [晚柒载](https://github.com/wqzai)
 
