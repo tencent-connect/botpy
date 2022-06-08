@@ -1,7 +1,7 @@
 import asyncio
 import traceback
 from types import TracebackType
-from typing import Any, Callable, Coroutine, Dict, List, Tuple, Optional, Type
+from typing import Any, Callable, Coroutine, Dict, List, Tuple, Optional, Union, Type
 
 from . import logging
 from .api import BotAPI
@@ -27,12 +27,28 @@ _loop: Any = _LoopSentinel()
 class Client:
     """``Client` 是一个用于与 QQ频道机器人 Websocket 和 API 交互的类。"""
 
-    def __init__(self, intents: Intents, timeout: int = 5, is_sandbox=False):
+    def __init__(
+            self,
+            intents: Intents,
+            timeout: int = 5,
+            is_sandbox=False,
+            log_config: Union[str, dict] = None,
+            log_format: str = None,
+            log_level: int = None,
+            bot_log: bool = True,
+            ext_handlers: Union[dict, List[dict], bool] = True
+    ):
         """
         Args:
           intents (Intents): 通道：机器人需要注册的通道事件code，通过Intents提供的方法获取。
           timeout (int): 机器人 HTTP 请求的超时时间。. Defaults to 5
           is_sandbox: 是否使用沙盒环境。. Defaults to False
+
+          log_config: 日志配置，可以为.json/.yaml，会从文件中读取(logging.config.dictConfig)。Default to None（不做更改）
+          log_format: 控制台输出格式(logging.basicConfig(format=))。Default to None（不做更改）
+          log_level: 控制台输出level。Default to None(不做更改),
+          bot_log: 是否启用bot日志。Default to True
+          ext_handlers: ext_handlers: 额外的handler，格式参考 logging.DEFAULT_FILE_HANDLER。Default to True(使用默认追加handler)
         """
         self.intents: int = intents.value
         self.ret_coro: bool = False
@@ -46,16 +62,24 @@ class Client:
         self._listeners: Dict[str, List[Tuple[asyncio.Future, Callable[..., bool]]]] = {}
         self._ws_ap: Dict = {}
 
+        logging.configure_logging(
+            config=log_config,
+            _format=log_format,
+            level=log_level,
+            bot_log=bot_log,
+            ext_handlers=ext_handlers
+        )
+
     async def __aenter__(self):
         _log.debug("bot client is __aenter__")
         await self._async_setup_hook()
         return self
 
     async def __aexit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+            self,
+            exc_type: Optional[Type[BaseException]],
+            exc_value: Optional[BaseException],
+            traceback: Optional[TracebackType],
     ) -> None:
         _log.debug("bot client is __aexit__")
 
@@ -234,22 +258,22 @@ class Client:
             self._schedule_event(coro, method, *args, **kwargs)
 
     def _schedule_event(
-        self,
-        coro: Callable[..., Coroutine[Any, Any, Any]],
-        event_name: str,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            coro: Callable[..., Coroutine[Any, Any, Any]],
+            event_name: str,
+            *args: Any,
+            **kwargs: Any,
     ) -> asyncio.Task:
         wrapped = self._run_event(coro, event_name, *args, **kwargs)
         # Schedules the task
         return self.loop.create_task(wrapped, name=f"botpy: {event_name}")
 
     async def _run_event(
-        self,
-        coro: Callable[..., Coroutine[Any, Any, Any]],
-        event_name: str,
-        *args: Any,
-        **kwargs: Any,
+            self,
+            coro: Callable[..., Coroutine[Any, Any, Any]],
+            event_name: str,
+            *args: Any,
+            **kwargs: Any,
     ) -> None:
         try:
             await coro(*args, **kwargs)
