@@ -35,7 +35,7 @@ class Client:
             log_config: Union[str, dict] = None,
             log_format: str = None,
             log_level: int = None,
-            bot_log: bool = True,
+            bot_log: Union[bool, None] = True,
             ext_handlers: Union[dict, List[dict], bool] = True
     ):
         """
@@ -47,7 +47,7 @@ class Client:
           log_config: 日志配置，可以为dict或.json/.yaml文件路径，会从文件中读取(logging.config.dictConfig)。Default to None（不做更改）
           log_format: 控制台输出格式(logging.basicConfig(format=))。Default to None（不做更改）
           log_level: 控制台输出level。Default to None(不做更改),
-          bot_log: 是否启用bot日志。Default to True
+          bot_log: bot_log: 是否启用bot日志 None/禁用拓展 False/全部禁用。Default to True
           ext_handlers: ext_handlers: 额外的handler，格式参考 logging.DEFAULT_FILE_HANDLER。Default to True(使用默认追加handler)
         """
         self.intents: int = intents.value
