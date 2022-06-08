@@ -19,8 +19,6 @@ from typing import List, Dict
 from botpy import BotAPI
 from botpy.message import Message
 
-CHANNEL_JUMP_RE = re.compile(r"#(.{1,12}?)(?= )")
-
 
 def get_channel_jump(text: str = None, message: Message = None) -> List[str]:
     """
@@ -29,7 +27,8 @@ def get_channel_jump(text: str = None, message: Message = None) -> List[str]:
     :param text: 文本，为空则message.content
     :return: 子频道名称列表(不带#)
     """
-    return CHANNEL_JUMP_RE.findall(message.content if text is None else text)
+    channel_jump_re = re.compile(r"#(.{1,12}?)(?= )")
+    return channel_jump_re.findall(message.content if text is None else text)
 
 
 async def get_channel_jump_strict(api: BotAPI, message: Message = None, text: str = None,
