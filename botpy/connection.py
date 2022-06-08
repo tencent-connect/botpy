@@ -6,12 +6,12 @@ from .api import BotAPI
 from .channel import Channel
 from .guild import Guild
 from .interaction import Interaction
-from .logging import logging
+from . import logging
 from .message import Message, MessageAudit
 from .robot import Robot
 from .types import gateway, channel, guild, user, session, reaction, interaction, forum
 
-_log = logging.getLogger()
+_log = logging.get_logger()
 
 
 class ConnectionSession:
@@ -22,12 +22,12 @@ class ConnectionSession:
     """
 
     def __init__(
-            self,
-            max_async,
-            connect: Callable,
-            dispatch: Callable,
-            loop=None,
-            api: BotAPI = None,
+        self,
+        max_async,
+        connect: Callable,
+        dispatch: Callable,
+        loop=None,
+        api: BotAPI = None,
     ):
         self.dispatch = dispatch
         self.state = ConnectionState(dispatch, api)
