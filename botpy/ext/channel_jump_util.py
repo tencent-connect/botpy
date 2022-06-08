@@ -18,7 +18,7 @@ from typing import List, Union, Match
 from botpy import BotAPI
 from botpy.message import Message
 
-CHANNEL_JUMP_RE = re.compile(r"#(.{1,12}?)(?= )")
+CHANNEL_JUMP_RE = re.compile(r"#(.{1,20}?)(?= )")
 
 
 def get_channel_jump(text: str = None, message: Message = None) -> List[str]:
