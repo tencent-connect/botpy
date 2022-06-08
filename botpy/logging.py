@@ -48,7 +48,7 @@ os.system("")
 
 def get_handler(handler, name=""):
     """
-    将hendler字典实例化
+    将handler字典实例化
     :param handler: handler配置
     :param name: 动态路径参数
     :return: Handler
