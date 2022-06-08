@@ -44,7 +44,7 @@ class Client:
           timeout (int): 机器人 HTTP 请求的超时时间。. Defaults to 5
           is_sandbox: 是否使用沙盒环境。. Defaults to False
 
-          log_config: 日志配置，可以为.json/.yaml，会从文件中读取(logging.config.dictConfig)。Default to None（不做更改）
+          log_config: 日志配置，可以为dict或.json/.yaml文件路径，会从文件中读取(logging.config.dictConfig)。Default to None（不做更改）
           log_format: 控制台输出格式(logging.basicConfig(format=))。Default to None（不做更改）
           log_level: 控制台输出level。Default to None(不做更改),
           bot_log: 是否启用bot日志。Default to True
