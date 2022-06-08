@@ -99,7 +99,7 @@ def configure_logging(
         config: Union[str, dict] = None,
         _format: str = None,
         level: int = None,
-        bot_log: bool = True,
+        bot_log: Union[bool, None] = True,
         ext_handlers: Union[dict, List, bool] = None,
         force: bool = False
 ) -> None:
@@ -108,7 +108,7 @@ def configure_logging(
     :param config: logging.config.dictConfig
     :param _format: logging.basicConfig(format=_format)
     :param level: 控制台输出level
-    :param bot_log: 是否启用bot日志
+    :param bot_log: 是否启用bot日志 None/禁用拓展 False/全部禁用
     :param ext_handlers: 额外的handler，格式参考 DEFAULT_FILE_HANDLER。Default to True(使用默认handler)
     :param force: 是否在已追加handler(_ext_handlers)不为空时继续追加(避免因多次实例化Client类导致重复添加)
     """
@@ -132,19 +132,21 @@ def configure_logging(
                 config, disable_existing_loggers=False
             )
 
-    if not bot_log:
-        logger = logging.getLogger("botpy")
-        logger.setLevel(60)
-        logger.handlers = []
-        if "botpy" in logs:
-            logs.pop("botpy")
-
     if _format is not None:
         logging.basicConfig(format=_format)
 
     for name, logger in logs.items():
         if level is not None:
             logger.setLevel(level)
+
+    if not bot_log:
+        logger = logging.getLogger("botpy")
+        if bot_log is False:
+            logger.setLevel(60)
+        if "botpy" in logs:
+            logs.pop("botpy")
+
+        logger.handlers = []
 
     if ext_handlers and (not _ext_handlers or force):
         if ext_handlers is True:
