@@ -142,7 +142,7 @@ def configure_logging(
     if not bot_log:
         logger = logging.getLogger("botpy")
         if bot_log is False:
-            logger.setLevel(60)
+            logger.propagate = False
         if "botpy" in logs:
             logs.pop("botpy")
 
