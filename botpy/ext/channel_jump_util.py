@@ -48,7 +48,7 @@ async def get_channel_jump_strict(api: BotAPI, message: Message = None, text: st
 async def escape_channel_jump(api: BotAPI, message: Message = None, text: str = None, guild_id: str = None,
                               strict: bool = False) -> Union[str, bool]:
     """
-    转义子频道转跳
+    转义子频道转跳 (#name -> #<#id>)
     :param api: BotAPI
     :param message: 消息对象
     :param text: 文本，为空则message.content
