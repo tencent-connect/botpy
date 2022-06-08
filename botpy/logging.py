@@ -136,7 +136,8 @@ def configure_logging(
         logger = logging.getLogger("botpy")
         logger.setLevel(60)
         logger.handlers = []
-        logs.pop("botpy")
+        if "botpy" in logs:
+            logs.pop("botpy")
 
     if _format is not None:
         logging.basicConfig(format=_format)
