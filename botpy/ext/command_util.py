@@ -9,8 +9,8 @@ class Commands:
     指令装饰器
     """
 
-    def __init__(self, name: tuple or str):
-        self.commands = name
+    def __init__(self, commands: tuple or str):
+        self.commands = commands
 
     def __call__(self, func):
         @wraps(func)
