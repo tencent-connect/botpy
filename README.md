@@ -188,7 +188,7 @@ python3 demo_at_reply.py -d
 [默认拓展](botpy/logging.py)
 
 ```python
-{
+DEFAULT_FILE_HANDLER={
     # 要实例化的Handler
     "handler": TimedRotatingFileHandler,
     # 可选 Default to DEFAULT_FILE_FORMAT
