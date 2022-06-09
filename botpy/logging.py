@@ -57,7 +57,7 @@ def get_handler(handler, name=""):
     if "filename" in handler:
         handler["filename"] = handler["filename"] % {"name": name}
 
-    _lever = handler.get("level") or logging.DEBUG
+    lever = handler.get("level") or logging.DEBUG
     _format = handler.get("format") or DEFAULT_FILE_FORMAT
 
     for k in ["level", "format"]:
@@ -65,7 +65,7 @@ def get_handler(handler, name=""):
             handler.pop(k)
 
     handler = handler.pop("handler")(**handler)
-    handler.setLevel(_lever)
+    handler.setLevel(lever)
     handler.setFormatter(logging.Formatter(_format))
     return handler
 
@@ -88,7 +88,7 @@ def get_logger(name=None):
 
     # 添加额外handler
     if _ext_handlers:
-        for handler in _ext_handlers.copy():
+        for handler in _ext_handlers:
             logger.addHandler(get_handler(handler, name))
 
     logs[name] = logger
@@ -157,5 +157,5 @@ def configure_logging(
         _ext_handlers.extend(ext_handlers)
 
         for name, logger in logs.items():
-            for handler in ext_handlers.copy():
+            for handler in ext_handlers:
                 logger.addHandler(get_handler(handler, name))
