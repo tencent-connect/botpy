@@ -111,7 +111,7 @@ examples/
 
 ## 日志打印
 
-基于自带的 logging 模块封装的日志模块，提供了日志写入以及美化了打印格式，并支持通过设置 `QQBOT_LOG_LEVEL` 环境变量来调整日志打印级别（默认打印级别为 `INFO`）。
+基于自带的 logging 模块封装的日志模块，提供了日志写入以及美化了打印格式，并支持调整打印级别（默认打印级别为 `INFO`）。
 
 ### 使用方法
 
@@ -131,21 +131,32 @@ logger = logging.get_logger()
 logger.info("hello world!")
 ```
 
-### 设置日志级别
-SDK默认的日志级别为`INFO`级别，需要修改请查看下面信息
-#### Debug日志
-命令行启动py后通过增加参数`-d` 或 `--debug`可以打开debug日志
+### 日志设置
+
+SDK的日志设置集成在`bot.Client`的实例化阶段，也可通过[`logging.configure_logging`](botpy/logging.py)修改(均为可选)
+
+```python
+import botpy
+
+botpy.Client(
+    ...
+    log_level=20,
+    log_format="new format",
+    bot_log=True,
+    ext_handlers=False,
+    log_config="log_config.json",
+)
+
+```
+
+### log_level
+
+日志级别，默认为`INFO`
+
+命令行启动py可增加参数`-d` 或 `--debug`快捷打开debug日志
 
 ```bash
 python3 demo_at_reply.py -d
-```
-
-
-#### 其他级别日志
-通过 `export` 命令添加 `QQBOT_LOG_LEVEL` 环境变量可以设置日志级别。例如：
-
-``` bash
-export QQBOT_LOG_LEVEL=10  # 10表示DEBUG级别
 ```
 
 几个可选取值（参考了[logging模块的取值](https://docs.python.org/3/library/logging.html#levels)）：
@@ -159,43 +170,58 @@ export QQBOT_LOG_LEVEL=10  # 10表示DEBUG级别
 | DEBUG | 10 |
 | NOTSET | 0 |
 
-### 禁用日志文件输出
+### log_format
 
-默认情况下 botpy 会在当前执行目录下生成格式为 `botpy.log.*` 的日志文件。如果想禁用这些日志文件，可以通过设置 `QQBOT_DISABLE_LOG` 环境变量为 1 来关闭。
+日志控制台输出格式
 
-``` bash
-export QQBOT_DISABLE_LOG=1  # 1表示禁用日志
-```
+### bot_log
 
-### 修改日志输出路径
+是否启用`botpy`日志
 
-SDK也支持修改日志输出路径，由于实际路径不尽相同，所以此处使用 `os` 模块来设置临时环境变量。
+`None` -> 禁用 拓展  
+`False` -> 禁用 拓展+控制台输出
 
-```python
-from botpy import logging
+### ext_handlers
 
-# 默认输出到log文件夹
-logger = logging.get_logger('logs')
+日志Handler拓展，为True使用默认拓展，False不添加拓展，可用list添加多个拓展
 
-```
-
-### 修改日志格式
-
-通过 `export` 命令添加 `QQBOT_LOG_FILE_FORMAT` 和 `QQBOT_LOG_PRINT_FORMAT` 环境变量可以设置日志格式。例如：
-
-```bash
- # 设置文件输出格式
-export QQBOT_LOG_FILE_FORMAT="%(asctime)s [%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s): %(message)s"
-```
-
-如需使用转义字符，可以使用 `os` 模块添加。例如：
+[默认拓展](botpy/logging.py)
 
 ```python
- # 设置控制台输出格式
+{
+    # 要实例化的Handler
+    "handler": TimedRotatingFileHandler,
+    # 可选 Default to DEFAULT_FILE_FORMAT
+    "format": "%(asctime)s\t[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t%(message)s",
+    # 可选 Default to DEBUG
+    "level": logging.DEBUG,
+    # 可选，其中如有 %(name)s 会在实例化阶段填入相应的日志name
+    "filename": os.path.join(os.getcwd(), "%(name)s.log"),
+    # 以下是Handler相关参数
+    "when": "D",
+    "backupCount": 7,
+    "encoding": "utf-8"
+}
+```
+
+#### 修改默认拓展
+
+```python
 import os
+impoty botpy
+from botpy.logging import DEFAULT_FILE_HANDLER
 
-os.environ["QQBOT_LOG_PRINT_FORMAT"] = "%(asctime)s \033[1;33m[%(levelname)s] %(funcName)s (%(filename)s:%(lineno)s):\033[0m %(message)s"
+# 修改日志路径
+DEFAULT_FILE_HANDLER["filename"] = os.path.join(os.getcwd(), "log", "%(name)s.log")
+# 修改日志格式
+DEFAULT_FILE_HANDLER["format"] = "new format"
+
+bot.Client(ext_handlers=DEFAULT_FILE_HANDLER)
 ```
+
+### log_config
+
+该参数将传入`logging.config.dictConfig`(内置logging而非botpy.logging)，如果为.json/.yaml文件路径将从文件中读取配置
 
 # 参与开发
 

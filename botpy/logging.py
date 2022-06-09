@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import logging
 import os
 import sys
+import json
+import yaml
+import logging
+import logging.config
+from typing import List, Dict, Union
 from logging.handlers import TimedRotatingFileHandler
 
 LOG_COLORS_CONFIG = {
@@ -12,72 +16,146 @@ LOG_COLORS_CONFIG = {
     "ERROR": "red",
     "CRITICAL": "red",
 }
+
+DEFAULT_PRINT_FORMAT = "\033[1;33m[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t\033[0m%(message)s"
+DEFAULT_FILE_FORMAT = "%(asctime)s\t[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t%(message)s"
+logging.basicConfig(format=DEFAULT_PRINT_FORMAT)
+
+DEFAULT_FILE_HANDLER = {
+    # 要实例化的Handler
+    "handler": TimedRotatingFileHandler,
+    # 可选 Default to DEFAULT_FILE_FORMAT
+    "format": "%(asctime)s\t[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t%(message)s",
+    # 可选 Default to DEBUG
+    "level": logging.DEBUG,
+    # 可选，其中如有 %(name)s 会在实例化阶段填入相应的日志name
+    "filename": os.path.join(os.getcwd(), "%(name)s.log"),
+    # 以下是Handler相关参数
+    "when": "D",
+    "backupCount": 7,
+    "encoding": "utf-8"
+}
+
+# 存放已经获取的Logger
+logs: Dict[str, logging.Logger] = {}
+
+# 追加的handler
+_ext_handlers: List[dict] = []
+
 # 解决Windows系统cmd运行日志输出不会显示颜色问题
 os.system("")
 
 
-print_format = os.getenv(
-    "QQBOT_LOG_PRINT_FORMAT", "\033[1;33m[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t\033[0m%(message)s"
-)
-file_format = os.getenv(
-    "QQBOT_LOG_FILE_FORMAT", "%(asctime)s\t[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t%(message)s"
-)
+def get_handler(handler, name=""):
+    """
+    将handler字典实例化
+    :param handler: handler配置
+    :param name: 动态路径参数
+    :return: Handler
+    """
+    handler = handler.copy()
+    if "filename" in handler:
+        handler["filename"] = handler["filename"] % {"name": name}
+
+    lever = handler.get("level") or logging.DEBUG
+    _format = handler.get("format") or DEFAULT_FILE_FORMAT
+
+    for k in ["level", "format"]:
+        if k in handler:
+            handler.pop(k)
+
+    handler = handler.pop("handler")(**handler)
+    handler.setLevel(lever)
+    handler.setFormatter(logging.Formatter(_format))
+    return handler
 
 
-def _get_level():
-    level = logging.INFO
-    level_str = os.getenv("QQBOT_LOG_LEVEL", str(logging.INFO))
-    try:
-        level = int(level_str)
-        if level not in (
-            logging.NOTSET,
-            logging.DEBUG,
-            logging.INFO,
-            logging.WARNING,
-            logging.ERROR,
-            logging.CRITICAL,
-        ):
-            logging.error("wrong logging level %s" % level_str)
-            level = logging.INFO
-    except ValueError:
-        logging.error("wrong logging level %s" % level_str)
-    logging.info("logging level: %d" % level)
-    return level
+def get_logger(name=None):
+    global logs
 
-
-def get_logger(name=None, log_path="log"):
     if not name:
         name = "botpy"
+    if name in logs:
+        return logs[name]
+
     logger = logging.getLogger(name)
-
-    logging.basicConfig(format=print_format)
-
     # 从用户命令行接收是否打印debug日志
     argv = sys.argv
-    if len(argv) > 1 and argv[1] in ["-d", "--debug"]:
+    if "-d" in argv or "--debug" in argv:
         logger.setLevel(level=logging.DEBUG)
     else:
-        logger.setLevel(level=_get_level())
+        logger.setLevel(logging.INFO)
 
-    # FileHandler
-    log_flag = os.getenv("QQBOT_DISABLE_LOG", "0")
-    if log_flag != "0":
-        return
+    # 添加额外handler
+    if _ext_handlers:
+        for handler in _ext_handlers:
+            logger.addHandler(get_handler(handler, name))
 
-    formatter = logging.Formatter(file_format)
-    if name is None:
-        name = "botpy"
-    log_file = os.path.join(os.getcwd(), log_path, f"{name}.log")
-
-    # save last 7 days log
-    try:
-        file_handler = TimedRotatingFileHandler(filename=log_file, when="D", backupCount=7, encoding="utf-8")
-        if len(logger.handlers) == 0:
-            file_handler.setLevel(level=logging.DEBUG)
-            file_handler.setFormatter(formatter)
-            logger.addHandler(file_handler)
-    except FileNotFoundError:
-        os.makedirs(os.path.join(os.getcwd(), log_path))
-        logger.warning("未找到存储日志的文件夹, 尝试重新创建成功")
-
+    logs[name] = logger
     return logger
+
+
+def configure_logging(
+        config: Union[str, dict] = None,
+        _format: str = None,
+        level: int = None,
+        bot_log: Union[bool, None] = True,
+        ext_handlers: Union[dict, List, bool] = None,
+        force: bool = False
+) -> None:
+    """
+    修改日志配置
+    :param config: logging.config.dictConfig
+    :param _format: logging.basicConfig(format=_format)
+    :param level: 控制台输出level
+    :param bot_log: 是否启用bot日志 None/禁用拓展 False/全部禁用
+    :param ext_handlers: 额外的handler，格式参考 DEFAULT_FILE_HANDLER。Default to True(使用默认handler)
+    :param force: 是否在已追加handler(_ext_handlers)不为空时继续追加(避免因多次实例化Client类导致重复添加)
+    """
+    global _ext_handlers
+
+    if config is not None:
+        if isinstance(config, dict):
+            logging.config.dictConfig(config)
+        elif config.endswith(".json"):
+            with open(config) as file:
+                loaded_config = json.load(file)
+                logging.config.dictConfig(loaded_config)
+        elif config.endswith((".yaml", ".yml")):
+            with open(config) as file:
+                loaded_config = yaml.safe_load(file)
+                logging.config.dictConfig(loaded_config)
+        else:
+            # See the note about fileConfig() here:
+            # https://docs.python.org/3/library/logging.config.html#configuration-file-format
+            logging.config.fileConfig(
+                config, disable_existing_loggers=False
+            )
+
+    if _format is not None:
+        logging.basicConfig(format=_format)
+
+    for name, logger in logs.items():
+        if level is not None:
+            logger.setLevel(level)
+
+    if not bot_log:
+        logger = logging.getLogger("botpy")
+        if bot_log is False:
+            logger.propagate = False
+        if "botpy" in logs:
+            logs.pop("botpy")
+
+        logger.handlers = []
+
+    if ext_handlers and (not _ext_handlers or force):
+        if ext_handlers is True:
+            ext_handlers = [DEFAULT_FILE_HANDLER]
+        elif not isinstance(ext_handlers, list):
+            ext_handlers = [ext_handlers]
+
+        _ext_handlers.extend(ext_handlers)
+
+        for name, logger in logs.items():
+            for handler in ext_handlers:
+                logger.addHandler(get_handler(handler, name))
