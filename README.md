@@ -208,7 +208,7 @@ python3 demo_at_reply.py -d
 
 ```python
 import os
-from botpy import Client
+impoty botpy
 from botpy.logging import DEFAULT_FILE_HANDLER
 
 # 修改日志路径
@@ -216,7 +216,7 @@ DEFAULT_FILE_HANDLER["filename"] = os.path.join(os.getcwd(), "log", "%(name)s.lo
 # 修改日志格式
 DEFAULT_FILE_HANDLER["format"] = "new format"
 
-Client(ext_handlers=DEFAULT_FILE_HANDLER)
+bot.Client(ext_handlers=DEFAULT_FILE_HANDLER)
 ```
 
 ### log_config
