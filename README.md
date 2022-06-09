@@ -139,12 +139,11 @@ SDK的日志设置集成在`bot.Client`的实例化阶段，也可通过[`loggin
 import botpy
 
 botpy.Client(
-    ...
     log_level=20,
     log_format="new format",
     bot_log=True,
     ext_handlers=False,
-    log_config="log_config.json",
+    log_config="log_config.json"
 )
 
 ```
@@ -178,8 +177,8 @@ python3 demo_at_reply.py -d
 
 是否启用`botpy`日志
 
-`None` -> 禁用 拓展  
-`False` -> 禁用 拓展+控制台输出
+`None` 禁用 拓展  
+`False` 禁用 拓展+控制台输出
 
 ### ext_handlers
 
@@ -208,7 +207,7 @@ DEFAULT_FILE_HANDLER={
 
 ```python
 import os
-impoty botpy
+import botpy
 from botpy.logging import DEFAULT_FILE_HANDLER
 
 # 修改日志路径
@@ -216,7 +215,7 @@ DEFAULT_FILE_HANDLER["filename"] = os.path.join(os.getcwd(), "log", "%(name)s.lo
 # 修改日志格式
 DEFAULT_FILE_HANDLER["format"] = "new format"
 
-bot.Client(ext_handlers=DEFAULT_FILE_HANDLER)
+botpy.Client(ext_handlers=DEFAULT_FILE_HANDLER)
 ```
 
 ### log_config
