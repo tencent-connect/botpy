@@ -133,12 +133,12 @@ logger.info("hello world!")
 
 ### 日志设置
 
-目前，SDK的日志设置集成在Client的实例化阶段，也可通过logging.configure_logging修改(均为可选)
+SDK的日志设置集成在`bot.Client`的实例化阶段，也可通过[`logging.configure_logging`](botpy/logging.py)修改(均为可选)
 
 ```python
-from botpy import Client
+import botpy
 
-Client(
+botpy.Client(
     ...
     log_level=20,
     log_format="new format",
@@ -178,8 +178,8 @@ python3 demo_at_reply.py -d
 
 是否启用`botpy`日志
 
-None -> 禁用 拓展  
-False -> 禁用 拓展+控制台输出
+`None` -> 禁用 拓展  
+`False` -> 禁用 拓展+控制台输出
 
 ### ext_handlers
 
