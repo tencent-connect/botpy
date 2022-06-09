@@ -26,8 +26,8 @@ DEFAULT_FILE_HANDLER = {
     "handler": TimedRotatingFileHandler,
     # 可选 Default to DEFAULT_FILE_FORMAT
     "format": "%(asctime)s\t[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t%(message)s",
-    # 可选 Default to INFO
-    "level": logging.INFO,
+    # 可选 Default to DEBUG
+    "level": logging.DEBUG,
     # 可选，其中如有 %(name)s 会在实例化阶段填入相应的日志name
     "filename": os.path.join(os.getcwd(), "%(name)s.log"),
     # 以下是Handler相关参数
