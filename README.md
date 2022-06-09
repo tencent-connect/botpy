@@ -151,7 +151,7 @@ botpy.Client(
 
 ### log_level
 
-修改日志级别，默认为`INFO`
+日志级别，默认为`INFO`
 
 命令行启动py可增加参数`-d` 或 `--debug`快捷打开debug日志
 
