@@ -49,9 +49,9 @@ class ConnectionSession:
         tasks = []
 
         while len(session_list) > 0:
-            _log.debug("session list circle run")
+            _log.debug("[botpy] 会话列表循环运行")
             time_interval = session_interval * (index + 1)
-            _log.info("[botpy]最大并发连接数: %s, 启动会话数: %s" % (self._max_async, len(session_list)))
+            _log.info("[botpy] 最大并发连接数: %s, 启动会话数: %s" % (self._max_async, len(session_list)))
             for i in range(self._max_async):
                 if len(session_list) == 0:
                     break
