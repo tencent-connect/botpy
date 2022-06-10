@@ -118,7 +118,7 @@ class BotHttp:
         }
 
         # you can directly pass headers into Session, but no need to pass it for every request
-        self._session = aiohttp.ClientSession(headers=self._headers)
+        self._session = aiohttp.ClientSession(headers=self._headers, timeout=self.timeout)
         self._global_over = asyncio.Event()
         self._global_over.set()
 
