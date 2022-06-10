@@ -184,7 +184,7 @@ python3 demo_at_reply.py -d
 
 日志Handler拓展，为True使用默认拓展，False不添加拓展，可用list添加多个拓展
 
-[默认拓展](botpy/logging.py)
+[默认拓展](./botpy/logging.py)
 
 ```python
 DEFAULT_FILE_HANDLER={
