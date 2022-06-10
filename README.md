@@ -138,10 +138,11 @@ SDK的日志设置集成在`bot.Client`的实例化阶段，也可通过[`loggin
 ```python
 import botpy
 
+# 示例，非默认值
 botpy.Client(
-    log_level=20,
+    log_level=10,
     log_format="new format",
-    bot_log=True,
+    bot_log=None,
     ext_handlers=False,
     log_config="log_config.json"
 )
@@ -171,39 +172,40 @@ python3 demo_at_reply.py -d
 
 ### log_format
 
-日志控制台输出格式
+日志控制台输出格式，默认为 `"\033[1;33m[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t\033[0m%(message)s"`
 
 ### bot_log
 
-是否启用`botpy`日志
+是否启用`botpy`日志，默认为`True`
 
+`True` 启用  
 `None` 禁用 拓展  
 `False` 禁用 拓展+控制台输出
 
 ### ext_handlers
 
-日志Handler拓展，为True使用默认拓展，False不添加拓展，可用list添加多个拓展
+日志Handler拓展，为`True`使用默认拓展，`False`不添加拓展，可用list添加多个拓展。默认为`True`
 
-[默认拓展](botpy/logging.py)
+[默认拓展](./botpy/logging.py)
 
 ```python
 import os
 import logging
 from logging.handlers import TimedRotatingFileHandler
 
-DEFAULT_FILE_HANDLER={
+DEFAULT_FILE_HANDLER = {
     # 要实例化的Handler
     "handler": TimedRotatingFileHandler,
     # 可选 Default to DEFAULT_FILE_FORMAT
     "format": "%(asctime)s\t[%(levelname)s]\t(%(filename)s:%(lineno)s)%(funcName)s\t%(message)s",
     # 可选 Default to DEBUG
     "level": logging.DEBUG,
-    # 可选，其中如有 %(name)s 会在实例化阶段填入相应的日志name
-    "filename": os.path.join(os.getcwd(), "%(name)s.log"),
     # 以下是Handler相关参数
     "when": "D",
     "backupCount": 7,
-    "encoding": "utf-8"
+    "encoding": "utf-8",
+    # *特殊* 对于filename参数，其中如有 %(name)s 会在实例化阶段填入相应的日志name
+    "filename": os.path.join(os.getcwd(), "%(name)s.log"),
 }
 ```
 
@@ -224,7 +226,7 @@ botpy.Client(ext_handlers=DEFAULT_FILE_HANDLER)
 
 ### log_config
 
-该参数将传入`logging.config.dictConfig`(内置logging而非botpy.logging)，如果为.json/.yaml文件路径将从文件中读取配置
+该参数将传入`logging.config.dictConfig`(内置logging而非botpy.logging)，如果为.json/.yaml文件路径将从文件中读取配置，无默认值
 
 # 参与开发
 
