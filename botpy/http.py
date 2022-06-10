@@ -5,7 +5,7 @@ from typing import Any, Optional, ClassVar, Union, Dict
 from urllib.parse import quote
 
 import aiohttp
-from aiohttp import ClientResponse, FormData
+from aiohttp import ClientResponse, FormData, ClientTimeout
 
 from . import logging
 from .errors import HttpErrorDict, ServerError
@@ -118,7 +118,7 @@ class BotHttp:
         }
 
         # you can directly pass headers into Session, but no need to pass it for every request
-        self._session = aiohttp.ClientSession(headers=self._headers, timeout=self.timeout)
+        self._session = aiohttp.ClientSession(headers=self._headers, timeout=ClientTimeout(self.timeout))
         self._global_over = asyncio.Event()
         self._global_over.set()
 
