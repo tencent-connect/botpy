@@ -187,6 +187,10 @@ python3 demo_at_reply.py -d
 [默认拓展](botpy/logging.py)
 
 ```python
+import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
 DEFAULT_FILE_HANDLER={
     # 要实例化的Handler
     "handler": TimedRotatingFileHandler,

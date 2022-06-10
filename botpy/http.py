@@ -23,12 +23,12 @@ HTTP_OK_STATUS = [200, 202, 204]
 async def _handle_response(url, response: ClientResponse) -> Union[Dict[str, Any], str]:
     data = await _json_or_text(response)
     if response.status in HTTP_OK_STATUS:
-        _log.debug(f"[botpy]请求成功, 请求连接: {url}, 返回内容: {data}")
+        _log.debug(f"[botpy] 请求成功, 请求连接: {url}, 返回内容: {data}")
         return data
     else:
         _log.error(
-            f"[botpy]接口请求异常，请求连接: {url},"
-            f" error code: {response.status}, 返回内容: {data}, trace_id:{response.headers.get(X_TPS_TRACE_ID)}"
+            f"[botpy] 接口请求异常，请求连接: {url}, "
+            f"错误代码: {response.status}, 返回内容: {data}, trace_id:{response.headers.get(X_TPS_TRACE_ID)}"
             # trace_id 用于定位接口问题
         )
         error_dict_get = HttpErrorDict.get(response.status)
@@ -112,7 +112,7 @@ class BotHttp:
 
         kwargs["headers"] = headers
         route.is_sandbox = self.is_sandbox
-        _log.debug(f"[botpy] request headers: {headers}, method: {route.method}, api_url: {route.url}")
+        _log.debug(f"[botpy] 请求头部: {headers}, 请求方式: {route.method}, 请求url: {route.url}")
 
         async with self._session.request(method=route.method, url=route.url, **kwargs) as response:
             return await _handle_response(route.url, response)
