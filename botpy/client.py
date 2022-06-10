@@ -47,7 +47,7 @@ class Client:
           log_config: 日志配置，可以为dict或.json/.yaml文件路径，会从文件中读取(logging.config.dictConfig)。Default to None（不做更改）
           log_format: 控制台输出格式(logging.basicConfig(format=))。Default to None（不做更改）
           log_level: 控制台输出level。Default to None(不做更改),
-          bot_log: bot_log: 是否启用bot日志 True/启用 None/禁用拓展 False/禁用拓展+控制台输出
+          bot_log: bot_log: bot_log: 是否启用bot日志 True/启用 None/禁用拓展 False/禁用拓展+控制台输出
           ext_handlers: ext_handlers: 额外的handler，格式参考 logging.DEFAULT_FILE_HANDLER。Default to True(使用默认追加handler)
         """
         self.intents: int = intents.value
@@ -71,7 +71,7 @@ class Client:
         )
 
     async def __aenter__(self):
-        _log.debug("bot client is __aenter__")
+        _log.debug("[botpy] 机器人客户端: __aenter__")
         await self._async_setup_hook()
         return self
 
@@ -81,7 +81,7 @@ class Client:
             exc_value: Optional[BaseException],
             traceback: Optional[TracebackType],
     ) -> None:
-        _log.debug("bot client is __aexit__")
+        _log.debug("[botpy] 机器人客户端: __aexit__")
 
         if not self.is_closed():
             await self.close()
@@ -157,7 +157,7 @@ class Client:
         return await self._bot_init(token)
 
     async def _bot_login(self, token: Token) -> None:
-        _log.info("[botpy]登录机器人账号中...")
+        _log.info("[botpy] 登录机器人账号中...")
 
         user = await self.http.login(token)
 
@@ -176,17 +176,17 @@ class Client:
         self._connection.state.robot = Robot(user)
 
     async def _bot_init(self, token):
-        _log.info("[botpy]程序启动...")
+        _log.info("[botpy] 程序启动...")
         # 每个机器人创建的连接数不能超过remaining剩余连接数
         if self._ws_ap["shards"] > self._ws_ap["session_start_limit"]["remaining"]:
-            raise Exception("session limit exceeded")
+            raise Exception("[botpy] 超出会话限制...")
 
         # 根据session限制建立链接
         concurrency = self._ws_ap["session_start_limit"]["max_concurrency"]
         session_interval = round(5 / concurrency)
 
         # 根据限制建立分片的并发链接数
-        _log.debug(f'session_interval: {session_interval}, shards: {self._ws_ap["shards"]}, intents: {self.intents}')
+        _log.debug(f'[botpy] 会话间隔: {session_interval}, 分片: {self._ws_ap["shards"]}, 事件代码: {self.intents}')
         return await self._pool_init(token.bot_token(), session_interval)
 
     async def _pool_init(self, token, session_interval):
@@ -213,7 +213,7 @@ class Client:
         loop.set_exception_handler(_loop_exception_handler)
 
         while not self._closed:
-            _log.debug("session loop check")
+            _log.debug("[botpy] 会话循环检查...")
             try:
                 # 返回协程对象，交由开发者自行调控
                 coroutine = self._connection.run(session_interval)
@@ -222,7 +222,7 @@ class Client:
                 else:
                     await coroutine
             except KeyboardInterrupt:
-                _log.info("[botpy]服务强行停止!")
+                _log.info("[botpy] 服务强行停止!")
                 # cancel all tasks lingering
 
     async def bot_connect(self, session):
@@ -234,7 +234,7 @@ class Client:
 
         param session: session对象
         """
-        _log.info("[botpy]会话启动中...")
+        _log.info("[botpy] 会话启动中...")
 
         client = BotWebSocket(session, self._connection)
         try:
@@ -247,7 +247,7 @@ class Client:
 
         解析client类的on_event事件，进行对应的事件回调
         """
-        _log.debug("dispatching event %s", event)
+        _log.info("[botpy] 调度事件: %s", event)
         method = "on_" + event
 
         try:
