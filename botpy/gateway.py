@@ -5,7 +5,8 @@ import traceback
 from typing import Optional
 
 import aiohttp
-from aiohttp import WSMessage, ClientWebSocketResponse
+from aiohttp import WSMessage, ClientWebSocketResponse, TCPConnector
+from ssl import SSLContext
 
 from . import logging
 from .connection import ConnectionSession
@@ -113,7 +114,8 @@ class BotWebSocket:
         if ws_url == "":
             raise Exception("[botpy] 会话url为空")
 
-        async with aiohttp.ClientSession() as session:
+        # adding SSLContext-containing connector to prevent SSL certificate verify failed error
+        async with aiohttp.ClientSession(connector=TCPConnector(limit=10, ssl=SSLContext())) as session:
             async with session.ws_connect(self._session["url"]) as ws_conn:
                 while True:
                     msg: WSMessage
