@@ -2,12 +2,14 @@ import asyncio
 import inspect
 from typing import List, Callable, Dict, Any, Optional
 
-from .api import BotAPI
 from .channel import Channel
 from .guild import Guild
 from .interaction import Interaction
-from . import logging
 from .message import Message, MessageAudit
+from .user import Member
+
+from . import logging
+from .api import BotAPI
 from .robot import Robot
 from .types import gateway, channel, guild, user, session, reaction, interaction, forum
 
@@ -111,22 +113,25 @@ class ConnectionState:
 
     # botpy.flags.Intents.guild_members
     def parse_guild_member_add(self, ctx: gateway.WsContext, data: user.GuildMemberPayload):
-        self._dispatch("guild_member_add", data)
+        _member = Member(self.api, ctx, data)
+        self._dispatch("guild_member_add", _member)
 
     def parse_guild_member_update(self, ctx: gateway.WsContext, data: user.GuildMemberPayload):
-        self._dispatch("guild_member_update", data)
+        _member = Member(self.api, ctx, data)
+        self._dispatch("guild_member_update", _member)
 
     def parse_guild_member_remove(self, ctx: gateway.WsContext, data: user.GuildMemberPayload):
-        self._dispatch("guild_member_remove", data)
+        _member = Member(self.api, ctx, data)
+        self._dispatch("guild_member_remove", _member)
 
     # botpy.flags.Intents.guild_messages
     def parse_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
-        self._dispatch("message_create", message)
+        _message = Message(self.api, ctx, data)
+        self._dispatch("message_create", _message)
 
     def parse_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
-        self._dispatch("message_delete", message)
+        _message = Message(self.api, ctx, data)
+        self._dispatch("message_delete", _message)
 
     # botpy.flags.Intents.guild_message_reactions
     def parse_message_reaction_add(self, ctx: gateway.WsContext, data: reaction.Reaction):
@@ -137,12 +142,12 @@ class ConnectionState:
 
     # botpy.flags.Intents.direct_message
     def parse_direct_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
-        self._dispatch("direct_message_create", message)
+        _message = Message(self.api, ctx, data)
+        self._dispatch("direct_message_create", _message)
 
     def parse_direct_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
-        self._dispatch("direct_message_delete", message)
+        _message = Message(self.api, ctx, data)
+        self._dispatch("direct_message_delete", _message)
 
     # botpy.flags.Intents.interaction
     def parse_interaction_create(self, ctx: gateway.WsContext, data: interaction.InteractionPayload):
@@ -151,12 +156,12 @@ class ConnectionState:
 
     # botpy.flags.Intents.message_audit
     def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        message_audit = MessageAudit(self.api, data)
-        self._dispatch("message_audit_pass", message_audit)
+        _message_audit = MessageAudit(self.api, ctx, data)
+        self._dispatch("message_audit_pass", _message_audit)
 
     def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        message_audit = MessageAudit(self.api, data)
-        self._dispatch("message_audit_reject", message_audit)
+        _message_audit = MessageAudit(self.api, ctx, data)
+        self._dispatch("message_audit_reject", _message_audit)
 
     # botpy.flags.Intents.audio_action
     def parse_audio_start(self, ctx: gateway.WsContext, data):
@@ -173,8 +178,8 @@ class ConnectionState:
 
     # botpy.flags.Intents.public_guild_messages
     def parse_at_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        message = Message(self.api, data)
-        self._dispatch("at_message_create", message)
+        _message = Message(self.api, ctx, data)
+        self._dispatch("at_message_create", _message)
 
     def parse_ready(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
         self._dispatch("ready")
