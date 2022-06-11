@@ -5,7 +5,8 @@ from typing import Any, Optional, ClassVar, Union, Dict
 from urllib.parse import quote
 
 import aiohttp
-from aiohttp import ClientResponse, FormData, ClientTimeout
+from aiohttp import ClientResponse, FormData, ClientTimeout, TCPConnector
+from ssl import SSLContext
 
 from . import logging
 from .errors import HttpErrorDict, ServerError
@@ -118,7 +119,9 @@ class BotHttp:
         }
 
         # you can directly pass headers into Session, but no need to pass it for every request
-        self._session = aiohttp.ClientSession(headers=self._headers, timeout=ClientTimeout(self.timeout))
+        # adding SSLContext-containing connector to prevent SSL certificate verify failed error
+        self._session = aiohttp.ClientSession(headers=self._headers, timeout=ClientTimeout(self.timeout),
+                                              connector=TCPConnector(limit=500, ssl=SSLContext()))
         self._global_over = asyncio.Event()
         self._global_over.set()
 
