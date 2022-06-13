@@ -210,11 +210,10 @@ class APITestCase(unittest.TestCase):
         result = self.loop.run_until_complete(self.api.get_reaction_users(CHANNEL_ID, MESSAGE_ID, 1, "4"))
         self.assertEqual(result["is_end"], True)
 
-    def test_put_pin(self):
+    def test_put_and_delete_pin(self):
         result = self.loop.run_until_complete(self.api.put_pin(CHANNEL_ID, MESSAGE_ID))
         self.assertIsNotNone(result)
 
-    def test_delete_pin(self):
         result = self.loop.run_until_complete(self.api.delete_pin(CHANNEL_ID, MESSAGE_ID))
         self.assertEqual(None, result)
 
