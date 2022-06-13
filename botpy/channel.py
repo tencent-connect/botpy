@@ -5,7 +5,6 @@ from .types import channel, gateway
 class Channel:
     __slots__ = (
         "_api",
-        "_ctx",
         "guild_id",
         "id",
         "name",
@@ -17,12 +16,11 @@ class Channel:
         "speak_permission",
         "application_id",
         "permissions",
-        "event_id"
+        "event_id",
     )
 
     def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: channel.ChannelPayload):
         self._api = api
-        # self._ctx = ctx
 
         self.id = data.get("id")
         self.name = data.get("name")
