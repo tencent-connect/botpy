@@ -28,15 +28,15 @@ class Client:
     """``Client` 是一个用于与 QQ频道机器人 Websocket 和 API 交互的类。"""
 
     def __init__(
-            self,
-            intents: Intents,
-            timeout: int = 5,
-            is_sandbox=False,
-            log_config: Union[str, dict] = None,
-            log_format: str = None,
-            log_level: int = None,
-            bot_log: Union[bool, None] = True,
-            ext_handlers: Union[dict, List[dict], bool] = True
+        self,
+        intents: Intents,
+        timeout: int = 5,
+        is_sandbox=False,
+        log_config: Union[str, dict] = None,
+        log_format: str = None,
+        log_level: int = None,
+        bot_log: Union[bool, None] = True,
+        ext_handlers: Union[dict, List[dict], bool] = True,
     ):
         """
         Args:
@@ -63,11 +63,7 @@ class Client:
         self._ws_ap: Dict = {}
 
         logging.configure_logging(
-            config=log_config,
-            _format=log_format,
-            level=log_level,
-            bot_log=bot_log,
-            ext_handlers=ext_handlers
+            config=log_config, _format=log_format, level=log_level, bot_log=bot_log, ext_handlers=ext_handlers
         )
 
     async def __aenter__(self):
@@ -76,10 +72,10 @@ class Client:
         return self
 
     async def __aexit__(
-            self,
-            exc_type: Optional[Type[BaseException]],
-            exc_value: Optional[BaseException],
-            traceback: Optional[TracebackType],
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> None:
         _log.debug("[botpy] 机器人客户端: __aexit__")
 
@@ -168,7 +164,7 @@ class Client:
         self._connection = ConnectionSession(
             max_async=self._ws_ap["session_start_limit"]["max_concurrency"],
             connect=self.bot_connect,
-            dispatch=self.dispatch,
+            dispatch=self.ws_dispatch,
             loop=self.loop,
             api=self.api,
         )
@@ -216,7 +212,7 @@ class Client:
             _log.debug("[botpy] 会话循环检查...")
             try:
                 # 返回协程对象，交由开发者自行调控
-                coroutine = self._connection.run(session_interval)
+                coroutine = self._connection.multi_run(session_interval)
                 if self.ret_coro:
                     return coroutine
                 else:
@@ -242,7 +238,7 @@ class Client:
         except (Exception, KeyboardInterrupt, SystemExit) as e:
             await client.on_error(e)
 
-    def dispatch(self, event: str, *args: Any, **kwargs: Any) -> None:
+    def ws_dispatch(self, event: str, *args: Any, **kwargs: Any) -> None:
         """分发ws的下行事件
 
         解析client类的on_event事件，进行对应的事件回调
@@ -258,22 +254,22 @@ class Client:
             self._schedule_event(coro, method, *args, **kwargs)
 
     def _schedule_event(
-            self,
-            coro: Callable[..., Coroutine[Any, Any, Any]],
-            event_name: str,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        coro: Callable[..., Coroutine[Any, Any, Any]],
+        event_name: str,
+        *args: Any,
+        **kwargs: Any,
     ) -> asyncio.Task:
         wrapped = self._run_event(coro, event_name, *args, **kwargs)
         # Schedules the task
         return self.loop.create_task(wrapped, name=f"botpy: {event_name}")
 
     async def _run_event(
-            self,
-            coro: Callable[..., Coroutine[Any, Any, Any]],
-            event_name: str,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        coro: Callable[..., Coroutine[Any, Any, Any]],
+        event_name: str,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         try:
             await coro(*args, **kwargs)

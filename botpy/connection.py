@@ -41,7 +41,7 @@ class ConnectionSession:
         # session链接同时最大并发数
         self._session_list: List[session.Session] = []
 
-    async def run(self, session_interval=5):
+    async def multi_run(self, session_interval=5):
         if len(self._session_list) == 0:
             return
         # 根据并发数同时建立多个future
