@@ -5,7 +5,7 @@
 botpy
 =====
 
-**botpy** 是基于\ `机器人开放平台API <https://bot.q.qq.com/wiki/develop/api/>`_ 实现的机器人框架，目的提供一个易使用、开发效率高地开发框架。
+**botpy** 是基于\ `机器人开放平台API <https://bot.q.qq.com/wiki/develop/api/>`_ 实现的机器人框架，目的提供一个易使用、开发效率高的开发框架。
 
 
 .. image:: https://img.shields.io/pypi/v/qq-botpy

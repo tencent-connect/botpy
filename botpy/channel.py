@@ -17,22 +17,21 @@ class Channel:
         "speak_permission",
         "application_id",
         "permissions",
+        "event_id"
     )
 
     def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: channel.ChannelPayload):
         self._api = api
-        self._ctx = ctx
+        # self._ctx = ctx
 
         self.id = data.get("id")
-        self.name = data.get("name", "default_channel")
+        self.name = data.get("name")
         self.type = data.get("type")
         self.sub_type = data.get("sub_type")
         self.position = data.get("position")
         self.owner_id = data.get("owner_id")
         self.private_type = data.get("private_type")
         self.speak_permission = data.get("speak_permission")
-        self.application_id = data.get("application_id", "")
+        self.application_id = data.get("application_id")
         self.permissions = data.get("permissions")
-
-    async def reply(self, content: str, **kwargs):
-        await self._api.post_message(content=content, channel_id=self.id, msg_id=self._ctx["id"], **kwargs)
+        self.event_id = ctx.get("id")
