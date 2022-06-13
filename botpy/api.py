@@ -136,7 +136,7 @@ class BotAPI:
           role_id (str): 身份组 ID。
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         route = Route("DELETE", "/guilds/{guild_id}/roles/{role_id}", guild_id=guild_id, role_id=role_id)
         return await self._http.request(route)
@@ -158,7 +158,7 @@ class BotAPI:
           channel_id (str): 您要在其中创建角色的频道的 ID。如果要删除的身份组ID是5-子频道管理员，需要增加channel对象来指定具体是哪个子频道
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {}
         if channel_id:
@@ -185,7 +185,7 @@ class BotAPI:
             如果要删除的身份组ID是5-子频道管理员，需要增加channel对象来指定具体是哪个子频道
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {}
         if channel_id:
@@ -394,7 +394,7 @@ class BotAPI:
           remove (Permission): 删除的权限类型，示例：`remove = Permission(view_permission=True,manager_permission=True)`
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {}
         if add is not None:
@@ -436,7 +436,7 @@ class BotAPI:
           remove (Permission):  删除的权限类型，示例：删除可读和发言权限, `remove = Permission(view_permission=True,speak_permission=True)`
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {}
         if add is not None:
@@ -531,7 +531,7 @@ class BotAPI:
           hide_tip (bool): 是否隐藏撤回提示小灰条。. Defaults to False
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         params = {"hide_tip": "true" if hide_tip else "false"}
 
@@ -668,7 +668,7 @@ class BotAPI:
           channel_id: 子频道 ID。
 
         Returns:
-          返回值是一个字符串。成功执行返回空字符串
+          成功执行返回`None`。成功执行返回空字符串
         """
         route = Route("PUT", "/channels/{channel_id}/mic", channel_id=channel_id)
         return await self._http.request(route)
@@ -684,7 +684,7 @@ class BotAPI:
           channel_id: 子频道 ID。
 
         Returns:
-          返回值是一个字符串。成功执行返回空字符串
+          成功执行返回`None`。成功执行返回空字符串
         """
         route = Route("DELETE", "/channels/{channel_id}/mic", channel_id=channel_id)
         return await self._http.request(route)
@@ -746,7 +746,7 @@ class BotAPI:
           mute_seconds (str): 禁言的秒数。两个字段二选一，默认以 mute_end_timestamp 为准
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
@@ -760,7 +760,7 @@ class BotAPI:
           guild_id (str): 要取消禁言的频道 ID。
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {
             "mute_end_timestamp": "0",
@@ -785,7 +785,7 @@ class BotAPI:
           mute_seconds (str): 禁言的秒数。两个字段二选一，默认以 mute_end_timestamp 为准
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
         route = Route("PATCH", "/guilds/{guild_id}/members/{user_id}/mute", guild_id=guild_id, user_id=user_id)
@@ -804,7 +804,7 @@ class BotAPI:
           mute_seconds (str): 将用户禁言的秒数。两个字段二选一，默认以 mute_end_timestamp 为准
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
         payload.update({"user_ids": user_ids})
@@ -820,7 +820,7 @@ class BotAPI:
           user_ids (List[str]): 您要禁言的用户 ID 列表。
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         payload = {"mute_end_timestamp": "0", "mute_seconds": "0", "user_ids": user_ids}
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
@@ -883,7 +883,7 @@ class BotAPI:
           message_id (str): 要删除的公告消息的 ID。
 
         Returns:
-          返回值是一个字符串。
+          成功执行返回`None`。
         """
         route = Route("DELETE", "/guilds/{guild_id}/announces/{message_id}", guild_id=guild_id, message_id=message_id)
         return await self._http.request(route)
