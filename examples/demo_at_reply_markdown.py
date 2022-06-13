@@ -1,56 +1,50 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import asyncio
 import os.path
 
-import qqbot
-from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.message import MessageMarkdown, MessageMarkdownParams
-from qqbot.model.ws_context import WsContext
+import botpy
+from botpy import logging
+from botpy.message import Message
+from botpy.types.message import MarkdownPayload, MessageMarkdownParams
+from botpy.ext.yaml_util import YamlUtil
+
+_log = logging.get_logger()
+
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
-async def _message_handler(context: WsContext, message: qqbot.Message):
-    """
-    定义事件回调的处理
+class MyClient(botpy.Client):
+    async def on_ready(self):
+        _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
-    :param context: WsContext 对象，包含 event_type 和 event_id
-    :param message: 事件对象（如监听消息是Message对象）
-    """
-    await handle_send_markdown_by_template(message.channel_id, message.id)
+    async def handle_send_markdown_by_template(self, channel_id, msg_id):
+        params = [
+            MessageMarkdownParams(key="title", values=["标题"]),
+            MessageMarkdownParams(key="content", values=["为了成为一名合格的巫师，请务必阅读频道公告", "藏馆黑色魔法书"]),
+        ]
+        markdown = MarkdownPayload(template_id=65, params=params)
 
-    await handle_send_markdown_by_content(message.channel_id, message.id)
+        # 通过api发送回复消息
+        await self.api.post_message(channel_id, markdown=markdown, msg_id=msg_id)
 
+    async def handle_send_markdown_by_content(self, channel_id, msg_id):
+        markdown = MarkdownPayload(content="# 标题 \n## 简介很开心 \n内容")
+        # 通过api发送回复消息
+        await self.api.post_message(channel_id, markdown=markdown, msg_id=msg_id)
 
-async def handle_send_markdown_by_template(channel_id, msg_id):
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
-
-    markdown = MessageMarkdown()
-    markdown.template_id = 65
-    markdown.params = [
-        MessageMarkdownParams(key="title", values=["标题"]),
-        MessageMarkdownParams(key="content", values=["为了成为一名合格的巫师，请务必阅读频道公告", "藏馆黑色魔法书"]),
-    ]
-
-    send = qqbot.MessageSendRequest(content="", markdown=markdown, msg_id=msg_id)
-    # 通过api发送回复消息
-    await msg_api.post_message(channel_id, send)
-
-
-async def handle_send_markdown_by_content(channel_id, msg_id):
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
-
-    markdown = MessageMarkdown()
-    markdown.content = "# 标题 \n## 简介很开心 \n内容"
-
-    send = qqbot.MessageSendRequest(content="", markdown=markdown, msg_id=msg_id)
-    # 通过api发送回复消息
-    await msg_api.post_message(channel_id, send)
+    async def on_at_message_create(self, message: Message):
+        await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
+        await self.handle_send_markdown_by_template(message.channel_id, message.id)
+        await self.handle_send_markdown_by_content(message.channel_id, message.id)
 
 
 if __name__ == "__main__":
-    # async的异步接口的使用示例
-    t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
-    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler)
-    qqbot.async_listen_events(t_token, False, qqbot_handler)
+    # 通过预设置的类型，设置需要监听的事件通道
+    # intents = botpy.Intents.none()
+    # intents.public_guild_messages=True
+
+    # 通过kwargs，设置需要监听的事件通道
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=test_config["appid"], token=test_config["token"])

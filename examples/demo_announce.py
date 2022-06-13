@@ -1,54 +1,42 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import os.path
+import os
 
-import qqbot
-from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.announce import (
-    RecommendChannel,
-    CreateAnnounceRequest,
-    RecommendChannelRequest,
-    CreateChannelAnnounceRequest,
-)
-from qqbot.model.ws_context import WsContext
+import botpy
+from botpy import logging
+from botpy.message import Message
+from botpy.types.announce import AnnouncesType
+from botpy.ext.yaml_util import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
+_log = logging.get_logger()
 
-async def _announce_handler(context: WsContext, message: qqbot.Message):
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
-    announce_api = qqbot.AsyncAnnouncesAPI(t_token, False)
 
-    qqbot.logger.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
+class MyClient(botpy.Client):
+    async def on_at_message_create(self, message: Message):
+        _log.info(f"{self.robot.name}receive message {message.content}")
 
-    # 先发送消息告知用户
-    message_to_send = qqbot.MessageSendRequest("command received: %s" % message.content)
-    await msg_api.post_message(message.channel_id, message_to_send)
+        # 先发送消息告知用户
+        await self.api.post_message(message.channel_id, content="command received: %s" % message.content)
 
-    # 输入/xxx后的处理
-    message_id = "088de19cbeb883e7e97110a2e39c0138d401"
-    if "/建公告" in message.content:
-        create_announce_request = CreateAnnounceRequest(message.channel_id, message_id)
-        await announce_api.create_announce(message.guild_id, create_announce_request)
+        # 输入/xxx后的处理
+        message_id = "088de19cbeb883e7e97110a2e39c0138d401"
+        if "/建公告" in message.content:
+            await self.api.create_announce(message.guild_id, message.channel_id, message_id)
 
-    elif "/删公告" in message.content:
-        await announce_api.delete_announce(message.guild_id, message_id)
+        elif "/删公告" in message.content:
+            await self.api.delete_announce(message.guild_id, message_id)
 
-    elif "/建子频道公告" in message.content:
-        create_channel_announce_request = CreateChannelAnnounceRequest(message_id)
-        await announce_api.create_channel_announce(message.channel_id, create_channel_announce_request)
-
-    elif "/删子频道公告" in message.content:
-        await announce_api.delete_channel_announce(message.channel_id, message_id)
-
-    elif "/设置推荐子频道" in message.content:
-        channel_list = [RecommendChannel(message.channel_id, "introduce")]
-        request = RecommendChannelRequest(0, channel_list)
-        await announce_api.post_recommended_channels(message.guild_id, request)
+        elif "/设置推荐子频道" in message.content:
+            channel_list = [{"channel_id": message.channel_id, "introduce": "introduce"}]
+            await self.api.create_recommend_announce(message.guild_id, AnnouncesType.MEMBER, channel_list)
 
 
 if __name__ == "__main__":
-    t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
-    # 注册机器人被@后的事件
-    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _announce_handler)
-    qqbot.async_listen_events(t_token, False, qqbot_handler)
+    # 通过预设置的类型，设置需要监听的事件通道
+    # intents = botpy.Intents.none()
+    # intents.public_guild_messages=True
+
+    # 通过kwargs，设置需要监听的事件通道
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=test_config["appid"], token=test_config["token"])

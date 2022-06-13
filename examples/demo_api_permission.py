@@ -2,41 +2,47 @@
 # -*- coding: utf-8 -*-
 import os.path
 
-import qqbot
-from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.api_permission import (
-    APIPermissionDemandIdentify,
-    PermissionDemandToCreate,
-)
-from qqbot.model.ws_context import WsContext
+import botpy
+from botpy import logging
+from botpy.message import Message
+from botpy.ext.yaml_util import YamlUtil
+from botpy.types.permission import APIPermissionDemandIdentify
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
+_log = logging.get_logger()
 
-async def _api_permission_handler(context: WsContext, message: qqbot.Message):
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
-    api_permission_api = qqbot.AsyncAPIPermissionAPI(t_token, False)
 
-    qqbot.logger.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
+class MyClient(botpy.Client):
+    async def on_ready(self):
+        _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
-    # 先发送消息告知用户
-    message_to_send = qqbot.MessageSendRequest("command received: %s" % message.content)
-    await msg_api.post_message(message.channel_id, message_to_send)
 
-    # 输入/xxx后的处理
-    if "/权限列表" in message.content:
-        apis = await api_permission_api.get_permissions(message.guild_id)
-        for api in apis:
-            qqbot.logger.info("api: %s" % api.desc + ", status: %d" % api.auth_status)
+    async def on_at_message_create(self, message: Message):
+        # 先发送消息告知用户
+        await message.reply(content=f"机器人{self.robot.name}创建日程{message.content}")
 
-    if "/请求权限" in message.content:
-        demand_identity = APIPermissionDemandIdentify("/guilds/{guild_id}/members/{user_id}", "GET")
-        permission_demand_to_create = PermissionDemandToCreate(message.channel_id, demand_identity)
-        demand = await api_permission_api.post_permission_demand(message.guild_id, permission_demand_to_create)
-        qqbot.logger.info("api title: %s" % demand.title + ", desc: %s" % demand.desc)
-
+        # 输入/xxx后的处理
+        if "/权限列表" in message.content:
+            apis = await self.api.get_permissions(message.guild_id)
+            for api in apis:
+                _log.info("api: %s" % api["desc"] + ", status: %d" % api["auth_status"])
+        if "/请求权限" in message.content:
+            demand_identity = APIPermissionDemandIdentify(path="/guilds/{guild_id}/members/{user_id}", method="GET")
+            demand = await self.api.post_permission_demand(
+                message.guild_id,
+                message.channel_id,
+                demand_identity,
+                '获取当前频道成员信息'
+            )
+            _log.info("api title: %s" % demand["title"] + ", desc: %s" % demand["desc"])
 
 if __name__ == "__main__":
-    t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
-    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _api_permission_handler)
-    qqbot.async_listen_events(t_token, False, qqbot_handler)
+    # 通过预设置的类型，设置需要监听的事件通道
+    # intents = botpy.Intents.none()
+    # intents.public_guild_messages=True
+
+    # 通过kwargs，设置需要监听的事件通道
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=test_config["appid"], token=test_config["token"])

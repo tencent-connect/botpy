@@ -1,35 +1,29 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import asyncio
-import os.path
+import os
 
-import qqbot
-from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.ws_context import WsContext
+import botpy
+from botpy import logging
+from botpy.message import Message
+from botpy.ext.yaml_util import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
+_log = logging.get_logger()
 
-async def _message_handler(context: WsContext, message: qqbot.Message):
-    """
-    定义事件回调的处理
 
-    :param context: WsContext 对象，包含 event_type 和 event_id
-    :param message: 事件对象（如监听消息是Message对象）
-    """
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
-    # 打印返回信息
-    qqbot.logger.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
-    for i in range(5):
-        await asyncio.sleep(5)
-        # 构造消息发送请求数据对象
-        send = qqbot.MessageSendRequest("<@%s>谢谢你，加油 " % message.author.id, message.id)
-        # 通过api发送回复消息
-        await msg_api.post_message(message.channel_id, send)
+class MyClient(botpy.Client):
+    async def on_ready(self):
+        _log.info(f"robot 「{self.robot.name}」 on_ready!")
+
+    async def on_at_message_create(self, message: Message):
+        await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
 
 
 if __name__ == "__main__":
-    # async的异步接口的使用示例
-    t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
-    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _message_handler)
-    qqbot.async_listen_events(t_token, False, qqbot_handler)
+    # 通过预设置的类型，设置需要监听的事件通道
+    # intents = botpy.Intents.none()
+    # intents.public_guild_messages=True
+
+    # 通过kwargs，设置需要监听的事件通道
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=test_config["appid"], token=test_config["token"])

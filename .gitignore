@@ -137,10 +137,10 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# qqbot
+# botpy
 config.y*ml
 tests/.test.yaml
-qqbot.log.*
+botpy.log.*
 temp/
 
 # idea config

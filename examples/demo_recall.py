@@ -2,25 +2,32 @@
 # -*- coding: utf-8 -*-
 import os.path
 
-import qqbot
-from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.ws_context import WsContext
+import botpy
+from botpy import logging
+from botpy.message import Message
+from botpy.ext.yaml_util import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
-async def _recall_handler(context: WsContext, message: qqbot.Message):
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
-    # 打印返回信息
-    qqbot.logger.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
-    send = qqbot.MessageSendRequest("async recall")
-    # 通过api发送回复消息
-    await msg_api.post_message(message.channel_id, send)
-    await msg_api.recall_message(message.channel_id, message.id)
+_log = logging.get_logger()
+
+
+class MyClient(botpy.Client):
+    async def on_ready(self):
+        _log.info(f"robot 「{self.robot.name}」 on_ready!")
+
+    async def on_at_message_create(self, message: Message):
+        _message = await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
+        await self.api.recall_message(message.channel_id, _message.get("id"))
 
 
 if __name__ == "__main__":
-    # async的异步接口的使用示例
-    t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
-    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _recall_handler)
-    qqbot.async_listen_events(t_token, False, qqbot_handler)
+    # 通过预设置的类型，设置需要监听的事件通道
+    # intents = botpy.Intents.none()
+    # intents.public_guild_messages=True
+
+    # 通过kwargs，设置需要监听的事件通道
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=test_config["appid"], token=test_config["token"])

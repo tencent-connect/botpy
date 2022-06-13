@@ -3,64 +3,67 @@
 import os.path
 import time
 
-import qqbot
-from qqbot.core.util.yaml_util import YamlUtil
-from qqbot.model.ws_context import WsContext
+import botpy
+from botpy import logging
+from botpy.message import Message
+from botpy.ext.yaml_util import YamlUtil
 
 test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+_log = logging.get_logger()
 
 CHANNEL_SCHEDULE_ID = "12333"  # 修改为自己频道的日程子频道ID
 
 
-async def _schedule_handler(context: WsContext, message: qqbot.Message):
-    schedule_id: str = ""  # 日程ID，可以填写或者发送/创建日程 命令后获取
+class MyClient(botpy.Client):
+    async def on_ready(self):
+        _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
-    msg_api = qqbot.AsyncMessageAPI(t_token, False)
-    schedule_api = qqbot.AsyncScheduleAPI(t_token, False)
+    async def on_at_message_create(self, message: Message):
+        schedule_id: str = ""  # 日程ID，可以填写或者发送/创建日程 命令后获取
+        _log.info("receive message %s" % message.content)
+        # 先发送消息告知用户
+        await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
 
-    qqbot.logger.info("event_type %s" % context.event_type + ",receive message %s" % message.content)
+        delay = 1000 * 60
+        start_time = int(round(time.time() * 1000)) + delay
+        end_time = start_time + delay
 
-    # 先发送消息告知用户
-    message_to_send = qqbot.MessageSendRequest("command received: %s" % message.content)
-    await msg_api.post_message(message.channel_id, message_to_send)
-
-    delay = 1000 * 60
-    start_time = int(round(time.time() * 1000)) + delay
-    end_time = start_time + delay
-
-    # 判断用户@后输出的指令
-    if "/创建日程" in message.content:
-        schedule = await schedule_api.create_schedule(
-            CHANNEL_SCHEDULE_ID,
-            qqbot.ScheduleToCreate(
+        # 判断用户@后输出的指令
+        if "/创建日程" in message.content:
+            schedule = await self.api.create_schedule(
+                CHANNEL_SCHEDULE_ID,
                 name="test",
                 start_timestamp=str(start_time),
                 end_timestamp=str(end_time),
+                jump_channel_id=CHANNEL_SCHEDULE_ID,
                 remind_type="0",
-            ),
-        )
-        schedule_id = schedule.id
+            )
+            schedule_id = schedule.id
 
-    elif "/查询日程" in message.content:
-        schedule = await schedule_api.get_schedule(CHANNEL_SCHEDULE_ID, schedule_id)
-        qqbot.logger.info(schedule)
+        elif "/查询日程" in message.content:
+            schedule = await self.api.get_schedule(CHANNEL_SCHEDULE_ID, schedule_id)
+            _log.info(schedule)
 
-    elif "/更新日程" in message.content:
-        await schedule_api.update_schedule(
-            CHANNEL_SCHEDULE_ID,
-            schedule_id,
-            qqbot.ScheduleToPatch(
+        elif "/更新日程" in message.content:
+            await self.api.update_schedule(
+                CHANNEL_SCHEDULE_ID,
+                schedule_id,
                 name="update",
                 start_timestamp=str(start_time),
                 end_timestamp=str(end_time),
+                jump_channel_id=CHANNEL_SCHEDULE_ID,
                 remind_type="0",
-            ),
-        )
-    elif "/删除日程" in message.content:
-        await schedule_api.delete_schedule(CHANNEL_SCHEDULE_ID, schedule_id)
+            )
+        elif "/删除日程" in message.content:
+            await self.api.delete_schedule(CHANNEL_SCHEDULE_ID, schedule_id)
 
 
 if __name__ == "__main__":
-    t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
-    qqbot_handler = qqbot.Handler(qqbot.HandlerType.AT_MESSAGE_EVENT_HANDLER, _schedule_handler)
-    qqbot.async_listen_events(t_token, False, qqbot_handler)
+    # 通过预设置的类型，设置需要监听的事件通道
+    # intents = botpy.Intents.none()
+    # intents.public_guild_messages=True
+
+    # 通过kwargs，设置需要监听的事件通道
+    intents = botpy.Intents(public_guild_messages=True)
+    client = MyClient(intents=intents)
+    client.run(appid=test_config["appid"], token=test_config["token"])

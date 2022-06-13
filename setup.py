@@ -4,11 +4,11 @@ import os
 from setuptools import setup, find_packages
 
 setup(
-    name="qq-bot",
+    name="qq-botpy",
     version=os.getenv("VERSION_NAME"),
     author="veehou",
     author_email="veehou@tencent.com",
-    description="qq guild robot sdk with python3, support asyncio and synchronous",
+    description="qq robot client with python3",
     long_description=open("README.rst").read(),
     # 项目主页
     url="https://github.com/tencent-connect/botpy",
@@ -17,14 +17,14 @@ setup(
     # 执照
     license="Tencent",
     # 安装依赖
-    install_requires=["requests", "websocket-client", "aiohttp>=3.6.0,<3.8.0"],
+    install_requires=["aiohttp>=3.7.4,<4", "PyYAML"],
     # 分类
     classifiers=[
         # 发展时期,常见的如下
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         # 开发的目标用户
         "Intended Audience :: Developers",
         # 属于什么类型
