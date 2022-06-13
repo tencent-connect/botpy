@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 
+from botpy import BotAPI
 from botpy.message import Message
 
 
@@ -15,17 +16,18 @@ class Commands:
     def __call__(self, func):
         @wraps(func)
         async def decorated(*args, **kwargs):
+            api: BotAPI = kwargs["api"]
             message: Message = kwargs["message"]
             if isinstance(self.commands, tuple):
                 for command in self.commands:
-                    if self.commands in message.content:
+                    if command in message.content:
                         # 分割指令后面的指令参数
                         params = message.content.split(self.commands)[1].strip()
-                        return await func(message=message, params=params)
-            elif isinstance(self.commands, str):
+                        return await func(api=api, message=message, params=params)
+            elif self.commands in message.content:
                 # 分割指令后面的指令参数
-                params = message.content.split(self.command)[1].strip()
-                return await func(message=message, params=params)
+                params = message.content.split(self.commands)[1].strip()
+                return await func(api=api, message=message, params=params)
             else:
                 return False
 
