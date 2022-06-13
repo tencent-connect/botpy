@@ -13,7 +13,7 @@
 pip install qq-botpy
 ```
 
-更新包的话需要添加 `--upgrade` `注：需要python3.7+`
+更新包的话需要添加 `--upgrade` `兼容版本：python3.8+`
 
 ### 使用
 
