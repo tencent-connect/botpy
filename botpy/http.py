@@ -76,15 +76,11 @@ class BotHttp:
     TODO 增加并发请求的锁控制 @veehou
     """
 
-    def __init__(
-        self,
-        timeout: int,
-        is_sandbox: bool = False,
-    ):
+    def __init__(self, timeout: int, is_sandbox: bool = False, app_id: str = None, token: str = None):
         self.timeout = timeout
         self.is_sandbox = is_sandbox
 
-        self._token: Optional[Token] = None
+        self._token: Optional[Token] = None if not app_id else Token(app_id=app_id, access_token=token)
         self._session: Optional[aiohttp.ClientSession] = None
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
@@ -103,6 +99,19 @@ class BotHttp:
                 for k, v in kwargs.pop("json").items():
                     kwargs["data"].add_field(k, v)
 
+        if not self._headers:
+            self._headers = {
+                "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
+                "User-Agent": "botpy/v1",
+            }
+
+        if not self._session:
+            self._session = aiohttp.ClientSession(
+                headers=self._headers,
+                timeout=ClientTimeout(self.timeout),
+                connector=TCPConnector(limit=500, ssl=SSLContext()),
+            )
+
         route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
 
@@ -120,8 +129,11 @@ class BotHttp:
 
         # you can directly pass headers into Session, but no need to pass it for every request
         # adding SSLContext-containing connector to prevent SSL certificate verify failed error
-        self._session = aiohttp.ClientSession(headers=self._headers, timeout=ClientTimeout(self.timeout),
-                                              connector=TCPConnector(limit=500, ssl=SSLContext()))
+        self._session = aiohttp.ClientSession(
+            headers=self._headers,
+            timeout=ClientTimeout(self.timeout),
+            connector=TCPConnector(limit=500, ssl=SSLContext()),
+        )
         self._global_over = asyncio.Event()
         self._global_over.set()
 

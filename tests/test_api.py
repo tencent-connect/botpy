@@ -38,8 +38,7 @@ class APITestCase(unittest.TestCase):
     def setUp(self) -> None:
         print("setUp")
         self.loop = asyncio.get_event_loop()
-        self.http = BotHttp(timeout=5)
-        self.loop.run_until_complete(self.http.login(token))
+        self.http = BotHttp(timeout=5, app_id=test_config["token"]["appid"], token=test_config["token"]["token"])
         self.api = botpy.BotAPI(self.http)
 
     def tearDown(self) -> None:
@@ -65,19 +64,19 @@ class APITestCase(unittest.TestCase):
         self.assertEqual("Test Update Role", result["role"]["name"])
 
         result = self.loop.run_until_complete(self.api.delete_guild_role(GUILD_ID, role_id=id))
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_guild_role_member_add_delete(self):
         result = self.loop.run_until_complete(
             self.api.create_guild_role_member(GUILD_ID, GUILD_TEST_ROLE_ID, GUILD_TEST_MEMBER_ID)
         )
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_guild_role_member_delete(self):
         result = self.loop.run_until_complete(
             self.api.delete_guild_role_member(GUILD_ID, GUILD_TEST_ROLE_ID, GUILD_TEST_MEMBER_ID)
         )
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_guild_member(self):
         member: user.Member = self.loop.run_until_complete(self.api.get_guild_member(GUILD_ID, GUILD_OWNER_ID))
@@ -121,7 +120,7 @@ class APITestCase(unittest.TestCase):
         remove = Permission(manager_permission=True)
         coroutine = self.api.update_channel_user_permissions(CHANNEL_ID, GUILD_TEST_MEMBER_ID, remove=remove)
         result = self.loop.run_until_complete(coroutine)
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_channel_role_permissions(self):
         coroutine = self.api.get_channel_role_permissions(CHANNEL_ID, GUILD_TEST_ROLE_ID)
@@ -132,7 +131,7 @@ class APITestCase(unittest.TestCase):
         add = Permission(manager_permission=True)
         coroutine = self.api.update_channel_role_permissions(CHANNEL_ID, GUILD_TEST_MEMBER_ID, add=add)
         result = self.loop.run_until_complete(coroutine)
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_me(self):
         user = self.loop.run_until_complete(self.api.me())
@@ -164,11 +163,11 @@ class APITestCase(unittest.TestCase):
 
     def test_mute_all(self):
         result = self.loop.run_until_complete(self.api.mute_all(GUILD_ID, mute_seconds="20"))
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_mute_member(self):
         result = self.loop.run_until_complete(self.api.mute_member(GUILD_ID, GUILD_TEST_MEMBER_ID, mute_seconds="20"))
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_mute_multi_member(self):
         result: List[str] = self.loop.run_until_complete(
@@ -200,12 +199,12 @@ class APITestCase(unittest.TestCase):
 
     def test_put_and_delete_reaction(self):
         result = self.loop.run_until_complete(self.api.put_reaction(CHANNEL_ID, MESSAGE_ID, 1, "4"))
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
         time.sleep(1)  # 表情表态操作有频率限制，中间隔一秒
 
         result = self.loop.run_until_complete(self.api.delete_reaction(CHANNEL_ID, MESSAGE_ID, 1, "4"))
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_get_reaction_users(self):
         result = self.loop.run_until_complete(self.api.get_reaction_users(CHANNEL_ID, MESSAGE_ID, 1, "4"))
@@ -217,7 +216,7 @@ class APITestCase(unittest.TestCase):
 
     def test_delete_pin(self):
         result = self.loop.run_until_complete(self.api.delete_pin(CHANNEL_ID, MESSAGE_ID))
-        self.assertEqual("", result)
+        self.assertEqual(None, result)
 
     def test_get_pins(self):
         result = self.loop.run_until_complete(self.api.get_pins(CHANNEL_ID))
