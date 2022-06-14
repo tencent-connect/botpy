@@ -517,7 +517,7 @@ class BotAPI:
         route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
         return await self._http.request(route, json=payload)
 
-    async def recall_message(self, channel_id: str, message_id: str, hide_tip: bool = False) -> str:
+    async def recall_message(self, channel_id: str, message_id: str, hidetip: bool = False) -> str:
         """
         撤回消息。
 
@@ -528,12 +528,12 @@ class BotAPI:
         Args:
           channel_id (str): 您要将消息发送到的频道的 ID。
           message_id (str): 要撤回的消息的 ID。
-          hide_tip (bool): 是否隐藏撤回提示小灰条。. Defaults to False
+          hidetip (bool): 是否隐藏撤回提示小灰条。. Defaults to False
 
         Returns:
           成功执行返回`None`。
         """
-        params = {"hide_tip": "true" if hide_tip else "false"}
+        params = {"hidetip": "true" if hidetip else "false"}
 
         route = Route(
             "DELETE",

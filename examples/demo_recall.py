@@ -19,7 +19,7 @@ class MyClient(botpy.Client):
 
     async def on_at_message_create(self, message: Message):
         _message = await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
-        await self.api.recall_message(message.channel_id, _message.get("id"))
+        await self.api.recall_message(message.channel_id, _message.get("id"), hidetip=True)
 
 
 if __name__ == "__main__":
