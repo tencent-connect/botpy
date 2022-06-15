@@ -35,10 +35,7 @@ def _handle_message_parameters(
     markdown: message.MarkdownPayload = None,
     keyboard: message.Keyboard = None,
 ) -> Dict:
-    payload = {}
-    params = locals()
-    payload.update({k: v for k, v in params.items() if v})
-    return payload
+    return {k: v for k, v in locals().items() if v}
 
 
 class BotAPI:
@@ -533,15 +530,15 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        params = {"hidetip": "true" if hidetip else "false"}
 
         route = Route(
             "DELETE",
-            "/channels/{channel_id}/messages/{message_id}",
+            "/channels/{channel_id}/messages/{message_id}?hidetip={hidetip}",
             channel_id=channel_id,
             message_id=message_id,
+            hidetip=str(hidetip).lower(),
         )
-        return await self._http.request(route, params=params)
+        return await self._http.request(route)
 
     async def post_keyboard_message(
         self,
