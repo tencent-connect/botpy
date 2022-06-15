@@ -363,7 +363,7 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {"add": str(add.value), "remove": str(remove.value)}
+        payload = {"add": str(add.value) if add else None, "remove": str(remove.value) if remove else None}
 
         route = Route(
             "PUT", "/channels/{channel_id}/members/{user_id}/permissions", channel_id=channel_id, user_id=user_id
@@ -401,7 +401,7 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {"add": str(add.value), "remove": str(remove.value)}
+        payload = {"add": str(add.value)  if add else None, "remove": str(remove.value)  if remove else None}
 
         route = Route(
             "PUT", "/channels/{channel_id}/roles/{role_id}/permissions", channel_id=channel_id, role_id=role_id
@@ -492,15 +492,15 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
+        params = {"hidetip": str(hidetip).lower()}
 
         route = Route(
             "DELETE",
-            "/channels/{channel_id}/messages/{message_id}?hidetip={hidetip}",
+            "/channels/{channel_id}/messages/{message_id}",
             channel_id=channel_id,
             message_id=message_id,
-            hidetip=str(hidetip).lower(),
         )
-        return await self._http.request(route)
+        return await self._http.request(route, params=params)
 
     async def post_keyboard_message(
         self,
@@ -1113,8 +1113,8 @@ class BotAPI:
             type=emoji_type,
             id=emoji_id,
         )
-        path = {"limit": limit, "cookie": cookie}
-        return await self._http.request(route, params=path)
+        params = {"limit": limit, "cookie": cookie} if cookie else {"limit": limit}
+        return await self._http.request(route, params=params)
 
     # 精华消息API
     async def put_pin(self, channel_id: str, message_id: str) -> pins_message.PinsMessage:
