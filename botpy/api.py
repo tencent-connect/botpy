@@ -3,7 +3,7 @@
 # 异步api
 
 from io import BufferedReader
-from typing import Any, List, Dict, Union, BinaryIO
+from typing import Any, List, Union, BinaryIO
 
 from .flags import Permission
 from .http import BotHttp, Route
@@ -21,21 +21,6 @@ from .types import (
     reaction,
     forum,
 )
-
-
-def _handle_message_parameters(
-    content: str = None,
-    embed: message.Embed = None,
-    ark: message.Ark = None,
-    message_reference: message.Reference = None,
-    image: str = None,
-    file_image: Union[bytes, BinaryIO, str] = None,
-    msg_id: str = None,
-    event_id: str = None,
-    markdown: message.MarkdownPayload = None,
-    keyboard: message.Keyboard = None,
-) -> Dict:
-    return {k: v for k, v in locals().items() if v}
 
 
 class BotAPI:
@@ -98,10 +83,8 @@ class BotAPI:
         Returns:
           class:GuildRole
         """
-        valid_keys = ("name", "color", "hoist")
-        payload = {k: v for k, v in fields.items() if k in valid_keys}
         route = Route("POST", "/guilds/{guild_id}/roles", guild_id=guild_id)
-        return await self._http.request(route, json=payload)
+        return await self._http.request(route, json=fields)
 
     async def update_guild_role(self, guild_id: str, role_id: str, **fields: Any) -> guild.GuildRole:
         """
@@ -119,10 +102,8 @@ class BotAPI:
         Returns:
           class:GuildRole
         """
-        valid_keys = ("name", "color", "hoist")
-        payload = {k: v for k, v in fields.items() if k in valid_keys}
         route = Route("PATCH", "/guilds/{guild_id}/roles/{role_id}", guild_id=guild_id, role_id=role_id)
-        return await self._http.request(route, json=payload)
+        return await self._http.request(route, json=fields)
 
     async def delete_guild_role(self, guild_id: str, role_id: str) -> str:
         """
@@ -157,9 +138,7 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {}
-        if channel_id:
-            payload = {"channel": {"id": channel_id}}
+        payload = {"channel": {"id": channel_id}}
 
         route = Route(
             "PUT",
@@ -184,9 +163,7 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {}
-        if channel_id:
-            payload = {"channel": {"id": channel_id}}
+        payload = {"channel": {"id": channel_id}}
 
         route = Route(
             "DELETE",
@@ -231,12 +208,7 @@ class BotAPI:
         Returns:
           user.Member 对象的列表。
         """
-        params: Dict[str, Any] = {}
-
-        if after is not None:
-            params["after"] = after
-        if limit is not None:
-            params["limit"] = limit
+        params = {"after": after, "limit": limit}
 
         route = Route(
             "GET",
@@ -343,10 +315,8 @@ class BotAPI:
         Returns:Dict:
           channel.Channel
         """
-        valid_keys = ("name", "position", "parent_id", "private_type", "speak_permission")
-        payload = {k: v for k, v in fields.items() if k in valid_keys and v}
         route = Route("PATCH", "/channels/{channel_id}", channel_id=channel_id)
-        return await self._http.request(route, json=payload)
+        return await self._http.request(route, json=fields)
 
     async def delete_channel(self, channel_id: str) -> channel.ChannelPayload:
         """
@@ -393,11 +363,7 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {}
-        if add is not None:
-            payload.update({"add": str(add.value)})
-        if remove is not None:
-            payload.update({"remove": str(remove.value)})
+        payload = {"add": str(add.value), "remove": str(remove.value)}
 
         route = Route(
             "PUT", "/channels/{channel_id}/members/{user_id}/permissions", channel_id=channel_id, user_id=user_id
@@ -435,11 +401,7 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {}
-        if add is not None:
-            payload.update({"add": str(add.value)})
-        if remove is not None:
-            payload.update({"remove": str(remove.value)})
+        payload = {"add": str(add.value), "remove": str(remove.value)}
 
         route = Route(
             "PUT", "/channels/{channel_id}/roles/{role_id}/permissions", channel_id=channel_id, role_id=role_id
@@ -508,9 +470,9 @@ class BotAPI:
         elif isinstance(file_image, str):
             with open(file_image, "rb") as img:
                 file_image = img.read()
-        payload = _handle_message_parameters(
-            content, embed, ark, message_reference, image, file_image, msg_id, event_id, markdown, keyboard
-        )
+        payload = locals()
+        payload.pop("self", None)
+        payload.pop("img", None)
         route = Route("POST", "/channels/{channel_id}/messages", channel_id=channel_id)
         return await self._http.request(route, json=payload)
 
@@ -628,11 +590,11 @@ class BotAPI:
         elif isinstance(file_image, str):
             with open(file_image, "rb") as img:
                 file_image = img.read()
-        send_payload = _handle_message_parameters(
-            content, embed, ark, message_reference, image, file_image, msg_id, event_id, markdown, keyboard
-        )
+        payload = locals()
+        payload.pop("self", None)
+        payload.pop("img", None)
         route = Route("POST", "/dms/{guild_id}/messages", guild_id=guild_id)
-        return await self._http.request(route, json=send_payload)
+        return await self._http.request(route, json=payload)
 
     # 音频接口
     async def update_audio(self, channel_id: str, audio_control: audio.AudioControl) -> str:
@@ -711,9 +673,9 @@ class BotAPI:
         """
         params = {"limit": limit}
         if desc and guild_id:
-            params.update({"before": guild_id})
+            params["before"] = guild_id
         elif guild_id:
-            params.update({"after": guild_id})
+            params["after"] = guild_id
 
         route = Route("GET", "/users/@me/guilds")
         return await self._http.request(route, params=params)
@@ -745,7 +707,10 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
+        payload = {
+            "mute_end_timestamp": mute_end_timestamp,
+            "mute_seconds": mute_seconds
+        }
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
 
@@ -784,7 +749,10 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
+        payload = {
+            "mute_end_timestamp": mute_end_timestamp,
+            "mute_seconds": mute_seconds
+        }
         route = Route("PATCH", "/guilds/{guild_id}/members/{user_id}/mute", guild_id=guild_id, user_id=user_id)
         return await self._http.request(route, json=payload)
 
@@ -803,8 +771,11 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {k: v for k, v in locals().items() if k in ["mute_end_timestamp", "mute_seconds"] and v}
-        payload.update({"user_ids": user_ids})
+        payload = {
+            "mute_end_timestamp": mute_end_timestamp,
+            "mute_seconds": mute_seconds,
+            "user_ids": user_ids
+        }
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
 
@@ -935,9 +906,7 @@ class BotAPI:
         Returns:
           列表[schedule.Schedule]
         """
-        payload = {}
-        if since:
-            payload = {"since": since}
+        payload = {"since": since}
         route = Route("GET", "/channels/{channel_id}/schedules", channel_id=channel_id)
         return await self._http.request(route, json=payload)
 
@@ -1144,9 +1113,7 @@ class BotAPI:
             type=emoji_type,
             id=emoji_id,
         )
-        path = {"limit": limit}
-        if cookie:
-            path.update({"cookie": cookie})
+        path = {"limit": limit, "cookie": cookie}
         return await self._http.request(route, params=path)
 
     # 精华消息API

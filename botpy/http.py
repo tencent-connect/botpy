@@ -2,7 +2,6 @@
 import asyncio
 from json.decoder import JSONDecodeError
 from typing import Any, Optional, ClassVar, Union, Dict
-from urllib.parse import quote
 
 import aiohttp
 from aiohttp import ClientResponse, FormData, ClientTimeout, TCPConnector
@@ -66,7 +65,7 @@ class Route:
 
         # path的参数:
         if self.parameters:
-            _url = _url.format_map({k: quote(v) if isinstance(v, str) else v for k, v in self.parameters.items()})
+            _url = _url.format_map(self.parameters)
         return _url
 
 
@@ -89,6 +88,20 @@ class BotHttp:
         if self._session:
             await self._session.close()
 
+    async def check_session(self):
+        if not self._headers:
+            self._headers = {
+                "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
+                "User-Agent": "botpy/v1",
+            }
+
+        if not self._session or self._session.closed:
+            self._session = aiohttp.ClientSession(
+                headers=self._headers,
+                timeout=ClientTimeout(self.timeout),
+                connector=TCPConnector(limit=500, ssl=SSLContext()),
+            )
+
     async def request(self, route: Route, **kwargs: Any):
         # some checking if it's a JSON request
         if "json" in kwargs:
@@ -97,21 +110,10 @@ class BotHttp:
             if json__get and isinstance(json__get, bytes):
                 kwargs["data"] = FormData()
                 for k, v in kwargs.pop("json").items():
-                    kwargs["data"].add_field(k, v)
+                    if v:
+                        kwargs["data"].add_field(k, v)
 
-        if not self._headers:
-            self._headers = {
-                "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
-                "User-Agent": "botpy/v1",
-            }
-
-        if not self._session:
-            self._session = aiohttp.ClientSession(
-                headers=self._headers,
-                timeout=ClientTimeout(self.timeout),
-                connector=TCPConnector(limit=500, ssl=SSLContext()),
-            )
-
+        await self.check_session()
         route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
 
@@ -122,18 +124,7 @@ class BotHttp:
         """login后保存token和session"""
 
         self._token = token
-        self._headers = {
-            "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
-            "User-Agent": "botpy/v1",
-        }
-
-        # you can directly pass headers into Session, but no need to pass it for every request
-        # adding SSLContext-containing connector to prevent SSL certificate verify failed error
-        self._session = aiohttp.ClientSession(
-            headers=self._headers,
-            timeout=ClientTimeout(self.timeout),
-            connector=TCPConnector(limit=500, ssl=SSLContext()),
-        )
+        await self.check_session()
         self._global_over = asyncio.Event()
         self._global_over.set()
 

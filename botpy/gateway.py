@@ -4,8 +4,7 @@ import json
 import traceback
 from typing import Optional
 
-import aiohttp
-from aiohttp import WSMessage, ClientWebSocketResponse, TCPConnector
+from aiohttp import WSMessage, ClientWebSocketResponse, TCPConnector, ClientSession, WSMsgType
 from ssl import SSLContext
 
 from . import logging
@@ -99,7 +98,7 @@ class BotWebSocket:
         self._conn = ws
         if self._conn is None:
             raise Exception("[botpy] websocket连接失败")
-        if self._session["session_id"] != "":
+        if self._session["session_id"]:
             await self.ws_resume()
         else:
             await self.ws_identify()
@@ -111,20 +110,20 @@ class BotWebSocket:
 
         _log.info("[botpy] 启动中...")
         ws_url = self._session["url"]
-        if ws_url == "":
+        if not ws_url:
             raise Exception("[botpy] 会话url为空")
 
         # adding SSLContext-containing connector to prevent SSL certificate verify failed error
-        async with aiohttp.ClientSession(connector=TCPConnector(limit=10, ssl=SSLContext())) as session:
+        async with ClientSession(connector=TCPConnector(limit=10, ssl=SSLContext())) as session:
             async with session.ws_connect(self._session["url"]) as ws_conn:
                 while True:
                     msg: WSMessage
                     msg = await ws_conn.receive()
-                    if msg.type == aiohttp.WSMsgType.TEXT:
+                    if msg.type == WSMsgType.TEXT:
                         await self.on_message(ws_conn, msg.data)
-                    elif msg.type == aiohttp.WSMsgType.ERROR:
+                    elif msg.type == WSMsgType.ERROR:
                         await self.on_error(ws_conn.exception())
-                    elif msg.type == aiohttp.WSMsgType.CLOSED or msg.type == aiohttp.WSMsgType.CLOSE:
+                    elif msg.type == WSMsgType.CLOSED or msg.type == WSMsgType.CLOSE:
                         await self.on_closed(ws_conn.close_code, msg.extra)
                     if ws_conn.closed:
                         _log.debug("[botpy] ws关闭, 停止接收消息!")
@@ -132,7 +131,7 @@ class BotWebSocket:
 
     async def ws_identify(self):
         """websocket鉴权"""
-        if self._session["intent"] == 0:
+        if not self._session["intent"]:
             self._session["intent"] = 1
 
         _log.info("[botpy] 鉴权中...")
@@ -230,5 +229,5 @@ class BotWebSocket:
                 _log.debug("[botpy] ws连接已关闭, 心跳检测停止，ws对象: %s" % self._conn)
                 return
 
-            await asyncio.sleep(interval)
             await self.send_msg(json.dumps(payload))
+            await asyncio.sleep(interval)
