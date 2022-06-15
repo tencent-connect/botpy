@@ -139,6 +139,7 @@ botpy
    ├── demo_at_reply.py             # 机器人at被动回复async示例
    ├── demo_at_reply_ark.py         # 机器人at被动回复ark消息示例
    ├── demo_at_reply_embed.py       # 机器人at被动回复embed消息示例
+   ├── demo_at_reply_command.py     # 机器人at被动使用Command指令装饰器回复消息示例
    ├── demo_at_reply_file_data.py   # 机器人at被动回复本地图片消息示例
    ├── demo_at_reply_keyboard.py    # 机器人at被动回复md带内嵌键盘的示例
    ├── demo_at_reply_markdown.py    # 机器人at被动回复md消息示例
