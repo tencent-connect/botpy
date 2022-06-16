@@ -5,8 +5,11 @@ from typing import List, Callable, Dict, Any, Optional
 from .channel import Channel
 from .guild import Guild
 from .interaction import Interaction
-from .message import Message, MessageAudit
+from .message import Message, DirectMessage, MessageAudit
 from .user import Member
+from .reaction import Reaction
+from .audio import Audio
+from .forum import Forum
 
 from . import logging
 from .api import BotAPI
@@ -135,18 +138,20 @@ class ConnectionState:
 
     # botpy.flags.Intents.guild_message_reactions
     def parse_message_reaction_add(self, ctx: gateway.WsContext, data: reaction.Reaction):
-        self._dispatch("message_reaction_add", data)
+        _reaction = Reaction(self.api, ctx, data)
+        self._dispatch("message_reaction_add", _reaction)
 
     def parse_message_reaction_remove(self, ctx: gateway.WsContext, data: reaction.Reaction):
-        self._dispatch("message_reaction_remove", data)
+        _reaction = Reaction(self.api, ctx, data)
+        self._dispatch("message_reaction_remove", _reaction)
 
     # botpy.flags.Intents.direct_message
-    def parse_direct_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        _message = Message(self.api, ctx, data)
+    def parse_direct_message_create(self, ctx: gateway.WsContext, data: gateway.DirectMessagePayload):
+        _message = DirectMessage(self.api, ctx, data)
         self._dispatch("direct_message_create", _message)
 
-    def parse_direct_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        _message = Message(self.api, ctx, data)
+    def parse_direct_message_delete(self, ctx: gateway.WsContext, data: gateway.DirectMessagePayload):
+        _message = DirectMessage(self.api, ctx, data)
         self._dispatch("direct_message_delete", _message)
 
     # botpy.flags.Intents.interaction
@@ -165,16 +170,20 @@ class ConnectionState:
 
     # botpy.flags.Intents.audio_action
     def parse_audio_start(self, ctx: gateway.WsContext, data):
-        self._dispatch("audio_start", data)
+        _audio = Audio(self.api, ctx, data)
+        self._dispatch("audio_start", _audio)
 
     def parse_audio_finish(self, ctx: gateway.WsContext, data):
-        self._dispatch("audio_finish", data)
+        _audio = Audio(self.api, ctx, data)
+        self._dispatch("audio_finish", _audio)
 
     def parse_on_mic(self, ctx: gateway.WsContext, data):
-        self._dispatch("on_mic", data)
+        _audio = Audio(self.api, ctx, data)
+        self._dispatch("on_mic", _audio)
 
     def parse_off_mic(self, ctx: gateway.WsContext, data):
-        self._dispatch("off_mic", data)
+        _audio = Audio(self.api, ctx, data)
+        self._dispatch("off_mic", _audio)
 
     # botpy.flags.Intents.public_guild_messages
     def parse_at_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
@@ -188,13 +197,16 @@ class ConnectionState:
         self._dispatch("resumed")
 
     def parse_forum_thread_create(self, ctx: gateway.WsContext, data: forum.Thread):
-        self._dispatch("forum_thread_create", data)
+        _forum = Forum(self.api, ctx, data)
+        self._dispatch("forum_thread_create", _forum)
 
     def parse_forum_thread_update(self, ctx: gateway.WsContext, data: forum.Thread):
-        self._dispatch("forum_thread_update", data)
+        _forum = Forum(self.api, ctx, data)
+        self._dispatch("forum_thread_update", _forum)
 
     def parse_forum_thread_delete(self, ctx: gateway.WsContext, data: forum.Thread):
-        self._dispatch("forum_thread_delete", data)
+        _forum = Forum(self.api, ctx, data)
+        self._dispatch("forum_thread_delete", _forum)
 
     def parse_forum_post_create(self, ctx: gateway.WsContext, data: forum.Post):
         self._dispatch("forum_post_create", data)

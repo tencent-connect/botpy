@@ -44,6 +44,21 @@ class MessagePayload(TypedDict):
     timestamp: str
 
 
+class DirectMessagePayload(TypedDict):
+    author: UserPayload
+    channel_id: str
+    content: str
+    direct_message: bool
+    guild_id: str
+    id: str
+    member: Member
+    message_reference: MessageRefPayload
+    seq: int
+    seq_in_channel: str
+    src_guild_id: str
+    timestamp: str
+
+
 class MessageAuditPayload(TypedDict):
     audit_id: str
     message_id: str
