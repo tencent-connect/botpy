@@ -128,8 +128,7 @@ class Intents(BaseFlags):
     @classmethod
     def all(cls):
         """打开所有事件的监听"""
-        bits = max(cls.VALID_FLAGS.values()).bit_length()
-        value = (1 << bits) - 1
+        value = max(cls.VALID_FLAGS.values()) * 2 - 1
         self = cls.__new__(cls)
         self.value = value
         return self
