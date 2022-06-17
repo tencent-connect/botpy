@@ -46,7 +46,7 @@ class _Url:
         self.desc = data.get("desc", None)
 
 
-class Forum:
+class Thread:
     __slots__ = (
         "_api",
         "_ctx",
