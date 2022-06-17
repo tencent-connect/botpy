@@ -12,6 +12,11 @@ class UserPayload(TypedDict):
     username: str
     bot: bool
     status: int
+    avatar: str
+
+
+class MessageRefPayload(TypedDict):
+    message_id: str
 
 
 class ReadyEvent(TypedDict):
@@ -32,9 +37,25 @@ class MessagePayload(TypedDict):
     guild_id: str
     id: str
     member: Member
+    message_reference: MessageRefPayload
     mentions: List[UserPayload]
     seq: int
     seq_in_channel: str
+    timestamp: str
+
+
+class DirectMessagePayload(TypedDict):
+    author: UserPayload
+    channel_id: str
+    content: str
+    direct_message: bool
+    guild_id: str
+    id: str
+    member: Member
+    message_reference: MessageRefPayload
+    seq: int
+    seq_in_channel: str
+    src_guild_id: str
     timestamp: str
 
 
