@@ -9,7 +9,7 @@ from .message import Message, DirectMessage, MessageAudit
 from .user import Member
 from .reaction import Reaction
 from .audio import Audio
-from .forum import Forum
+from .forum import Thread
 
 from . import logging
 from .api import BotAPI
@@ -197,15 +197,15 @@ class ConnectionState:
         self._dispatch("resumed")
 
     def parse_forum_thread_create(self, ctx: gateway.WsContext, data: forum.Thread):
-        _forum = Forum(self.api, ctx, data)
+        _forum = Thread(self.api, ctx, data)
         self._dispatch("forum_thread_create", _forum)
 
     def parse_forum_thread_update(self, ctx: gateway.WsContext, data: forum.Thread):
-        _forum = Forum(self.api, ctx, data)
+        _forum = Thread(self.api, ctx, data)
         self._dispatch("forum_thread_update", _forum)
 
     def parse_forum_thread_delete(self, ctx: gateway.WsContext, data: forum.Thread):
-        _forum = Forum(self.api, ctx, data)
+        _forum = Thread(self.api, ctx, data)
         self._dispatch("forum_thread_delete", _forum)
 
     def parse_forum_post_create(self, ctx: gateway.WsContext, data: forum.Post):
