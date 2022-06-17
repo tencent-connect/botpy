@@ -1,15 +1,15 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os.path
+import os
 
 import botpy
 from botpy import BotAPI
+
 from botpy.message import Message
 from botpy.types.inline import Keyboard, Button, RenderData, Action, Permission, KeyboardRow
 from botpy.types.message import MarkdownPayload, KeyboardPayload
-from botpy.ext.yaml_util import YamlUtil
+from botpy.ext.cog_yaml import read
 
-test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
 class MyClient(botpy.Client):

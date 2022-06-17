@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 import os
 
 import botpy
 from botpy import logging
+
 from botpy.message import Message
 from botpy.types.message import Embed, EmbedField
-from botpy.ext.yaml_util import YamlUtil
+from botpy.ext.cog_yaml import read
 
-test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 _log = logging.get_logger()
 
@@ -21,8 +23,8 @@ class MyClient(botpy.Client):
             title="embed消息",
             prompt="消息透传显示",
             fields=[
-                EmbedField(name="<@!1234>hello world", value="通知提醒"),
-                EmbedField(name="<@!1234>hello world", value="通知提醒"),
+                EmbedField(name="<@!1234>hello world"),
+                EmbedField(name="<@!1234>hello world"),
             ],
         )
 
@@ -30,8 +32,8 @@ class MyClient(botpy.Client):
         #     "title": "embed消息",
         #     "prompt": "消息透传显示",
         #     "fields": [
-        #         {"name": "<@!1234>hello world", "value": "通知提醒"},
-        #         {"name": "<@!1234>hello world", "value": "标题"},
+        #         {"name": "<@!1234>hello world"},
+        #         {"name": "<@!1234>hello world"},
         #     ],
         # }
 
