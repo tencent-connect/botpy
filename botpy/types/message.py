@@ -16,7 +16,6 @@ class Thumbnail(TypedDict):
 
 class EmbedField(TypedDict):
     name: str
-    value: str
 
 
 class Embed(TypedDict, total=False):
