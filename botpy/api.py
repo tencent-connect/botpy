@@ -735,9 +735,9 @@ class BotAPI:
         self, guild_id: str, user_id: str, mute_end_timestamp: str = None, mute_seconds: str = None
     ) -> str:
         """
-        使频道中的所有成员禁言。
+        使频道中的指定成员禁言。
 
-        用于将频道的全体成员（非管理员）禁言。
+        用于将频道的指定成员（非管理员）禁言。
         需要使用的 token 对应的用户具备管理员权限。如果是机器人，要求被添加为管理员。
 
         Args:
@@ -1181,6 +1181,7 @@ class BotAPI:
         )
         return await self._http.request(route)
 
+    # 帖子相关接口
     async def get_threads(self, channel_id: str) -> forum.ForumRsp:
         """
         该接口用于获取子频道下的帖子列表。
