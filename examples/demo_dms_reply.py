@@ -1,18 +1,13 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-
-搁置
-
-"""
 import os
 
 import botpy
 from botpy import logging
-from botpy.message import Message
-from botpy.ext.yaml_util import YamlUtil
 
-test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+from botpy.message import DirectMessage
+from botpy.ext.cog_yaml import read
+
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 _log = logging.get_logger()
 
@@ -21,7 +16,7 @@ class MyClient(botpy.Client):
     async def on_ready(self):
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
-    async def on_direct_message_create(self, message: Message):
+    async def on_direct_message_create(self, message: DirectMessage):
         await self.api.post_dms(
             guild_id=message.guild_id,
             content=f"机器人{self.robot.name}收到你的私信了: {message.content}",

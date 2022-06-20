@@ -1,15 +1,14 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import os
 
 import botpy
 from botpy import logging
+
 from botpy.types.message import Reference
 from botpy.message import Message
-from botpy.ext.yaml_util import YamlUtil
+from botpy.ext.cog_yaml import read
 
-test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 _log = logging.get_logger()
 

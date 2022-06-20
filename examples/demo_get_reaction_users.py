@@ -1,15 +1,15 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os.path
+import os
 from typing import List
 
 import botpy
+
 from botpy.message import Message
 from botpy.types import reaction
 from botpy.types.user import User
-from botpy.ext.yaml_util import YamlUtil
+from botpy.ext.cog_yaml import read
 
-test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 
 class MyClient(botpy.Client):

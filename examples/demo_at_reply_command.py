@@ -3,16 +3,17 @@ import os
 
 import botpy
 from botpy import logging, BotAPI
+
 from botpy.ext.command_util import Commands
 from botpy.message import Message
-from botpy.ext.yaml_util import YamlUtil
+from botpy.ext.cog_yaml import read
 
-test_config = YamlUtil.read(os.path.join(os.path.dirname(__file__), "config.yaml"))
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 _log = logging.get_logger()
 
 
-@Commands("你好")
+@Commands(name=("你好", "hello"))
 async def hello(api: BotAPI, message: Message, params=None):
     _log.info(params)
     # 第一种用reply发送消息
