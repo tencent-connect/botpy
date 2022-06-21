@@ -7,7 +7,6 @@ class Interaction:
 
     def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: interaction.InteractionPayload):
         self._api = api
-        # self._ctx = ctx
 
         self.id = data.get("id")
         self.type = data.get("type")
