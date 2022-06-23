@@ -1233,7 +1233,7 @@ class BotAPI:
         """
         route = Route(
             "PUT",
-            "PUT /channels/{channel_id}/threads",
+            "/channels/{channel_id}/threads",
             channel_id=channel_id,
         )
 
@@ -1252,6 +1252,6 @@ class BotAPI:
           成功返回空字符串。
         """
         route = Route(
-            "DELETE", "DELETE /channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
+            "DELETE", "/channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
         )
         return await self._http.request(route)
