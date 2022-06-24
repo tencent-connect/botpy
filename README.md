@@ -1,9 +1,24 @@
-# botpy
+<div align="center">
 
-**botpy** 是基于[机器人开放平台API](https://bot.q.qq.com/wiki/develop/api/) 实现的机器人框架，目的提供一个易使用、开发效率高的开发框架。
+![botpy](https://socialify.git.ci/tencent-connect/botpy/image?description=1&font=Source%20Code%20Pro&forks=1&issues=1&language=1&logo=https%3A%2F%2Fgithub.com%2Ftencent-connect%2Fbot-docs%2Fblob%2Fmain%2Fdocs%2F.vuepress%2Fpublic%2Ffavicon-64px.png%3Fraw%3Dtrue&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Light)
 
+[![Language](https://img.shields.io/badge/language-python-green.svg?style=plastic)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-orange.svg?style=plastic)](https://github.com/tencent-connect/botpy/blob/master/LICENSE)
+![Python](https://img.shields.io/badge/python-3.8+-blue)
 ![PyPI](https://img.shields.io/pypi/v/qq-botpy)
 [![BK Pipelines Status](https://api.bkdevops.qq.com/process/api/external/pipelines/projects/qq-guild-open/p-713959939bdc4adca0eea2d4420eef4b/badge?X-DEVOPS-PROJECT-ID=qq-guild-open)](https://devops.woa.com/process/api-html/user/builds/projects/qq-guild-open/pipelines/p-713959939bdc4adca0eea2d4420eef4b/latestFinished?X-DEVOPS-PROJECT-ID=qq-guild-open)
+
+_✨ 基于 [机器人开放平台API](https://bot.q.qq.com/wiki/develop/api/) 实现的机器人框架 ✨_
+
+_✨ 为开发者提供一个易使用、开发效率高的开发框架 ✨_
+
+[文档](https://bot.q.qq.com/wiki/develop/pythonsdk/)
+·
+[下载](https://github.com/tencent-connect/botpy/tags)
+·
+[安装](https://bot.q.qq.com/wiki/develop/pythonsdk/#sdk-安装)
+
+</div>
 
 ## 准备工作
 
@@ -43,12 +58,9 @@ import botpy
 
 ```python
 import botpy
-from botpy.types.message import Message
+from botpy.message import Message
 
 class MyClient(botpy.Client):
-    async def on_ready(self):
-        print(f"robot 「{self.robot.name}」 on_ready!")
-
     async def on_at_message_create(self, message: Message):
         await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
 ```
@@ -61,7 +73,7 @@ class MyClient(botpy.Client):
 
 ```python
 import botpy
-from botpy.types.message import Message
+from botpy.message import Message
 
 class MyClient(botpy.Client):
     async def on_at_message_create(self, message: Message):
@@ -89,7 +101,7 @@ intents.public_guild_messages=True
 
 ```python
 import botpy
-from botpy.types.message import Message
+from botpy.message import Message
 
 class MyClient(botpy.Client):
     async def on_at_message_create(self, message: Message):
@@ -132,8 +144,6 @@ class MyClient(botpy.Client):
 
 ```python
 from botpy import logging
-
-logger = logging.get_logger()
 ```
 
 或者通过`botpy.logger`也可以获取logger对象
@@ -141,7 +151,10 @@ logger = logging.get_logger()
 然后就可以愉快地使用 logger 进行打印。例如：
 
 ```python
+from botpy import logger
+
 logger.info("hello world!")
+
 ```
 
 ### 日志设置
@@ -159,7 +172,6 @@ botpy.Client(
     ext_handlers=False,
     log_config="log_config.json"
 )
-
 ```
 
 ### log_level
@@ -271,9 +283,11 @@ pytest
 
 ## 致谢
 
-感谢参与内测、开发和提出宝贵意见的开发者们（排名不分先后）：
+感谢感谢以下开发者对 `botpy` 作出的贡献：
 
-[小念](https://github.com/ReadSmall), [Neutron](https://github.com/Huang1220), [晚柒载](https://github.com/wqzai)
+<a href="https://github.com/tencent-connect/botpy/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=tencent-connect/botpy" />
+</a>
 
 # 加入官方社区
 

@@ -268,7 +268,7 @@ class BotAPI:
     # 子频道相关接口
     async def get_channel(self, channel_id: str) -> channel.ChannelPayload:
         """
-        它获取频道信息。
+        获取频道信息
 
         Args:
           channel_id (str): 子频道 ID。
