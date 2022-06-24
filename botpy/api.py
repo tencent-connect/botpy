@@ -194,6 +194,37 @@ class BotAPI:
         )
         return await self._http.request(route)
 
+    async def get_delete_member(
+            self,
+            guild_id: str,
+            user_id: str,
+            add_blacklist: bool = False,
+            delete_history_msg_days: int = 0
+    ) -> str:
+        """
+        删除频道成员
+
+        Args:
+          guild_id (str): 频道ID
+          user_id (str): 用户ID
+          add_blacklist (bool): 是否同时添加黑名单
+          delete_history_msg_days (int): 用于撤回该成员的消息，可以指定撤回消息的时间范围
+
+        Returns:
+          成功执行返回`None`。成功执行返回空字符串
+        """
+        # 注：消息撤回时间范围仅支持固定的天数：3，7，15，30。 特殊的时间范围：-1: 撤回全部消息。默认值为0不撤回任何消息。
+        if delete_history_msg_days not in (3, 7, 15, 30, 0, -1):
+            delete_history_msg_days = 0
+        params = {'add_blacklist': str(add_blacklist).lower(), 'delete_history_msg_days': delete_history_msg_days}
+        route = Route(
+            "DELETE",
+            "/guilds/{guild_id}/members/{user_id}",
+            guild_id=guild_id,
+            user_id=user_id,
+        )
+        return await self._http.request(route, params=params)
+
     async def get_guild_members(self, guild_id: str, after: str = "0", limit: int = 1) -> List[user.Member]:
         """
         获取成员列表。
@@ -1233,7 +1264,7 @@ class BotAPI:
         """
         route = Route(
             "PUT",
-            "PUT /channels/{channel_id}/threads",
+            "/channels/{channel_id}/threads",
             channel_id=channel_id,
         )
 
@@ -1252,6 +1283,6 @@ class BotAPI:
           成功返回空字符串。
         """
         route = Route(
-            "DELETE", "DELETE /channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
+            "DELETE", "/channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
         )
         return await self._http.request(route)
