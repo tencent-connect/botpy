@@ -23,7 +23,7 @@ class Member:
 
     class _User:
         def __init__(self, data):
-            self.id = data.get("user")
+            self.id = data.get("id")
             self.username = data.get("username")
             self.avatar = data.get("avatar")
             self.bot = data.get("bot")
