@@ -216,14 +216,14 @@ class BotAPI:
         # 注：消息撤回时间范围仅支持固定的天数：3，7，15，30。 特殊的时间范围：-1: 撤回全部消息。默认值为0不撤回任何消息。
         if delete_history_msg_days not in (3, 7, 15, 30, 0, -1):
             delete_history_msg_days = 0
-        params = {'add_blacklist': str(add_blacklist).lower(), 'delete_history_msg_days': delete_history_msg_days}
+        payload = {"add_blacklist": add_blacklist, "delete_history_msg_days": delete_history_msg_days}
         route = Route(
             "DELETE",
             "/guilds/{guild_id}/members/{user_id}",
             guild_id=guild_id,
             user_id=user_id,
         )
-        return await self._http.request(route, params=params)
+        return await self._http.request(route, json=payload)
 
     async def get_guild_members(self, guild_id: str, after: str = "0", limit: int = 1) -> List[user.Member]:
         """
