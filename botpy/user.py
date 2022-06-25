@@ -3,14 +3,7 @@ from .types import user, gateway
 
 
 class Member:
-    __slots__ = (
-        "_api",
-        "_ctx",
-        "user",
-        "nick",
-        "roles",
-        "joined_at",
-        "event_id")
+    __slots__ = ("_api", "_ctx", "user", "nick", "roles", "joined_at", "event_id")
 
     def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: user.GuildMemberPayload):
         self._api = api
