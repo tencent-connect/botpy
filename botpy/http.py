@@ -28,7 +28,7 @@ async def _handle_response(url, response: ClientResponse) -> Union[Dict[str, Any
     except (KeyError, JSONDecodeError):
         data = None
     if response.status in HTTP_OK_STATUS:
-        _log.debug(f"[botpy] 请求成功, 请求连接: {url}, 返回内容: {data}")
+        _log.debug(f"[botpy] 请求成功, 请求连接: {url}, 返回内容: {data}, trace_id:{response.headers.get(X_TPS_TRACE_ID)}")
         return data
     else:
         _log.error(
