@@ -17,7 +17,7 @@ class MyClient(botpy.Client):
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
     async def on_at_message_create(self, message: Message):
-        _log.info(message.author.get("avatar"))
+        _log.info(message.author.avatar)
         await message.reply(content=f"机器人{self.robot.name}收到你的@消息了: {message.content}")
 
 
