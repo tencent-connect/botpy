@@ -1,3 +1,4 @@
 pre-commit
 PyYAML
 aiohttp>=3.7.4,<4
+APScheduler

@@ -44,7 +44,7 @@ botpy
 
 ..
 
-   原机器人的老版本\ ``qq-bot``\ 仍然可以使用，但新接口的支持上会逐渐暂停，此次升级不会影响线上使用的机器人 
+   原机器人的老版本\ ``qq-bot``\ 仍然可以使用，但新接口的支持上会逐渐暂停，此次升级不会影响线上使用的机器人
 
 
 使用方式
@@ -56,7 +56,7 @@ botpy
 步骤1
 ~~~~~
 
-通过继承实现\ ``bot.Client``\ , 实现自己的机器人Client 
+通过继承实现\ ``bot.Client``\ , 实现自己的机器人Client
 
 步骤2
 ~~~~~
@@ -93,7 +93,7 @@ botpy
        async def on_at_message_create(self, message: Message):
            await self.api.post_message(channel_id=message.channel_id, content="content")
 
-   intents = botpy.Intents(public_guild_messages=True) 
+   intents = botpy.Intents(public_guild_messages=True)
    client = MyClient(intents=intents)
    client.run(appid="12345", token="xxxx")
 
@@ -126,7 +126,7 @@ botpy
 示例机器人
 ----------
 
-`\ ``examples`` <./examples/>`_ 目录下存放示例机器人，具体使用可参考\ `\ ``Readme.md`` <./examples/README.md>`_ 
+`\ ``examples`` <./examples/>`_ 目录下存放示例机器人，具体使用可参考\ `\ ``Readme.md`` <./examples/README.md>`_
 
 .. code-block::
 
