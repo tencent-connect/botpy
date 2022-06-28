@@ -89,6 +89,12 @@ class ConnectionState:
         self._dispatch = dispatch
         self.api = api
 
+    def parse_ready(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
+        self._dispatch("ready")
+
+    def parse_resumed(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
+        self._dispatch("resumed")
+
     # botpy.flags.Intents.guilds
     def parse_guild_create(self, ctx: gateway.WsContext, data: guild.GuildPayload):
         _guild = Guild(self.api, ctx, data)
@@ -190,12 +196,11 @@ class ConnectionState:
         _message = Message(self.api, ctx, data)
         self._dispatch("at_message_create", _message)
 
-    def parse_ready(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
-        self._dispatch("ready")
+    def parse_public_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
+        _message = Message(self.api, ctx, data)
+        self._dispatch("public_message_delete", _message)
 
-    def parse_resumed(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
-        self._dispatch("resumed")
-
+    # botpy.flags.Intents.forums
     def parse_forum_thread_create(self, ctx: gateway.WsContext, data: forum.Thread):
         _forum = Thread(self.api, ctx, data)
         self._dispatch("forum_thread_create", _forum)
