@@ -1,7 +1,7 @@
 from json import loads
 
 from .api import BotAPI
-from .types import gateway, forum
+from .types import forum
 
 
 class _Text:
@@ -56,48 +56,48 @@ class Thread:
         "author_id",
         "event_id")
 
-    def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: forum.Thread):
+    def __init__(self, api: BotAPI, event_id, data: forum.Thread):
         self._api = api
 
-        self.author_id = data.get("author_id")
-        self.channel_id = data.get("channel_id")
-        self.guild_id = data.get("guild_id")
-        self.thread_info = self._ThreadInfo(data.get("thread_info"))
-        self.event_id = ctx.get("id")
+        self.author_id = data.get("author_id", None)
+        self.channel_id = data.get("channel_id", None)
+        self.guild_id = data.get("guild_id", None)
+        self.thread_info = self._ThreadInfo(data.get("thread_info", {}))
+        self.event_id = event_id
 
     class _ThreadInfo:
         def __init__(self, data):
-            self.title = self._Title(loads(data.get("title")))
-            self.content = self._Content(loads(data.get("content")))
-            self.thread_id = data.get("thread_id")
-            self.date_time = data.get("date_time")
+            self.title = self._Title(loads(data.get("title", {})))
+            self.content = self._Content(loads(data.get("content", {})))
+            self.thread_id = data.get("thread_id", None)
+            self.date_time = data.get("date_time", None)
 
         class _Title:
             def __init__(self, data):
-                self.paragraphs = [self._Paragraphs(items) for items in data.get("paragraphs")]
+                self.paragraphs = [self._Paragraphs(items) for items in data.get("paragraphs", {})]
 
             class _Paragraphs:
                 def __init__(self, data):
-                    self.elems = [self._Elems(items) for items in data.get("elems")]
-                    self.props = data.get("props")
+                    self.elems = [self._Elems(items) for items in data.get("elems", {})]
+                    self.props = data.get("props", None)
 
                 class _Elems:
                     def __init__(self, data):
-                        self.type = data.get("type")
+                        self.type = data.get("type", None)
                         self.text = _Text(data.get("text", {}))
 
         class _Content:
             def __init__(self, data):
-                self.paragraphs = [self._Paragraphs(items) for items in data.get("paragraphs")]
+                self.paragraphs = [self._Paragraphs(items) for items in data.get("paragraphs", {})]
 
             class _Paragraphs:
                 def __init__(self, data):
-                    self.elems = [self._Elems(items) for items in data.get("elems")]
-                    self.props = data.get("props")
+                    self.elems = [self._Elems(items) for items in data.get("elems", {})]
+                    self.props = data.get("props", None)
 
                 class _Elems:
                     def __init__(self, data):
-                        self.type = data.get("type")
+                        self.type = data.get("type", None)
                         if self.type == 1:
                             self.text = _Text(data.get("text", {}))
                         elif self.type == 2:

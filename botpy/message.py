@@ -19,29 +19,29 @@ class Message:
         "event_id"
     )
 
-    def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: gateway.MessagePayload):
+    def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
         # TODO 创建一些实体类的数据缓存 @veehou
         self._api = api
 
-        self.author = self._User(data.get("author"))
-        self.channel_id = data.get("channel_id")
-        self.id = data.get("id")
-        self.content = data.get("content")
-        self.guild_id = data.get("guild_id")
-        self.member = self._Member(data.get("member"))
+        self.author = self._User(data.get("author", {}))
+        self.channel_id = data.get("channel_id", None)
+        self.id = data.get("id", None)
+        self.content = data.get("content", None)
+        self.guild_id = data.get("guild_id", None)
+        self.member = self._Member(data.get("member", {}))
         self.message_reference = self._MessageRef(data.get("message_reference", {}))
         self.mentions = [self._User(items) for items in data.get("mentions", {})]
-        self.seq = data.get("seq")  # 全局消息序号
-        self.seq_in_channel = data.get("seq_in_channel")  # 子频道消息序号
-        self.timestamp = data.get("timestamp")
-        self.event_id = ctx.get("id")
+        self.seq = data.get("seq", None)  # 全局消息序号
+        self.seq_in_channel = data.get("seq_in_channel", None)  # 子频道消息序号
+        self.timestamp = data.get("timestamp", None)
+        self.event_id = event_id
 
     class _User:
         def __init__(self, data):
-            self.id = data.get("id")
-            self.username = data.get("username")
-            self.bot = data.get("bot")
-            self.avatar = data.get("avatar")
+            self.id = data.get("id", None)
+            self.username = data.get("username", None)
+            self.bot = data.get("bot", None)
+            self.avatar = data.get("avatar", None)
 
     class _Member:
         def __init__(self, data):
@@ -75,28 +75,28 @@ class DirectMessage:
         "event_id"
     )
 
-    def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: gateway.DirectMessagePayload):
+    def __init__(self, api: BotAPI, event_id, data: gateway.DirectMessagePayload):
         self._api = api
 
-        self.author = self._User(data.get("author"))
-        self.channel_id = data.get("channel_id")
-        self.id = data.get("id")
-        self.content = data.get("content")
-        self.direct_message = data.get("direct_message")
-        self.guild_id = data.get("guild_id")
-        self.member = self._Member(data.get("member"))
+        self.author = self._User(data.get("author", {}))
+        self.channel_id = data.get("channel_id", None)
+        self.id = data.get("id", None)
+        self.content = data.get("content", None)
+        self.direct_message = data.get("direct_message", None)
+        self.guild_id = data.get("guild_id", None)
+        self.member = self._Member(data.get("member", {}))
         self.message_reference = self._MessageRef(data.get("message_reference", {}))
-        self.seq = data.get("seq")  # 全局消息序号
-        self.seq_in_channel = data.get("seq_in_channel")  # 子频道消息序号
-        self.src_guild_id = data.get("src_guild_id")
-        self.timestamp = data.get("timestamp")
-        self.event_id = ctx.get("id")
+        self.seq = data.get("seq", None)  # 全局消息序号
+        self.seq_in_channel = data.get("seq_in_channel", None)  # 子频道消息序号
+        self.src_guild_id = data.get("src_guild_id", None)
+        self.timestamp = data.get("timestamp", None)
+        self.event_id = event_id
 
     class _User:
         def __init__(self, data):
-            self.id = data.get("id")
-            self.username = data.get("username")
-            self.avatar = data.get("avatar")
+            self.id = data.get("id", None)
+            self.username = data.get("username", None)
+            self.avatar = data.get("avatar", None)
 
     class _Member:
         def __init__(self, data):
@@ -119,10 +119,11 @@ class MessageAudit:
         "guild_id",
         "event_id")
 
-    def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
+    def __init__(self, api: BotAPI, event_id, data: gateway.MessageAuditPayload):
         self._api = api
-        self.audit_id = data.get("audit_id")
-        self.channel_id = data.get("channel_id")
-        self.message_id = data.get("message_id")
-        self.guild_id = data.get("guild_id")
-        self.event_id = ctx.get("id")
+
+        self.audit_id = data.get("audit_id", None)
+        self.channel_id = data.get("channel_id", None)
+        self.message_id = data.get("message_id", None)
+        self.guild_id = data.get("guild_id", None)
+        self.event_id = event_id
