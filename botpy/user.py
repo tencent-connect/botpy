@@ -13,6 +13,7 @@ class Member:
         self.roles = data.get("roles", None)
         self.joined_at = data.get("joined_at", None)
         self.event_id = event_id
+        self.guild_id = data.get("guild_id", None)
 
     class _User:
         def __init__(self, data):
