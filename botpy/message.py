@@ -13,6 +13,7 @@ class Message:
         "member",
         "message_reference",
         "mentions",
+        "attachments",
         "seq",
         "seq_in_channel",
         "timestamp",
@@ -31,6 +32,7 @@ class Message:
         self.member = self._Member(data.get("member", {}))
         self.message_reference = self._MessageRef(data.get("message_reference", {}))
         self.mentions = [self._User(items) for items in data.get("mentions", {})]
+        self.attachments = [self._Attachments(items) for items in data.get("attachments", {})]
         self.seq = data.get("seq", None)  # 全局消息序号
         self.seq_in_channel = data.get("seq_in_channel", None)  # 子频道消息序号
         self.timestamp = data.get("timestamp", None)
@@ -52,6 +54,16 @@ class Message:
     class _MessageRef:
         def __init__(self, data):
             self.message_id = data.get("message_id", None)
+
+    class _Attachments:
+        def __init__(self, data):
+            self.content_type = data.get("content_type", None)
+            self.filename = data.get("filename", None)
+            self.height = data.get("height", None)
+            self.width = data.get("width", None)
+            self.id = data.get("id", None)
+            self.size = data.get("size", None)
+            self.url = data.get("url", None)
 
     async def reply(self, **kwargs):
         return await self._api.post_message(channel_id=self.channel_id, msg_id=self.id, **kwargs)

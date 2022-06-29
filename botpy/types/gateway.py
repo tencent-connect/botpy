@@ -19,6 +19,16 @@ class MessageRefPayload(TypedDict):
     message_id: str
 
 
+class MessageAttachPayload(TypedDict):
+    content_type: str
+    filename: str
+    height: int
+    width: int
+    id: str
+    size: int
+    url: str
+
+
 class ReadyEvent(TypedDict):
     version: int
     session_id: str
@@ -39,6 +49,7 @@ class MessagePayload(TypedDict):
     member: Member
     message_reference: MessageRefPayload
     mentions: List[UserPayload]
+    attachments: List[MessageAttachPayload]
     seq: int
     seq_in_channel: str
     timestamp: str
