@@ -18,6 +18,9 @@ class MyClient(botpy.Client):
 
     async def on_guild_member_add(self, member: Member):
         _log.info("%s 加入频道" % member.nick)
+        dms_payload = await self.api.create_dms(member.guild_id, member.user.id)
+        _log.info("发送私信")
+        await self.api.post_dms(dms_payload["guild_id"], content="welcome join guild", msg_id=member.event_id)
 
     async def on_guild_member_update(self, member: Member):
         _log.info("%s 更新了资料" % member.nick)
