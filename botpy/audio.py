@@ -1,5 +1,5 @@
 from .api import BotAPI
-from .types import gateway, audio
+from .types import audio
 
 
 class Audio:
@@ -12,11 +12,11 @@ class Audio:
         "text",
         "event_id")
 
-    def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: audio.AudioAction):
+    def __init__(self, api: BotAPI, event_id, data: audio.AudioAction):
         self._api = api
 
-        self.channel_id = data.get("channel_id")
-        self.guild_id = data.get("guild_id")
-        self.audio_url = data.get("audio_url")
-        self.text = data.get("text")
-        self.event_id = ctx.get("id")
+        self.channel_id = data.get("channel_id", None)
+        self.guild_id = data.get("guild_id", None)
+        self.audio_url = data.get("audio_url", None)
+        self.text = data.get("text", None)
+        self.event_id = event_id

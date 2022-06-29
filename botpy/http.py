@@ -20,7 +20,8 @@ _log = logging.get_logger()
 HTTP_OK_STATUS = [200, 202, 204]
 
 
-async def _handle_response(url, response: ClientResponse) -> Union[Dict[str, Any], str]:
+async def _handle_response(response: ClientResponse) -> Union[Dict[str, Any], str]:
+    url = response.request_info.url
     try:
         condition = response.headers["content-type"] == "application/json"
         # note that when content-type is application/json, aiohttp will directly auto-sub encoding to be utf-8
@@ -118,7 +119,7 @@ class BotHttp:
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
 
         async with self._session.request(method=route.method, url=route.url, **kwargs) as response:
-            return await _handle_response(route.url, response)
+            return await _handle_response(response)
 
     async def login(self, token: Token) -> robot.Robot:
         """login后保存token和session"""

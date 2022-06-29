@@ -14,7 +14,7 @@ from .forum import Thread
 from . import logging
 from .api import BotAPI
 from .robot import Robot
-from .types import gateway, channel, guild, user, session, reaction, interaction, forum
+from .types import session
 
 _log = logging.get_logger()
 
@@ -36,7 +36,7 @@ class ConnectionSession:
     ):
         self.dispatch = dispatch
         self.state = ConnectionState(dispatch, api)
-        self.parser: Dict[str, Callable[[gateway.WsContext, Any], None]] = self.state.parsers
+        self.parser: Dict[str, Callable[[dict], None]] = self.state.parsers
 
         self._connect = connect
         self._max_async = max_async
@@ -89,141 +89,141 @@ class ConnectionState:
         self._dispatch = dispatch
         self.api = api
 
-    def parse_ready(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
+    def parse_ready(self, kwargs):
         self._dispatch("ready")
 
-    def parse_resumed(self, ctx: gateway.WsContext, data: gateway.ReadyEvent):
+    def parse_resumed(self, kwargs):
         self._dispatch("resumed")
 
     # botpy.flags.Intents.guilds
-    def parse_guild_create(self, ctx: gateway.WsContext, data: guild.GuildPayload):
-        _guild = Guild(self.api, ctx, data)
+    def parse_guild_create(self, kwargs):
+        _guild = Guild(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("guild_create", _guild)
 
-    def parse_guild_update(self, ctx: gateway.WsContext, data: guild.GuildPayload):
-        _guild = Guild(self.api, ctx, data)
+    def parse_guild_update(self, kwargs):
+        _guild = Guild(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("guild_update", _guild)
 
-    def parse_guild_delete(self, ctx: gateway.WsContext, data: guild.GuildPayload):
-        _guild = Guild(self.api, ctx, data)
+    def parse_guild_delete(self, kwargs):
+        _guild = Guild(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("guild_delete", _guild)
 
-    def parse_channel_create(self, ctx: gateway.WsContext, data: channel.ChannelPayload):
-        _channel = Channel(self.api, ctx, data)
+    def parse_channel_create(self, kwargs):
+        _channel = Channel(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("channel_create", _channel)
 
-    def parse_channel_update(self, ctx: gateway.WsContext, data: channel.ChannelPayload):
-        _channel = Channel(self.api, ctx, data)
+    def parse_channel_update(self, kwargs):
+        _channel = Channel(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("channel_update", _channel)
 
-    def parse_channel_delete(self, ctx: gateway.WsContext, data: channel.ChannelPayload):
-        _channel = Channel(self.api, ctx, data)
+    def parse_channel_delete(self, kwargs):
+        _channel = Channel(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("channel_delete", _channel)
 
     # botpy.flags.Intents.guild_members
-    def parse_guild_member_add(self, ctx: gateway.WsContext, data: user.GuildMemberPayload):
-        _member = Member(self.api, ctx, data)
+    def parse_guild_member_add(self, kwargs):
+        _member = Member(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("guild_member_add", _member)
 
-    def parse_guild_member_update(self, ctx: gateway.WsContext, data: user.GuildMemberPayload):
-        _member = Member(self.api, ctx, data)
+    def parse_guild_member_update(self, kwargs):
+        _member = Member(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("guild_member_update", _member)
 
-    def parse_guild_member_remove(self, ctx: gateway.WsContext, data: user.GuildMemberPayload):
-        _member = Member(self.api, ctx, data)
+    def parse_guild_member_remove(self, kwargs):
+        _member = Member(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("guild_member_remove", _member)
 
     # botpy.flags.Intents.guild_messages
-    def parse_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        _message = Message(self.api, ctx, data)
+    def parse_message_create(self, kwargs):
+        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("message_create", _message)
 
-    def parse_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        _message = Message(self.api, ctx, data)
+    def parse_message_delete(self, kwargs):
+        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("message_delete", _message)
 
     # botpy.flags.Intents.guild_message_reactions
-    def parse_message_reaction_add(self, ctx: gateway.WsContext, data: reaction.Reaction):
-        _reaction = Reaction(self.api, ctx, data)
+    def parse_message_reaction_add(self, kwargs):
+        _reaction = Reaction(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("message_reaction_add", _reaction)
 
-    def parse_message_reaction_remove(self, ctx: gateway.WsContext, data: reaction.Reaction):
-        _reaction = Reaction(self.api, ctx, data)
+    def parse_message_reaction_remove(self, kwargs):
+        _reaction = Reaction(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("message_reaction_remove", _reaction)
 
     # botpy.flags.Intents.direct_message
-    def parse_direct_message_create(self, ctx: gateway.WsContext, data: gateway.DirectMessagePayload):
-        _message = DirectMessage(self.api, ctx, data)
+    def parse_direct_message_create(self, kwargs):
+        _message = DirectMessage(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("direct_message_create", _message)
 
-    def parse_direct_message_delete(self, ctx: gateway.WsContext, data: gateway.DirectMessagePayload):
-        _message = DirectMessage(self.api, ctx, data)
+    def parse_direct_message_delete(self, kwargs):
+        _message = DirectMessage(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("direct_message_delete", _message)
 
     # botpy.flags.Intents.interaction
-    def parse_interaction_create(self, ctx: gateway.WsContext, data: interaction.InteractionPayload):
-        _interaction = Interaction(self.api, ctx, data)
+    def parse_interaction_create(self, kwargs):
+        _interaction = Interaction(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("interaction_create", _interaction)
 
     # botpy.flags.Intents.message_audit
-    def parse_message_audit_pass(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        _message_audit = MessageAudit(self.api, ctx, data)
+    def parse_message_audit_pass(self, kwargs):
+        _message_audit = MessageAudit(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("message_audit_pass", _message_audit)
 
-    def parse_message_audit_reject(self, ctx: gateway.WsContext, data: gateway.MessageAuditPayload):
-        _message_audit = MessageAudit(self.api, ctx, data)
+    def parse_message_audit_reject(self, kwargs):
+        _message_audit = MessageAudit(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("message_audit_reject", _message_audit)
 
     # botpy.flags.Intents.audio_action
-    def parse_audio_start(self, ctx: gateway.WsContext, data):
-        _audio = Audio(self.api, ctx, data)
+    def parse_audio_start(self, kwargs):
+        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("audio_start", _audio)
 
-    def parse_audio_finish(self, ctx: gateway.WsContext, data):
-        _audio = Audio(self.api, ctx, data)
+    def parse_audio_finish(self, kwargs):
+        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("audio_finish", _audio)
 
-    def parse_on_mic(self, ctx: gateway.WsContext, data):
-        _audio = Audio(self.api, ctx, data)
+    def parse_on_mic(self, kwargs):
+        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("on_mic", _audio)
 
-    def parse_off_mic(self, ctx: gateway.WsContext, data):
-        _audio = Audio(self.api, ctx, data)
+    def parse_off_mic(self, kwargs):
+        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("off_mic", _audio)
 
     # botpy.flags.Intents.public_guild_messages
-    def parse_at_message_create(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        _message = Message(self.api, ctx, data)
+    def parse_at_message_create(self, kwargs):
+        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("at_message_create", _message)
 
-    def parse_public_message_delete(self, ctx: gateway.WsContext, data: gateway.MessagePayload):
-        _message = Message(self.api, ctx, data)
+    def parse_public_message_delete(self, kwargs):
+        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("public_message_delete", _message)
 
     # botpy.flags.Intents.forums
-    def parse_forum_thread_create(self, ctx: gateway.WsContext, data: forum.Thread):
-        _forum = Thread(self.api, ctx, data)
+    def parse_forum_thread_create(self, kwargs):
+        _forum = Thread(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("forum_thread_create", _forum)
 
-    def parse_forum_thread_update(self, ctx: gateway.WsContext, data: forum.Thread):
-        _forum = Thread(self.api, ctx, data)
+    def parse_forum_thread_update(self, kwargs):
+        _forum = Thread(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("forum_thread_update", _forum)
 
-    def parse_forum_thread_delete(self, ctx: gateway.WsContext, data: forum.Thread):
-        _forum = Thread(self.api, ctx, data)
+    def parse_forum_thread_delete(self, kwargs):
+        _forum = Thread(self.api, kwargs.get('id', None), kwargs.get('d', {}))
         self._dispatch("forum_thread_delete", _forum)
 
-    def parse_forum_post_create(self, ctx: gateway.WsContext, data: forum.Post):
-        self._dispatch("forum_post_create", data)
+    def parse_forum_post_create(self, kwargs):
+        self._dispatch("forum_post_create", kwargs.get('d', {}))
 
-    def parse_forum_post_delete(self, ctx: gateway.WsContext, data: forum.Post):
-        self._dispatch("forum_post_delete", data)
+    def parse_forum_post_delete(self, kwargs):
+        self._dispatch("forum_post_delete", kwargs.get('d', {}))
 
-    def parse_forum_reply_create(self, ctx: gateway.WsContext, data: forum.Reply):
-        self._dispatch("forum_reply_create", data)
+    def parse_forum_reply_create(self, kwargs):
+        self._dispatch("forum_reply_create", kwargs.get('d', {}))
 
-    def parse_forum_reply_delete(self, ctx: gateway.WsContext, data: forum.Reply):
-        self._dispatch("forum_reply_delete", data)
+    def parse_forum_reply_delete(self, kwargs):
+        self._dispatch("forum_reply_delete", kwargs.get('d', {}))
 
-    def parse_forum_publish_audit_result(self, ctx: gateway.WsContext, data: forum.AuditResult):
-        self._dispatch("forum_publish_audit_result", data)
+    def parse_forum_publish_audit_result(self, kwargs):
+        self._dispatch("forum_publish_audit_result", kwargs.get('d', {}))
