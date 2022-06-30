@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import asyncio
-from json import dumps
 from json.decoder import JSONDecodeError
+from ssl import SSLContext
 from typing import Any, Optional, ClassVar, Union, Dict
 
 import aiohttp
 from aiohttp import ClientResponse, FormData, ClientTimeout, TCPConnector
-from ssl import SSLContext
 
 from . import logging
 from .errors import HttpErrorDict, ServerError
@@ -34,7 +33,7 @@ async def _handle_response(response: ClientResponse) -> Union[Dict[str, Any], st
         return data
     else:
         _log.error(
-            f"[botpy] 接口请求异常，请求连接: {url}，"
+            f"[botpy] 接口请求异常，请求连接: {url}, "
             f"错误代码: {response.status}, 返回内容: {data}, trace_id:{response.headers.get(X_TPS_TRACE_ID)}"
             # trace_id 用于定位接口问题
         )
@@ -116,9 +115,9 @@ class BotHttp:
                         if not not isinstance(v, dict):
                             if k == 'message_reference':
                                 _log.error(
-                                    f"[botpy] 接口参数传入异常，请求连接: {route.url}，"
-                                    f"错误原因：file_image与message_reference不能同时传入，"
-                                    f"备注：sdk已按照优先级，去除message_reference参数"
+                                    f"[botpy] 接口参数传入异常, 请求连接: {route.url}, "
+                                    f"错误原因: file_image与message_reference不能同时传入，"
+                                    f"备注: sdk已按照优先级，去除message_reference参数"
                                 )
                         else:
                             kwargs["data"].add_field(k, v)
