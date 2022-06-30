@@ -89,141 +89,141 @@ class ConnectionState:
         self._dispatch = dispatch
         self.api = api
 
-    def parse_ready(self, kwargs):
+    def parse_ready(self, payload):
         self._dispatch("ready")
 
-    def parse_resumed(self, kwargs):
+    def parse_resumed(self, payload):
         self._dispatch("resumed")
 
     # botpy.flags.Intents.guilds
-    def parse_guild_create(self, kwargs):
-        _guild = Guild(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_guild_create(self, payload):
+        _guild = Guild(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("guild_create", _guild)
 
-    def parse_guild_update(self, kwargs):
-        _guild = Guild(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_guild_update(self, payload):
+        _guild = Guild(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("guild_update", _guild)
 
-    def parse_guild_delete(self, kwargs):
-        _guild = Guild(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_guild_delete(self, payload):
+        _guild = Guild(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("guild_delete", _guild)
 
-    def parse_channel_create(self, kwargs):
-        _channel = Channel(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_channel_create(self, payload):
+        _channel = Channel(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("channel_create", _channel)
 
-    def parse_channel_update(self, kwargs):
-        _channel = Channel(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_channel_update(self, payload):
+        _channel = Channel(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("channel_update", _channel)
 
-    def parse_channel_delete(self, kwargs):
-        _channel = Channel(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_channel_delete(self, payload):
+        _channel = Channel(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("channel_delete", _channel)
 
     # botpy.flags.Intents.guild_members
-    def parse_guild_member_add(self, kwargs):
-        _member = Member(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_guild_member_add(self, payload):
+        _member = Member(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("guild_member_add", _member)
 
-    def parse_guild_member_update(self, kwargs):
-        _member = Member(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_guild_member_update(self, payload):
+        _member = Member(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("guild_member_update", _member)
 
-    def parse_guild_member_remove(self, kwargs):
-        _member = Member(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_guild_member_remove(self, payload):
+        _member = Member(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("guild_member_remove", _member)
 
     # botpy.flags.Intents.guild_messages
-    def parse_message_create(self, kwargs):
-        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_message_create(self, payload):
+        _message = Message(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("message_create", _message)
 
-    def parse_message_delete(self, kwargs):
-        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_message_delete(self, payload):
+        _message = Message(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("message_delete", _message)
 
     # botpy.flags.Intents.guild_message_reactions
-    def parse_message_reaction_add(self, kwargs):
-        _reaction = Reaction(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_message_reaction_add(self, payload):
+        _reaction = Reaction(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("message_reaction_add", _reaction)
 
-    def parse_message_reaction_remove(self, kwargs):
-        _reaction = Reaction(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_message_reaction_remove(self, payload):
+        _reaction = Reaction(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("message_reaction_remove", _reaction)
 
     # botpy.flags.Intents.direct_message
-    def parse_direct_message_create(self, kwargs):
-        _message = DirectMessage(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_direct_message_create(self, payload):
+        _message = DirectMessage(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("direct_message_create", _message)
 
-    def parse_direct_message_delete(self, kwargs):
-        _message = DirectMessage(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_direct_message_delete(self, payload):
+        _message = DirectMessage(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("direct_message_delete", _message)
 
     # botpy.flags.Intents.interaction
-    def parse_interaction_create(self, kwargs):
-        _interaction = Interaction(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_interaction_create(self, payload):
+        _interaction = Interaction(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("interaction_create", _interaction)
 
     # botpy.flags.Intents.message_audit
-    def parse_message_audit_pass(self, kwargs):
-        _message_audit = MessageAudit(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_message_audit_pass(self, payload):
+        _message_audit = MessageAudit(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("message_audit_pass", _message_audit)
 
-    def parse_message_audit_reject(self, kwargs):
-        _message_audit = MessageAudit(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_message_audit_reject(self, payload):
+        _message_audit = MessageAudit(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("message_audit_reject", _message_audit)
 
     # botpy.flags.Intents.audio_action
-    def parse_audio_start(self, kwargs):
-        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_audio_start(self, payload):
+        _audio = Audio(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("audio_start", _audio)
 
-    def parse_audio_finish(self, kwargs):
-        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_audio_finish(self, payload):
+        _audio = Audio(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("audio_finish", _audio)
 
-    def parse_on_mic(self, kwargs):
-        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_on_mic(self, payload):
+        _audio = Audio(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("on_mic", _audio)
 
-    def parse_off_mic(self, kwargs):
-        _audio = Audio(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_off_mic(self, payload):
+        _audio = Audio(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("off_mic", _audio)
 
     # botpy.flags.Intents.public_guild_messages
-    def parse_at_message_create(self, kwargs):
-        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_at_message_create(self, payload):
+        _message = Message(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("at_message_create", _message)
 
-    def parse_public_message_delete(self, kwargs):
-        _message = Message(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_public_message_delete(self, payload):
+        _message = Message(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("public_message_delete", _message)
 
     # botpy.flags.Intents.forums
-    def parse_forum_thread_create(self, kwargs):
-        _forum = Thread(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_forum_thread_create(self, payload):
+        _forum = Thread(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("forum_thread_create", _forum)
 
-    def parse_forum_thread_update(self, kwargs):
-        _forum = Thread(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_forum_thread_update(self, payload):
+        _forum = Thread(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("forum_thread_update", _forum)
 
-    def parse_forum_thread_delete(self, kwargs):
-        _forum = Thread(self.api, kwargs.get('id', None), kwargs.get('d', {}))
+    def parse_forum_thread_delete(self, payload):
+        _forum = Thread(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("forum_thread_delete", _forum)
 
-    def parse_forum_post_create(self, kwargs):
-        self._dispatch("forum_post_create", kwargs.get('d', {}))
+    def parse_forum_post_create(self, payload):
+        self._dispatch("forum_post_create", payload.get('d', {}))
 
-    def parse_forum_post_delete(self, kwargs):
-        self._dispatch("forum_post_delete", kwargs.get('d', {}))
+    def parse_forum_post_delete(self, payload):
+        self._dispatch("forum_post_delete", payload.get('d', {}))
 
-    def parse_forum_reply_create(self, kwargs):
-        self._dispatch("forum_reply_create", kwargs.get('d', {}))
+    def parse_forum_reply_create(self, payload):
+        self._dispatch("forum_reply_create", payload.get('d', {}))
 
-    def parse_forum_reply_delete(self, kwargs):
-        self._dispatch("forum_reply_delete", kwargs.get('d', {}))
+    def parse_forum_reply_delete(self, payload):
+        self._dispatch("forum_reply_delete", payload.get('d', {}))
 
-    def parse_forum_publish_audit_result(self, kwargs):
-        self._dispatch("forum_publish_audit_result", kwargs.get('d', {}))
+    def parse_forum_publish_audit_result(self, payload):
+        self._dispatch("forum_publish_audit_result", payload.get('d', {}))
