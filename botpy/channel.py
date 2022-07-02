@@ -1,5 +1,5 @@
 from .api import BotAPI
-from .types import channel, gateway
+from .types import channel
 
 
 class Channel:
@@ -19,17 +19,17 @@ class Channel:
         "event_id",
     )
 
-    def __init__(self, api: BotAPI, ctx: gateway.WsContext, data: channel.ChannelPayload):
+    def __init__(self, api: BotAPI, event_id, data: channel.ChannelPayload):
         self._api = api
 
-        self.id = data.get("id")
-        self.name = data.get("name")
-        self.type = data.get("type")
-        self.sub_type = data.get("sub_type")
-        self.position = data.get("position")
-        self.owner_id = data.get("owner_id")
-        self.private_type = data.get("private_type")
-        self.speak_permission = data.get("speak_permission")
-        self.application_id = data.get("application_id")
-        self.permissions = data.get("permissions")
-        self.event_id = ctx.get("id")
+        self.id = data.get("id", None)
+        self.name = data.get("name", None)
+        self.type = data.get("type", None)
+        self.sub_type = data.get("sub_type", None)
+        self.position = data.get("position", None)
+        self.owner_id = data.get("owner_id", None)
+        self.private_type = data.get("private_type", None)
+        self.speak_permission = data.get("speak_permission", None)
+        self.application_id = data.get("application_id", None)
+        self.permissions = data.get("permissions", None)
+        self.event_id = event_id
