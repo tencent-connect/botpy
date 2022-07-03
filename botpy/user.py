@@ -15,6 +15,9 @@ class Member:
         self.event_id = event_id
         self.guild_id = data.get("guild_id", None)
 
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+
     class _User:
         def __init__(self, data):
             self.id = data.get("id", None)
@@ -23,3 +26,6 @@ class Member:
             self.bot = data.get("bot", None)
             self.union_openid = data.get("union_openid", None)
             self.union_user_account = data.get("union_user_account", None)
+
+        def __repr__(self):
+            return str(self.__dict__)

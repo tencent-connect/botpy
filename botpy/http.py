@@ -112,7 +112,7 @@ class BotHttp:
                 kwargs["data"] = FormData()
                 for k, v in kwargs.pop("json").items():
                     if v:
-                        if not not isinstance(v, dict):
+                        if isinstance(v, dict):
                             if k == 'message_reference':
                                 _log.error(
                                     f"[botpy] 接口参数传入异常, 请求连接: {route.url}, "

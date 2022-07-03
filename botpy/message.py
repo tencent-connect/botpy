@@ -38,6 +38,9 @@ class Message:
         self.timestamp = data.get("timestamp", None)
         self.event_id = event_id
 
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+
     class _User:
         def __init__(self, data):
             self.id = data.get("id", None)
@@ -45,15 +48,24 @@ class Message:
             self.bot = data.get("bot", None)
             self.avatar = data.get("avatar", None)
 
+        def __repr__(self):
+            return str(self.__dict__)
+
     class _Member:
         def __init__(self, data):
             self.nick = data.get("nick", None)
             self.roles = data.get("roles", None)
             self.joined_at = data.get("joined_at", None)
 
+        def __repr__(self):
+            return str(self.__dict__)
+
     class _MessageRef:
         def __init__(self, data):
             self.message_id = data.get("message_id", None)
+
+        def __repr__(self):
+            return str(self.__dict__)
 
     class _Attachments:
         def __init__(self, data):
@@ -64,6 +76,9 @@ class Message:
             self.id = data.get("id", None)
             self.size = data.get("size", None)
             self.url = data.get("url", None)
+
+        def __repr__(self):
+            return str(self.__dict__)
 
     async def reply(self, **kwargs):
         return await self._api.post_message(channel_id=self.channel_id, msg_id=self.id, **kwargs)
@@ -104,19 +119,31 @@ class DirectMessage:
         self.timestamp = data.get("timestamp", None)
         self.event_id = event_id
 
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+
     class _User:
         def __init__(self, data):
             self.id = data.get("id", None)
             self.username = data.get("username", None)
             self.avatar = data.get("avatar", None)
 
+        def __repr__(self):
+            return str(self.__dict__)
+
     class _Member:
         def __init__(self, data):
             self.joined_at = data.get("joined_at", None)
 
+        def __repr__(self):
+            return str(self.__dict__)
+
     class _MessageRef:
         def __init__(self, data):
             self.message_id = data.get("message_id", None)
+
+        def __repr__(self):
+            return str(self.__dict__)
 
     async def reply(self, **kwargs):
         return await self._api.post_message(channel_id=self.channel_id, msg_id=self.id, **kwargs)
@@ -139,3 +166,6 @@ class MessageAudit:
         self.message_id = data.get("message_id", None)
         self.guild_id = data.get("guild_id", None)
         self.event_id = event_id
+
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})

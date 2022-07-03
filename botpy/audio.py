@@ -20,3 +20,6 @@ class Audio:
         self.audio_url = data.get("audio_url", None)
         self.text = data.get("text", None)
         self.event_id = event_id
+
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
