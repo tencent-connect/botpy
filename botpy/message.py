@@ -146,7 +146,7 @@ class DirectMessage:
             return str(self.__dict__)
 
     async def reply(self, **kwargs):
-        return await self._api.post_message(channel_id=self.channel_id, msg_id=self.id, **kwargs)
+        return await self._api.post_dms(guild_id=self.guild_id, msg_id=self.id, **kwargs)
 
 
 class MessageAudit:
