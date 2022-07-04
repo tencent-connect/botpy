@@ -85,6 +85,11 @@ class BotHttp:
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
 
+    def __del__(self):
+        if self._session and not self._session.closed:
+            _loop = asyncio.get_event_loop()
+            _loop.run_until_complete(self._session.close())
+
     async def close(self) -> None:
         if self._session:
             await self._session.close()
