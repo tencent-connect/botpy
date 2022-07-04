@@ -31,3 +31,6 @@ class Guild:
         self.description = data.get("description", None)
         self.joined_at = data.get("joined_at", None)
         self.event_id = event_id
+
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})

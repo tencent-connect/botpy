@@ -12,3 +12,6 @@ class Interaction:
         self.type = data.get("type", None)
         self.application_id = data.get("application_id", None)
         self.event_id = event_id
+
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})

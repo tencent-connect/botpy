@@ -23,12 +23,21 @@ class Reaction:
         self.target = self._Target(data.get("target", {}))
         self.event_id = event_id
 
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+
     class _Emoji:
         def __init__(self, data):
             self.id = data.get("id", None)
             self.type = data.get("type", None)
 
+        def __repr__(self):
+            return str(self.__dict__)
+
     class _Target:
         def __init__(self, data):
             self.id = data.get("id", None)
             self.type = data.get("type", None)   # 0: 消息 1: 帖子 2: 评论 3: 回复
+
+        def __repr__(self):
+            return str(self.__dict__)
