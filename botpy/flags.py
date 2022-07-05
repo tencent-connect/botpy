@@ -115,6 +115,7 @@ class Intents(BaseFlags):
     forums	论坛事件 (仅 私域 机器人能够设置此 intents)
     audio_action	音频事件
     """
+
     __slots__ = ()
 
     def __init__(self, **kwargs: bool) -> None:
@@ -128,9 +129,17 @@ class Intents(BaseFlags):
     @classmethod
     def all(cls):
         """打开所有事件的监听"""
-        value = max(cls.VALID_FLAGS.values()) * 2 - 1
-        self = cls.__new__(cls)
-        self.value = value
+        self = cls.none()
+        self.guild_messages = True
+        self.forums = True
+        self.interaction = True
+        self.audio_action = True
+        self.guilds = True
+        self.guild_members = True
+        self.guild_message_reactions = True
+        self.direct_message = True
+        self.message_audit = True
+        self.public_guild_messages = True
         return self
 
     @classmethod
