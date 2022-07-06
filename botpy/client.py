@@ -243,7 +243,7 @@ class Client:
 
         解析client类的on_event事件，进行对应的事件回调
         """
-        _log.info("[botpy] 调度事件: %s", event)
+        _log.debug("[botpy] 调度事件: %s", event)
         method = "on_" + event
 
         try:
