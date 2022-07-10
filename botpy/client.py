@@ -63,7 +63,11 @@ class Client:
         self._ws_ap: Dict = {}
 
         logging.configure_logging(
-            config=log_config, _format=log_format, level=log_level, bot_log=bot_log, ext_handlers=ext_handlers
+            config=log_config,
+            _format=log_format,
+            level=log_level,
+            bot_log=bot_log,
+            ext_handlers=ext_handlers,
         )
 
     async def __aenter__(self):
@@ -93,8 +97,6 @@ class Client:
             return
 
         self._closed = True
-
-        await self.http.close()
 
     def is_closed(self) -> bool:
         return self._closed
@@ -126,7 +128,6 @@ class Client:
 
         try:
             self.loop.run_until_complete(runner())
-            self.loop.run_forever()
         except KeyboardInterrupt:
             return
 
@@ -272,6 +273,7 @@ class Client:
         **kwargs: Any,
     ) -> None:
         try:
+            _log.debug("[botpy] _run_event")
             await coro(*args, **kwargs)
         except asyncio.CancelledError:
             pass
