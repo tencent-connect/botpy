@@ -5,7 +5,7 @@ from ssl import SSLContext
 from typing import Any, Optional, ClassVar, Union, Dict
 
 import aiohttp
-from aiohttp import ClientResponse, FormData, ClientTimeout, TCPConnector
+from aiohttp import ClientResponse, FormData, TCPConnector
 
 from . import logging
 from .errors import HttpErrorDict, ServerError
@@ -76,23 +76,19 @@ class BotHttp:
     TODO 增加并发请求的锁控制 @veehou
     """
 
-    def __init__(self, timeout: int, is_sandbox: bool = False, app_id: str = None, token: str = None):
+    def __init__(
+        self,
+        timeout: int,
+        is_sandbox: bool = False,
+        app_id: str = None,
+        token: str = None,
+    ):
         self.timeout = timeout
         self.is_sandbox = is_sandbox
 
         self._token: Optional[Token] = None if not app_id else Token(app_id=app_id, access_token=token)
-        self._session: Optional[aiohttp.ClientSession] = None
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
-
-    def __del__(self):
-        if self._session and not self._session.closed:
-            _loop = asyncio.get_event_loop()
-            _loop.run_until_complete(self._session.close())
-
-    async def close(self) -> None:
-        if self._session:
-            await self._session.close()
 
     async def check_session(self):
         if not self._headers:
@@ -100,13 +96,6 @@ class BotHttp:
                 "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
                 "User-Agent": "botpy/v1",
             }
-
-        if not self._session or self._session.closed:
-            self._session = aiohttp.ClientSession(
-                headers=self._headers,
-                timeout=ClientTimeout(self.timeout),
-                connector=TCPConnector(limit=500, ssl=SSLContext()),
-            )
 
     async def request(self, route: Route, **kwargs: Any):
         # some checking if it's a JSON request
@@ -118,7 +107,7 @@ class BotHttp:
                 for k, v in kwargs.pop("json").items():
                     if v:
                         if isinstance(v, dict):
-                            if k == 'message_reference':
+                            if k == "message_reference":
                                 _log.error(
                                     f"[botpy] 接口参数传入异常, 请求连接: {route.url}, "
                                     f"错误原因: file_image与message_reference不能同时传入，"
@@ -131,8 +120,19 @@ class BotHttp:
         route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
 
-        async with self._session.request(method=route.method, url=route.url, **kwargs) as response:
-            return await _handle_response(response)
+        async with aiohttp.ClientSession(
+            headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
+        ) as session:
+            _log.debug(session)
+
+            async with session.request(
+                method=route.method,
+                url=route.url,
+                timeout=(aiohttp.ClientTimeout(total=self.timeout)),
+                **kwargs,
+            ) as response:
+                _log.debug(response)
+                return await _handle_response(response)
 
     async def login(self, token: Token) -> robot.Robot:
         """login后保存token和session"""
