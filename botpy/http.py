@@ -89,6 +89,7 @@ class BotHttp:
         self._token: Optional[Token] = None if not app_id else Token(app_id=app_id, access_token=token)
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
+        self._session: Optional[aiohttp.ClientSession] = None
 
     async def check_session(self):
         if not self._headers:
@@ -96,6 +97,11 @@ class BotHttp:
                 "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
                 "User-Agent": "botpy/v1",
             }
+
+        if not self._session or self._session.closed:
+            self._session = aiohttp.ClientSession(
+                headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
+            )
 
     async def request(self, route: Route, **kwargs: Any):
         # some checking if it's a JSON request
@@ -119,20 +125,15 @@ class BotHttp:
         await self.check_session()
         route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
-
-        async with aiohttp.ClientSession(
-            headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
-        ) as session:
-            _log.debug(session)
-
-            async with session.request(
-                method=route.method,
-                url=route.url,
-                timeout=(aiohttp.ClientTimeout(total=self.timeout)),
-                **kwargs,
-            ) as response:
-                _log.debug(response)
-                return await _handle_response(response)
+        _log.debug(self._session)
+        async with self._session.request(
+            method=route.method,
+            url=route.url,
+            timeout=(aiohttp.ClientTimeout(total=self.timeout)),
+            **kwargs,
+        ) as response:
+            _log.debug(response)
+            return await _handle_response(response)
 
     async def login(self, token: Token) -> robot.Robot:
         """login后保存token和session"""
