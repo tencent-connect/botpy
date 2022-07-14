@@ -98,6 +98,8 @@ class Client:
 
         self._closed = True
 
+        await self.http.close()
+
     def is_closed(self) -> bool:
         return self._closed
 

@@ -87,9 +87,13 @@ class BotHttp:
         self.is_sandbox = is_sandbox
 
         self._token: Optional[Token] = None if not app_id else Token(app_id=app_id, access_token=token)
+        self._session: Optional[aiohttp.ClientSession] = None
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
-        self._session: Optional[aiohttp.ClientSession] = None
+
+    async def close(self) -> None:
+        if self._session:
+            await self._session.close()
 
     async def check_session(self):
         if not self._headers:
