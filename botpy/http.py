@@ -107,7 +107,9 @@ class BotHttp:
                 headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
             )
 
-    async def request(self, route: Route, **kwargs: Any):
+    async def request(self, route: Route, retry_time: int = 0, **kwargs: Any):
+        if retry_time > 2:
+            return
         # some checking if it's a JSON request
         if "json" in kwargs:
             json_ = kwargs["json"]
@@ -130,14 +132,21 @@ class BotHttp:
         route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
         _log.debug(self._session)
-        async with self._session.request(
-            method=route.method,
-            url=route.url,
-            timeout=(aiohttp.ClientTimeout(total=self.timeout)),
-            **kwargs,
-        ) as response:
-            _log.debug(response)
-            return await _handle_response(response)
+        try:
+            async with self._session.request(
+                method=route.method,
+                url=route.url,
+                timeout=(aiohttp.ClientTimeout(total=self.timeout)),
+                **kwargs,
+            ) as response:
+                _log.debug(response)
+                return await _handle_response(response)
+        except asyncio.TimeoutError:
+            _log.debug("session timeout retry")
+            self._session = aiohttp.ClientSession(
+                headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
+            )
+            await self.request(route, retry_time + 1, **kwargs)
 
     async def login(self, token: Token) -> robot.Robot:
         """login后保存token和session"""
