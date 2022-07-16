@@ -5,7 +5,7 @@ from ssl import SSLContext
 from typing import Any, Optional, ClassVar, Union, Dict
 
 import aiohttp
-from aiohttp import ClientResponse, FormData, TCPConnector
+from aiohttp import ClientResponse, FormData, TCPConnector, multipart, hdrs, payload
 
 from . import logging
 from .errors import HttpErrorDict, ServerError
@@ -18,6 +18,44 @@ _log = logging.get_logger()
 
 # 请求成功的返回码
 HTTP_OK_STATUS = [200, 202, 204]
+
+
+class _FormData(FormData):
+    def _gen_form_data(self) -> multipart.MultipartWriter:
+        """Encode a list of fields using the multipart/form-data MIME format"""
+        if self._is_processed:
+            return self._writer   # rewrite this part of FormData object to enable retry of request
+        for dispparams, headers, value in self._fields:
+            try:
+                if hdrs.CONTENT_TYPE in headers:
+                    part = payload.get_payload(
+                        value,
+                        content_type=headers[hdrs.CONTENT_TYPE],
+                        headers=headers,
+                        encoding=self._charset,
+                    )
+                else:
+                    part = payload.get_payload(
+                        value, headers=headers, encoding=self._charset
+                    )
+            except Exception as exc:
+                print(value)
+                raise TypeError(
+                    "Can not serialize value type: %r\n "
+                    "headers: %r\n value: %r" % (type(value), headers, value)
+                ) from exc
+
+            if dispparams:
+                part.set_content_disposition(
+                    "form-data", quote_fields=self._quote_fields, **dispparams
+                )
+                assert part.headers is not None
+                part.headers.popall(hdrs.CONTENT_LENGTH, None)
+
+            self._writer.append_payload(part)
+
+        self._is_processed = True
+        return self._writer
 
 
 async def _handle_response(response: ClientResponse) -> Union[Dict[str, Any], str]:
@@ -115,7 +153,7 @@ class BotHttp:
             json_ = kwargs["json"]
             json__get = json_.get("file_image")
             if json__get and isinstance(json__get, bytes):
-                kwargs["data"] = FormData()
+                kwargs["data"] = _FormData()
                 for k, v in kwargs.pop("json").items():
                     if v:
                         if isinstance(v, dict):
