@@ -132,7 +132,7 @@ class BotHttp:
     def __del__(self):
         if self._session and not self._session.closed:
             _loop = asyncio.get_event_loop()
-            _loop.run_until_complete(self.close())
+            _loop.create_task(self._session.close())
 
     async def close(self) -> None:
         if self._session:
