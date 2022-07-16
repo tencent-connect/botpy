@@ -120,6 +120,7 @@ class BotHttp:
         is_sandbox: bool = False,
         app_id: str = None,
         token: str = None,
+        loop: asyncio.AbstractEventLoop = None,
     ):
         self.timeout = timeout
         self.is_sandbox = is_sandbox
@@ -128,6 +129,13 @@ class BotHttp:
         self._session: Optional[aiohttp.ClientSession] = None
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
+        self._loop = loop
+
+    def __del__(self):
+        if self._session and not self._session.closed:
+            if not self._loop:
+                self._loop = asyncio.get_event_loop()
+            self._loop.run_until_complete(self.close())
 
     async def close(self) -> None:
         if self._session:

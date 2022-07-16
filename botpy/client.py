@@ -54,7 +54,7 @@ class Client:
         self.ret_coro: bool = False
         # TODO loop的整体梳理 @veehou
         self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-        self.http: BotHttp = BotHttp(timeout=timeout, is_sandbox=is_sandbox)
+        self.http: BotHttp = BotHttp(timeout=timeout, is_sandbox=is_sandbox, loop=self.loop)
         self.api: BotAPI = BotAPI(http=self.http)
 
         self._connection: Optional[ConnectionSession] = None
