@@ -79,8 +79,8 @@ async def _handle_response(response: ClientResponse) -> Union[Dict[str, Any], st
         # type of data should be dict or str or None, so there should be a condition to check and prevent bug
         message = data["message"] if isinstance(data, dict) else str(data)
         if not error_dict_get:
-            raise ServerError(message)
-        raise error_dict_get(msg=message)
+            raise ServerError(message) from None  # adding from None to prevent chain exception being raised
+        raise error_dict_get(msg=message) from None
 
 
 class Route:
@@ -185,8 +185,7 @@ class BotHttp:
                 _log.debug(response)
                 return await _handle_response(response)
         except asyncio.TimeoutError:
-            _log.debug("session timeout retry")
-            await self.request(route, retry_time + 1, **kwargs)
+            _log.warning(f"请求超时，请求连接: {route.url}")
         except ConnectionResetError:
             _log.debug("session connection broken retry")
             await self.request(route, retry_time + 1, **kwargs)
