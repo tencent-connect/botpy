@@ -147,7 +147,7 @@ class BotHttp:
 
         if not self._session or self._session.closed:
             self._session = aiohttp.ClientSession(
-                headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
+                headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext(), force_close=True)
             )
 
     async def request(self, route: Route, retry_time: int = 0, **kwargs: Any):
@@ -186,10 +186,9 @@ class BotHttp:
                 return await _handle_response(response)
         except asyncio.TimeoutError:
             _log.debug("session timeout retry")
-            await self.close()
-            self._session = aiohttp.ClientSession(
-                headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
-            )
+            await self.request(route, retry_time + 1, **kwargs)
+        except ConnectionResetError:
+            _log.debug("session connection broken retry")
             await self.request(route, retry_time + 1, **kwargs)
 
     async def login(self, token: Token) -> robot.Robot:
