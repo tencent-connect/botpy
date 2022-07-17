@@ -135,7 +135,7 @@ class BotHttp:
             _loop.create_task(self._session.close())
 
     async def close(self) -> None:
-        if self._session:
+        if self._session and not self._session.closed:
             await self._session.close()
 
     async def check_session(self):
