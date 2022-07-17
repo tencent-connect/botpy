@@ -186,6 +186,7 @@ class BotHttp:
                 return await _handle_response(response)
         except asyncio.TimeoutError:
             _log.debug("session timeout retry")
+            await self.close()
             self._session = aiohttp.ClientSession(
                 headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
             )
