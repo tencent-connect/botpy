@@ -246,7 +246,7 @@ class Client:
 
         解析client类的on_event事件，进行对应的事件回调
         """
-        _log.info("[botpy] 调度事件: %s", event)
+        _log.debug("[botpy] 调度事件: %s", event)
         method = "on_" + event
 
         try:
@@ -265,7 +265,7 @@ class Client:
     ) -> asyncio.Task:
         wrapped = self._run_event(coro, event_name, *args, **kwargs)
         # Schedules the task
-        return self.loop.create_task(wrapped, name=f"botpy: {event_name}")
+        return self.loop.create_task(wrapped, name=f"[botpy] {event_name}")
 
     async def _run_event(
         self,
