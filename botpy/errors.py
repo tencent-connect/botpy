@@ -41,10 +41,19 @@ class ServerError(RuntimeError):
         return self.msgs
 
 
+class ForbiddenError(RuntimeError):
+    def __init__(self, msg):
+        self.msgs = msg
+
+    def __str__(self):
+        return self.msgs
+
+
 HttpErrorDict = {
     401: AuthenticationFailedError,
     404: NotFoundError,
     405: MethodNotAllowedError,
+    403: ForbiddenError,
     429: SequenceNumberError,
     500: ServerError,
     504: ServerError,
