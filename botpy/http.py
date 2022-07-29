@@ -5,7 +5,7 @@ from ssl import SSLContext
 from typing import Any, Optional, ClassVar, Union, Dict
 
 import aiohttp
-from aiohttp import ClientResponse, FormData, TCPConnector
+from aiohttp import ClientResponse, FormData, TCPConnector, multipart, hdrs, payload
 
 from . import logging
 from .errors import HttpErrorDict, ServerError
@@ -18,6 +18,44 @@ _log = logging.get_logger()
 
 # 请求成功的返回码
 HTTP_OK_STATUS = [200, 202, 204]
+
+
+class _FormData(FormData):
+    def _gen_form_data(self) -> multipart.MultipartWriter:
+        """Encode a list of fields using the multipart/form-data MIME format"""
+        if self._is_processed:
+            return self._writer   # rewrite this part of FormData object to enable retry of request
+        for dispparams, headers, value in self._fields:
+            try:
+                if hdrs.CONTENT_TYPE in headers:
+                    part = payload.get_payload(
+                        value,
+                        content_type=headers[hdrs.CONTENT_TYPE],
+                        headers=headers,
+                        encoding=self._charset,
+                    )
+                else:
+                    part = payload.get_payload(
+                        value, headers=headers, encoding=self._charset
+                    )
+            except Exception as exc:
+                print(value)
+                raise TypeError(
+                    "Can not serialize value type: %r\n "
+                    "headers: %r\n value: %r" % (type(value), headers, value)
+                ) from exc
+
+            if dispparams:
+                part.set_content_disposition(
+                    "form-data", quote_fields=self._quote_fields, **dispparams
+                )
+                assert part.headers is not None
+                part.headers.popall(hdrs.CONTENT_LENGTH, None)
+
+            self._writer.append_payload(part)
+
+        self._is_processed = True
+        return self._writer
 
 
 async def _handle_response(response: ClientResponse) -> Union[Dict[str, Any], str]:
@@ -41,8 +79,8 @@ async def _handle_response(response: ClientResponse) -> Union[Dict[str, Any], st
         # type of data should be dict or str or None, so there should be a condition to check and prevent bug
         message = data["message"] if isinstance(data, dict) else str(data)
         if not error_dict_get:
-            raise ServerError(message)
-        raise error_dict_get(msg=message)
+            raise ServerError(message) from None  # adding from None to prevent chain exception being raised
+        raise error_dict_get(msg=message) from None
 
 
 class Route:
@@ -87,8 +125,18 @@ class BotHttp:
         self.is_sandbox = is_sandbox
 
         self._token: Optional[Token] = None if not app_id else Token(app_id=app_id, access_token=token)
+        self._session: Optional[aiohttp.ClientSession] = None
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
+
+    def __del__(self):
+        if self._session and not self._session.closed:
+            _loop = asyncio.get_event_loop()
+            _loop.create_task(self._session.close())
+
+    async def close(self) -> None:
+        if self._session and not self._session.closed:
+            await self._session.close()
 
     async def check_session(self):
         if not self._headers:
@@ -97,13 +145,20 @@ class BotHttp:
                 "User-Agent": "botpy/v1",
             }
 
-    async def request(self, route: Route, **kwargs: Any):
+        if not self._session or self._session.closed:
+            self._session = aiohttp.ClientSession(
+                headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext(), force_close=True)
+            )
+
+    async def request(self, route: Route, retry_time: int = 0, **kwargs: Any):
+        if retry_time > 2:
+            return
         # some checking if it's a JSON request
         if "json" in kwargs:
             json_ = kwargs["json"]
             json__get = json_.get("file_image")
             if json__get and isinstance(json__get, bytes):
-                kwargs["data"] = FormData()
+                kwargs["data"] = _FormData()
                 for k, v in kwargs.pop("json").items():
                     if v:
                         if isinstance(v, dict):
@@ -119,13 +174,9 @@ class BotHttp:
         await self.check_session()
         route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
-
-        async with aiohttp.ClientSession(
-            headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext())
-        ) as session:
-            _log.debug(session)
-
-            async with session.request(
+        _log.debug(self._session)
+        try:
+            async with self._session.request(
                 method=route.method,
                 url=route.url,
                 timeout=(aiohttp.ClientTimeout(total=self.timeout)),
@@ -133,6 +184,11 @@ class BotHttp:
             ) as response:
                 _log.debug(response)
                 return await _handle_response(response)
+        except asyncio.TimeoutError:
+            _log.warning(f"请求超时，请求连接: {route.url}")
+        except ConnectionResetError:
+            _log.debug("session connection broken retry")
+            await self.request(route, retry_time + 1, **kwargs)
 
     async def login(self, token: Token) -> robot.Robot:
         """login后保存token和session"""

@@ -98,6 +98,8 @@ class Client:
 
         self._closed = True
 
+        await self.http.close()
+
     def is_closed(self) -> bool:
         return self._closed
 
@@ -263,7 +265,7 @@ class Client:
     ) -> asyncio.Task:
         wrapped = self._run_event(coro, event_name, *args, **kwargs)
         # Schedules the task
-        return self.loop.create_task(wrapped, name=f"botpy: {event_name}")
+        return self.loop.create_task(wrapped, name=f"[botpy] {event_name}")
 
     async def _run_event(
         self,

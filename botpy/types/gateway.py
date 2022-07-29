@@ -64,6 +64,7 @@ class DirectMessagePayload(TypedDict):
     id: str
     member: Member
     message_reference: MessageRefPayload
+    attachments: List[MessageAttachPayload]
     seq: int
     seq_in_channel: str
     src_guild_id: str
