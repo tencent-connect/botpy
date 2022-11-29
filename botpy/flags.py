@@ -284,6 +284,36 @@ class Intents(BaseFlags):
         """
         return 1 << 30
 
+    @Flag
+    def audio_or_live_channel_member(self):
+        """:class:`bool`: 是否打开音视频/直播子频道成员进出事件的监听.
+
+        通过增加`client`的`on_xx`事件可以获取事件下发的数据:
+
+        - :func:`on_audio_or_live_channel_enter`            // 用户进入音视频/直播子频道时
+        - :func:`on_audio_or_live_channel_exit`        // 用户退出音视频/直播子频道时
+
+        """
+        return 1 << 19
+
+    @Flag
+    def open_forum_event(self):
+        """:class:`bool`: 开放论坛对象事件的监听.
+
+        通过增加`client`的`on_xx`事件可以获取事件下发的数据:
+
+
+        - :func:`on_open_forum_thread_create`            // 用户创建主题时
+        - :func:`on_open_forum_thread_update`            // 用户修改主题时
+        - :func:`on_open_forum_thread_delete`            // 用户删除主题时
+        - :func:`on_open_forum_post_create`            // 用户创建帖子时
+        - :func:`on_open_forum_post_delete`            // 用户删除帖子时
+        - :func:`on_open_forum_reply_create`            // 用户回复评论时
+        - :func:`on_open_forum_reply_delete`            // 用户删除评论时
+
+        """
+        return 1 << 18
+
 
 @fill_with_flags()
 class Permission(BaseFlags):
