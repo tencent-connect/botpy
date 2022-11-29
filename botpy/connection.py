@@ -8,8 +8,8 @@ from .interaction import Interaction
 from .message import Message, DirectMessage, MessageAudit
 from .user import Member
 from .reaction import Reaction
-from .audio import Audio
-from .forum import Thread
+from .audio import Audio, PublicAudio
+from .forum import Thread, OpenThread
 
 from . import logging
 from .api import BotAPI
@@ -227,3 +227,39 @@ class ConnectionState:
 
     def parse_forum_publish_audit_result(self, payload):
         self._dispatch("forum_publish_audit_result", payload.get('d', {}))
+
+    def parse_audio_or_live_channel_member_enter(self, payload):
+        _public_audio = PublicAudio(self.api, payload.get('d', {}))
+        self._dispatch("audio_or_live_channel_member_enter", _public_audio)
+
+    def parse_audio_or_live_channel_member_exit(self, payload):
+        _public_audio = PublicAudio(self.api, payload.get('d', {}))
+        self._dispatch("audio_or_live_channel_member_exit", _public_audio)
+
+    def parse_open_forum_thread_create(self, payload):
+        _forum = OpenThread(self.api, payload.get('d', {}))
+        self._dispatch("open_forum_thread_create", _forum)
+
+    def parse_open_forum_thread_update(self, payload):
+        _forum = OpenThread(self.api, payload.get('d', {}))
+        self._dispatch("open_forum_thread_update", _forum)
+
+    def parse_open_forum_thread_delete(self, payload):
+        _forum = OpenThread(self.api, payload.get('d', {}))
+        self._dispatch("open_forum_thread_delete", _forum)
+
+    def parse_open_forum_post_create(self, payload):
+        _forum = OpenThread(self.api, payload.get('d', {}))
+        self._dispatch("open_forum_post_create", payload.get('d', {}))
+
+    def parse_open_forum_post_delete(self, payload):
+        _forum = OpenThread(self.api, payload.get('d', {}))
+        self._dispatch("open_forum_post_delete", payload.get('d', {}))
+
+    def parse_open_forum_reply_create(self, payload):
+        _forum = OpenThread(self.api, payload.get('d', {}))
+        self._dispatch("open_forum_reply_create", payload.get('d', {}))
+
+    def parse_open_forum_reply_delete(self, payload):
+        _forum = OpenThread(self.api, payload.get('d', {}))
+        self._dispatch("open_forum_reply_delete", payload.get('d', {}))

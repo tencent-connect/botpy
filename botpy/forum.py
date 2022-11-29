@@ -150,3 +150,23 @@ class Thread:
 
                     def __repr__(self):
                         return str(self.__dict__)
+
+
+class OpenThread:
+    __slots__ = (
+        "_api",
+        "thread_info",
+        "channel_id",
+        "guild_id",
+        "author_id",
+        "event_id")
+
+    def __init__(self, api: BotAPI, data: forum.OpenForumEvent):
+        self._api = api
+
+        self.guild_id = data.get("guild_id", None)
+        self.channel_id = data.get("channel_id", None)
+        self.author_id = data.get("author_id", None)
+
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
