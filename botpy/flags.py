@@ -140,6 +140,8 @@ class Intents(BaseFlags):
         self.direct_message = True
         self.message_audit = True
         self.public_guild_messages = True
+        self.audio_or_live_channel_member = True
+        self.open_forum_event = True
         return self
 
     @classmethod
