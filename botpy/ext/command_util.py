@@ -19,21 +19,21 @@ class Commands:
 
     def __call__(self, func):
         @wraps(func)
-        async def decorated(*args, **kwargs):
+        async def decorated(**kwargs):
             api: BotAPI = kwargs["api"]
             message: Message = kwargs["message"]
+            args: tuple = kwargs["args"]
             if isinstance(self.commands, tuple):
                 for command in self.commands:
                     if command in message.content:
                         # 分割指令后面的指令参数
                         params = message.content.split(command)[1].strip()
-                        return await func(api=api, message=message, params=params)
+                        return await func(api=api, message=message, args=args, params=params)
             elif self.commands in message.content:
                 # 分割指令后面的指令参数
                 params = message.content.split(self.commands)[1].strip()
-                return await func(api=api, message=message, params=params)
+                return await func(api=api, message=message, args=args, params=params)
             else:
                 return False
 
         return decorated
-
