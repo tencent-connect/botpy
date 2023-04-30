@@ -3,7 +3,7 @@
 # 异步api
 
 from io import BufferedReader
-from typing import Any, List, Union, BinaryIO
+from typing import Any, List, Union, BinaryIO, Dict
 
 from .flags import Permission
 from .http import BotHttp, Route
