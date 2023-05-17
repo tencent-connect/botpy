@@ -3,7 +3,7 @@
 # 异步api
 
 from io import BufferedReader
-from typing import Any, List, Union, BinaryIO
+from typing import Any, List, Union, BinaryIO, Dict
 
 from .flags import Permission
 from .http import BotHttp, Route
@@ -245,6 +245,33 @@ class BotAPI:
             "GET",
             "/guilds/{guild_id}/members",
             guild_id=guild_id,
+        )
+        return await self._http.request(route, params=params)
+    
+        async def get_guild_role_members(
+            self, guild_id: str, role_id: str, start_index: str = "0", limit: int = 1
+    ) -> Dict[str, Union[List[user.Member], str]]:
+        """
+        获取频道身份组成员列表。
+
+        注意:该接口为私域机器人权限, 需要在管理端申请权限
+
+        Args:
+          guild_id (str): 频道 ID。
+          role_id (str): 身份组 ID。
+          start_index (str): 将上一次回包中next填入， 如果是第一次请求填 0，默认为 0。. Defaults to 0
+          limit (int): 分页大小，1-400。成员较多的频道尽量使用较大的limit值，以减少请求数。. Defaults to 1
+
+        Returns:
+          Dict[str, Union[List[user.Member], str]]
+        """
+        params = {"start_index": start_index, "limit": limit}
+
+        route = Route(
+            "GET",
+            "/guilds/{guild_id}/roles/{role_id}/members",
+            guild_id=guild_id,
+            role_id=role_id
         )
         return await self._http.request(route, params=params)
 
