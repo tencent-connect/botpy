@@ -32,6 +32,6 @@ setup(
         # 许可证信息
         "License :: OSI Approved :: MIT License",
         # 目标 Python 版本
-        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.7",
     ],
 )
