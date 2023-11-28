@@ -11,7 +11,7 @@ setup(
     description="qq robot client with python3",
     long_description=open("README.rst").read(),
     # 项目主页
-    url="https://github.com/tencent-connect/botpy",
+    url="https://github.com/cuckoo711/botpy-group-enable",
     # 你要安装的包，通过 setuptools.find_packages 找到当前目录下有哪些包
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     # 执照
@@ -32,6 +32,6 @@ setup(
         # 许可证信息
         "License :: OSI Approved :: MIT License",
         # 目标 Python 版本
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.11",
     ],
 )
