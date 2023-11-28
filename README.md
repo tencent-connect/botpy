@@ -2,7 +2,8 @@
 
 ### 安装
 
-直接拉取吧，放在 `site-packages\botpy` `兼容版本：python3.8+`
+直接拉取吧，将 `botpy` 文件夹单独放在项目库里的 `site-packages\botpy` 中
+`兼容版本：python3.8+`
 
 ### 使用
 
