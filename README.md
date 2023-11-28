@@ -1,13 +1,3 @@
-<div align="center">
-
-_✨ 基于 [机器人开放平台API](https://bot.q.qq.com/wiki/develop/api/) 实现的机器人框架 ✨_
-
-_✨ 为开发者提供一个易使用、开发效率高的开发框架 ✨_
-
-[文档](https://bot.q.qq.com/wiki/develop/pythonsdk/)
-
-</div>
-
 ## 准备工作
 
 ### 安装
@@ -32,13 +22,13 @@ import botpy
 
 在Intents中设置group_manage=True以启用QQ群事件
 目前支持：
-    - :func:`group_add_robot`: 机器人加入群聊
-    - :func:`group_del_robot`: 机器人退出群聊
-    - :func:`group_msg_reject`: 群聊拒绝机器人主动消息
-    - :func:`group_msg_receive`: 群聊接受机器人主动消息
-    - :func:`group_at_message_create`: 当收到@机器人的消息时
+1. :func:`group_add_robot`: 机器人加入群聊
+2. :func:`group_del_robot`: 机器人退出群聊
+3. :func:`group_msg_reject`: 群聊拒绝机器人主动消息
+4. :func:`group_msg_receive`: 群聊接受机器人主动消息
+5. :func:`group_at_message_create`: 当收到@机器人的消息时
 
-    消息结构体可使用reply进行回复
+消息结构体可使用reply进行回复
 
 
 ## 致谢
