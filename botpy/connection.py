@@ -5,7 +5,7 @@ from typing import List, Callable, Dict, Any, Optional
 from .channel import Channel
 from .guild import Guild
 from .interaction import Interaction
-from .message import Message, DirectMessage, MessageAudit
+from .message import Message, DirectMessage, MessageAudit, MessageGroupManage, MessageGroup
 from .user import Member
 from .reaction import Reaction
 from .audio import Audio, PublicAudio
@@ -263,3 +263,24 @@ class ConnectionState:
     def parse_open_forum_reply_delete(self, payload):
         _forum = OpenThread(self.api, payload.get('d', {}))
         self._dispatch("open_forum_reply_delete", payload.get('d', {}))
+
+    # botpy.flags.Intents.group_manage
+    def parse_group_add_robot(self, payload):
+        _message = MessageGroupManage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_add_robot", _message)
+
+    def parse_group_del_robot(self, payload):
+        _message = MessageGroupManage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_del_robot", _message)
+
+    def parse_group_msg_reject(self, payload):
+        _message = MessageGroupManage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_msg_reject", _message)
+
+    def parse_group_msg_receive(self, payload):
+        _message = MessageGroupManage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_msg_receive", _message)
+
+    def parse_group_at_message_create(self, payload):
+        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_at_message_create", _message)
