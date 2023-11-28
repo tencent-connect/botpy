@@ -116,3 +116,18 @@ class DeletionOperator(TypedDict):
 class DeletedMessageInfo(TypedDict):
     message: DeletedMessage
     op_user: DeletionOperator
+
+class MessageGroupManagePayload(TypedDict):
+    group_id: str
+    operator: UserPayload
+    user: UserPayload
+    type: int
+    timestamp: str
+
+class MessageGroupPayload(TypedDict):
+    group_id: str
+    operator: UserPayload
+    user: UserPayload
+    type: int
+    timestamp: str
+    message: MessagePayload
