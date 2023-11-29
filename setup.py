@@ -11,7 +11,7 @@ setup(
     description="qq robot client with python3",
     long_description=open("README.rst").read(),
     # 项目主页
-    url="https://github.com/cuckoo711/botpy-group-enable",
+    url="https://github.com/tencent-connect/botpy",
     # 你要安装的包，通过 setuptools.find_packages 找到当前目录下有哪些包
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     # 执照
