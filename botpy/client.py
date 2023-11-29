@@ -79,7 +79,7 @@ class Client:
         self,
         exc_type: Optional[Type[BaseException]],
         exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        _traceback: Optional[TracebackType],
     ) -> None:
         _log.debug("[botpy] 机器人客户端: __aexit__")
 
@@ -103,6 +103,7 @@ class Client:
     def is_closed(self) -> bool:
         return self._closed
 
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
         traceback.print_exc()
 
@@ -252,7 +253,7 @@ class Client:
         try:
             coro = getattr(self, method)
         except AttributeError:
-            pass
+            _log.debug("[botpy] 事件: %s 未注册", event)
         else:
             self._schedule_event(coro, method, *args, **kwargs)
 

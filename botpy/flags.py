@@ -114,6 +114,7 @@ class Intents(BaseFlags):
     message_audit	消息审核事件
     forums	论坛事件 (仅 私域 机器人能够设置此 intents)
     audio_action	音频事件
+    group_manage	群管理事件
     """
 
     __slots__ = ()
@@ -126,6 +127,7 @@ class Intents(BaseFlags):
                 raise TypeError(f"{key!r} is not a valid flag name.")
             setattr(self, key, value)
 
+    # noinspection PyUnresolvedReferences,PyDunderSlots
     @classmethod
     def all(cls):
         """打开所有事件的监听"""
@@ -142,6 +144,7 @@ class Intents(BaseFlags):
         self.public_guild_messages = True
         self.audio_or_live_channel_member = True
         self.open_forum_event = True
+        self.group_manage = True
         return self
 
     @classmethod
@@ -151,6 +154,7 @@ class Intents(BaseFlags):
         self.value = self.DEFAULT_VALUE
         return self
 
+    # noinspection PyUnresolvedReferences,PyDunderSlots
     @classmethod
     def default(cls):
         """打开所有公域事件的监听
@@ -226,6 +230,19 @@ class Intents(BaseFlags):
 
         """
         return 1 << 12
+
+    @Flag
+    def group_manage(self):
+        """:class:`bool`: 是否打开群管理事件的监听.
+
+        - :func:`group_add_robot`: 机器人加入群聊
+        - :func:`group_del_robot`: 机器人退出群聊
+        - :func:`group_msg_reject`: 群聊拒绝机器人主动消息
+        - :func:`group_msg_receive`: 群聊接受机器人主动消息
+        - :func:`group_at_message_create`: 当收到@机器人的消息时
+
+        """
+        return 1 << 25
 
     @Flag
     def interaction(self):

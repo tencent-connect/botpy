@@ -184,3 +184,41 @@ class MessageAudit:
 
     def __repr__(self):
         return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+
+
+class MessageGroup:
+    __slots__ = (
+        "_api",
+        "author",
+        "content",
+        "group_openid",
+        "op_member_openid",
+        "id",
+        "timestamp",
+        "event_id"
+    )
+
+    def __init__(self, api: BotAPI, event_id, data: gateway.MessageGroupPayload):
+        self._api = api
+
+        self.author = self._User(data.get("author", {}))
+        self.content = data.get("content", None)
+        self.group_openid = data.get("group_openid", None)
+        self.op_member_openid = data.get("op_member_openid", None)
+        self.id = data.get("id", None)
+        self.timestamp = data.get("timestamp", None)
+
+        self.event_id = event_id
+
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+
+    class _User:
+        def __init__(self, data):
+            self.member_openid = data.get("member_openid", None)
+
+        def __repr__(self):
+            return str(self.__dict__)
+
+    async def reply(self, **kwargs):
+        return await self._api.post_group_messages(group_openid=self.group_openid, msg_id=self.id, **kwargs)

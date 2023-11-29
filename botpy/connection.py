@@ -5,7 +5,7 @@ from typing import List, Callable, Dict, Any, Optional
 from .channel import Channel
 from .guild import Guild
 from .interaction import Interaction
-from .message import Message, DirectMessage, MessageAudit
+from .message import Message, DirectMessage, MessageAudit, MessageGroup
 from .user import Member
 from .reaction import Reaction
 from .audio import Audio, PublicAudio
@@ -65,8 +65,8 @@ class ConnectionSession:
 
         await asyncio.wait(tasks)
 
-    async def _runner(self, session, time_interval):
-        await self._connect(session)
+    async def _runner(self, _session, time_interval):
+        await self._connect(_session)
         # 后台有频率限制，根据间隔时间发起链接请求
         await asyncio.sleep(time_interval)
 
@@ -89,9 +89,11 @@ class ConnectionState:
         self._dispatch = dispatch
         self.api = api
 
+    # noinspection PyUnusedLocal
     def parse_ready(self, payload):
         self._dispatch("ready")
 
+    # noinspection PyUnusedLocal
     def parse_resumed(self, payload):
         self._dispatch("resumed")
 
@@ -263,3 +265,24 @@ class ConnectionState:
     def parse_open_forum_reply_delete(self, payload):
         _forum = OpenThread(self.api, payload.get('d', {}))
         self._dispatch("open_forum_reply_delete", payload.get('d', {}))
+
+    # botpy.flags.Intents.group_manage
+    def parse_group_add_robot(self, payload):
+        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_add_robot", _message)
+
+    def parse_group_del_robot(self, payload):
+        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_del_robot", _message)
+
+    def parse_group_msg_reject(self, payload):
+        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_msg_reject", _message)
+
+    def parse_group_msg_receive(self, payload):
+        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_msg_receive", _message)
+
+    def parse_group_at_message_create(self, payload):
+        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_at_message_create", _message)

@@ -1,4 +1,4 @@
-<div align="center">
+<div style="width: auto; margin: auto;">
 
 ![botpy](https://socialify.git.ci/tencent-connect/botpy/image?description=1&font=Source%20Code%20Pro&forks=1&issues=1&language=1&logo=https%3A%2F%2Fgithub.com%2Ftencent-connect%2Fbot-docs%2Fblob%2Fmain%2Fdocs%2F.vuepress%2Fpublic%2Ffavicon-64px.png%3Fraw%3Dtrue&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Light)
 
@@ -35,6 +35,7 @@ pip install qq-botpy
 需要使用的地方`import botpy`
 
 ```python
+# noinspection PyUnresolvedReferences
 import botpy
 ```
 
@@ -110,7 +111,7 @@ class MyClient(botpy.Client):
 
 ## 示例机器人
 
-[`examples`](./examples/) 目录下存放示例机器人，具体使用可参考[`Readme.md`](./examples/README.md) 
+[`examples`](./examples) 目录下存放示例机器人，具体使用可参考[`Readme.md`](./examples/README.md) 
 
     examples/
     .
@@ -167,7 +168,7 @@ pytest
 感谢感谢以下开发者对 `botpy` 作出的贡献：
 
 <a href="https://github.com/tencent-connect/botpy/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=tencent-connect/botpy" />
+  <img src="https://contrib.rocks/image?repo=tencent-connect/botpy"  alt="img"/>
 </a>
 
 # 加入官方社区

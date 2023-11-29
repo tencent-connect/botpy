@@ -79,3 +79,16 @@ class MessageAuditPayload(TypedDict):
     audit_time: str
     create_time: str
     seq_in_channel: str
+
+
+class GroupMemberPayload(TypedDict):
+    member_openid: str
+
+
+class MessageGroupPayload(TypedDict):
+    author: GroupMemberPayload
+    content: str
+    group_openid: str
+    op_member_openid: str
+    timestamp: str
+    id: str
