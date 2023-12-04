@@ -22,6 +22,7 @@ from .types import (
     forum,
 )
 
+
 class BotAPI:
     """
     机器人相关的API接口类
@@ -198,7 +199,7 @@ class BotAPI:
         guild_id: str,
         user_id: str,
         add_blacklist: bool = False,
-        delete_history_msg_days: int = 0
+        delete_history_msg_days: int = 0,
     ) -> str:
         """
         删除频道成员
@@ -246,7 +247,7 @@ class BotAPI:
             guild_id=guild_id,
         )
         return await self._http.request(route, params=params)
-    
+
     async def get_guild_role_members(
         self, guild_id: str, role_id: str, start_index: str = "0", limit: int = 1
     ) -> Dict[str, Union[List[user.Member], str]]:
@@ -270,7 +271,7 @@ class BotAPI:
             "GET",
             "/guilds/{guild_id}/roles/{role_id}/members",
             guild_id=guild_id,
-            role_id=role_id
+            role_id=role_id,
         )
         return await self._http.request(route, params=params)
 
@@ -584,6 +585,58 @@ class BotAPI:
         )
         return await self._http.request(route, json=payload)
 
+    async def on_interaction_result(self, interaction_id: str, code: int):
+        """
+        `on_interaction_result` 消息按钮回调结果
+
+        Args:
+          interaction_id (str): 消息按钮回调事件的 ID。
+          code (int): 回调结果 0 成功，1 操作失败，2 操作频繁，3 重复操作，4 没有权限，5 仅管理员操作
+
+        Returns:
+          无
+        """
+        payload = {"code": code}
+        route = Route(
+            "PUT",
+            "/interactions/{id}",
+            id=interaction_id,
+        )
+        return await self._http.request(route, json=payload)
+
+    async def patch_guild_message(
+        self,
+        channel_id: str,
+        patch_msg_id: str,
+        msg_id: str = None,
+        event_id: str = None,
+        markdown: message.MarkdownPayload = None,
+        keyboard: message.KeyboardPayload = message.KeyboardPayload(content={}),
+    ) -> message.Message:
+        """
+        修改频道markdown消息，需要先申请权限。
+
+        Args:
+          channel_id (str): 您要将消息发送到的频道的 ID。
+          patch_msg_id (str): 需要修改的消息id。
+          msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
+          event_id (str): 您要回复的消息的事件 ID。
+          markdown (message.MarkdownPayload): markdown 消息的构建参数。
+          keyboard (message.KeyboardPayload): keyboard 消息的构建参数
+
+        Returns:
+          message.Message: 一个消息字典对象。
+        """
+        payload = locals()
+        payload.pop("self", None)
+        route = Route(
+            "PATCH",
+            "/channels/{channel_id}/messages/{patch_msg_id}",
+            channel_id=channel_id,
+            patch_msg_id=patch_msg_id,
+        )
+        return await self._http.request(route, json=payload)
+
     # 私信消息
     async def create_dms(self, guild_id: str, user_id: str) -> message.DmsPayload:
         """
@@ -766,7 +819,7 @@ class BotAPI:
         """
         payload = {
             "mute_end_timestamp": mute_end_timestamp,
-            "mute_seconds": mute_seconds
+            "mute_seconds": mute_seconds,
         }
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
@@ -808,7 +861,7 @@ class BotAPI:
         """
         payload = {
             "mute_end_timestamp": mute_end_timestamp,
-            "mute_seconds": mute_seconds
+            "mute_seconds": mute_seconds,
         }
         route = Route("PATCH", "/guilds/{guild_id}/members/{user_id}/mute", guild_id=guild_id, user_id=user_id)
         return await self._http.request(route, json=payload)
@@ -831,7 +884,7 @@ class BotAPI:
         payload = {
             "mute_end_timestamp": mute_end_timestamp,
             "mute_seconds": mute_seconds,
-            "user_ids": user_ids
+            "user_ids": user_ids,
         }
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
@@ -1312,7 +1365,7 @@ class BotAPI:
             "DELETE", "/channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
         )
         return await self._http.request(route)
-    
+
     async def post_group_message(
         self,
         group_openid: str,
@@ -1444,5 +1497,3 @@ class BotAPI:
         payload.pop("self", None)
         route = Route("POST", "/v2/users/{openid}/files", openid=openid)
         return await self._http.request(route, json=payload)
-    
-

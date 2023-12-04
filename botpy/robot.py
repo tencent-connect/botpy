@@ -1,9 +1,13 @@
-from botpy.types import robot
+import asyncio
 import time
+
 import aiohttp
+
 from .logging import get_logger
+from botpy.types import robot
 
 _log = get_logger()
+
 
 class Robot:
     def __init__(self, data: robot.Robot):
@@ -39,17 +43,23 @@ class Token:
     async def update_access_token(self):
         session = aiohttp.ClientSession()
         data = None
-        async with session.post(
-            url="https://bots.qq.com/app/getAppAccessToken",
-            timeout=(aiohttp.ClientTimeout(total=5)),
-            json={
-                "appId": self.app_id,
-                "clientSecret": self.secret,
-            },
-        ) as response:
-            data = await response.json()
-        await session.close()
-        _log.info(f"{data}")
+        # TODO 增加超时重试
+        try:
+            async with session.post(
+                url="https://bots.qq.com/app/getAppAccessToken",
+                timeout=(aiohttp.ClientTimeout(total=20)),
+                json={
+                    "appId": self.app_id,
+                    "clientSecret": self.secret,
+                },
+            ) as response:
+                data = await response.json()
+        except asyncio.TimeoutError as e:
+            _log.info("[botpy] access_token TimeoutError:" + str(e))
+            raise
+        finally:
+            await session.close()
+        _log.info("[botpy] access_token expires_in " + data["expires_in"])
         self.access_token = data["access_token"]
         self.expires_in = int(data["expires_in"]) + int(time.time())
 

@@ -131,7 +131,7 @@ class BotWebSocket:
                     elif msg.type == WSMsgType.CLOSED or msg.type == WSMsgType.CLOSE:
                         await self.on_closed(ws_conn.close_code, msg.extra)
                     if ws_conn.closed:
-                        _log.debug("[botpy] ws关闭, 停止接收消息!")
+                        _log.info("[botpy] ws关闭, 停止接收消息!")
                         break
 
     async def ws_identify(self):

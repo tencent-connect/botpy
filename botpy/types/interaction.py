@@ -11,9 +11,12 @@ class InteractionPayload(TypedDict):
     id: str
     application_id: int
     type: int
+    chat_type: int
     data: InteractionData
     guild_id: int
     channel_id: int
+    group_open_id: str
+    timestamp: int
     version: int
 
 
