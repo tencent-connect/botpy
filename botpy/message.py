@@ -17,7 +17,7 @@ class Message:
         "seq",
         "seq_in_channel",
         "timestamp",
-        "event_id"
+        "event_id",
     )
 
     def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
@@ -39,7 +39,7 @@ class Message:
         self.event_id = event_id
 
     def __repr__(self):
-        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith("_")})
 
     class _User:
         def __init__(self, data):
@@ -100,7 +100,7 @@ class DirectMessage:
         "seq_in_channel",
         "src_guild_id",
         "timestamp",
-        "event_id"
+        "event_id",
     )
 
     def __init__(self, api: BotAPI, event_id, data: gateway.DirectMessagePayload):
@@ -122,7 +122,7 @@ class DirectMessage:
         self.event_id = event_id
 
     def __repr__(self):
-        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith("_")})
 
     class _User:
         def __init__(self, data):
@@ -171,7 +171,8 @@ class MessageAudit:
         "message_id",
         "channel_id",
         "guild_id",
-        "event_id")
+        "event_id",
+    )
 
     def __init__(self, api: BotAPI, event_id, data: gateway.MessageAuditPayload):
         self._api = api
@@ -183,8 +184,9 @@ class MessageAudit:
         self.event_id = event_id
 
     def __repr__(self):
-        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
-    
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith("_")})
+
+
 class BaseMessage:
     __slots__ = (
         "_api",
@@ -195,7 +197,7 @@ class BaseMessage:
         "attachments",
         "msg_seq",
         "timestamp",
-        "event_id"
+        "event_id",
     )
 
     def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
@@ -208,17 +210,17 @@ class BaseMessage:
         self.msg_seq = data.get("msg_seq", None)  # 全局消息序号
         self.timestamp = data.get("timestamp", None)
         self.event_id = event_id
-    
+
     def __repr__(self):
         return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith("_")})
-    
+
     class _MessageRef:
         def __init__(self, data):
             self.message_id = data.get("message_id", None)
 
         def __repr__(self):
             return str(self.__dict__)
-    
+
     class _Attachments:
         def __init__(self, data):
             self.content_type = data.get("content_type", None)
@@ -231,11 +233,12 @@ class BaseMessage:
 
         def __repr__(self):
             return str(self.__dict__)
-        
+
+
 class GroupMessage(BaseMessage):
     __slots__ = (
         "author",
-        "group_openid"
+        "group_openid",
     )
 
     def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
@@ -246,7 +249,7 @@ class GroupMessage(BaseMessage):
     def __repr__(self):
         slots = self.__slots__ + super().__slots__
         return str({items: str(getattr(self, items)) for items in slots if not items.startswith("_")})
-    
+
     class _User:
         def __init__(self, data):
             self.member_openid = data.get("member_openid", None)
@@ -278,5 +281,3 @@ class C2CMessage(BaseMessage):
 
     async def reply(self, **kwargs):
         return await self._api.post_c2c_message(openid=self.author.user_openid, msg_id=self.id, **kwargs)
-
-    
