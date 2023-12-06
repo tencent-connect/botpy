@@ -22,11 +22,6 @@ from .types import (
     forum,
 )
 
-
-from .logging import get_logger
-
-_log = get_logger()
-
 class BotAPI:
     """
     机器人相关的API接口类
@@ -1359,7 +1354,6 @@ class BotAPI:
         """
         payload = locals()
         payload.pop("self", None)
-        _log.info(payload)
         route = Route("POST", "/v2/groups/{group_openid}/messages", group_openid=group_openid)
         return await self._http.request(route, json=payload)
 
