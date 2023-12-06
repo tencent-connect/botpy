@@ -22,7 +22,6 @@ from .types import (
     forum,
 )
 
-
 class BotAPI:
     """
     机器人相关的API接口类
@@ -195,11 +194,11 @@ class BotAPI:
         return await self._http.request(route)
 
     async def get_delete_member(
-            self,
-            guild_id: str,
-            user_id: str,
-            add_blacklist: bool = False,
-            delete_history_msg_days: int = 0
+        self,
+        guild_id: str,
+        user_id: str,
+        add_blacklist: bool = False,
+        delete_history_msg_days: int = 0
     ) -> str:
         """
         删除频道成员
@@ -248,8 +247,8 @@ class BotAPI:
         )
         return await self._http.request(route, params=params)
     
-        async def get_guild_role_members(
-            self, guild_id: str, role_id: str, start_index: str = "0", limit: int = 1
+    async def get_guild_role_members(
+        self, guild_id: str, role_id: str, start_index: str = "0", limit: int = 1
     ) -> Dict[str, Union[List[user.Member], str]]:
         """
         获取频道身份组成员列表。
@@ -459,7 +458,7 @@ class BotAPI:
         Returns:
           成功执行返回`None`。
         """
-        payload = {"add": str(add.value)  if add else None, "remove": str(remove.value)  if remove else None}
+        payload = {"add": str(add.value) if add else None, "remove": str(remove.value) if remove else None}
 
         route = Route(
             "PUT", "/channels/{channel_id}/roles/{role_id}/permissions", channel_id=channel_id, role_id=role_id
@@ -1313,3 +1312,133 @@ class BotAPI:
             "DELETE", "/channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
         )
         return await self._http.request(route)
+    
+    async def post_group_message(
+        self,
+        group_openid: str,
+        msg_type: int = 0,
+        content: str = None,
+        embed: message.Embed = None,
+        ark: message.Ark = None,
+        message_reference: message.Reference = None,
+        media: message.Media = None,
+        msg_id: str = None,
+        event_id: str = None,
+        markdown: message.MarkdownPayload = None,
+        keyboard: message.Keyboard = None,
+    ) -> message.Message:
+        """
+        发送消息。
+
+        注意:
+        - 要求操作人在该群具有发送消息的权限。
+        - 发送成功之后，会触发一个创建消息的事件。
+        - 被动回复消息有效期为 5 分钟
+        - 发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
+
+        Args:
+          group_openid (str): 您要将消息发送到的群的 ID。
+          msg_type (int): 消息类型：0 是文本，1 图文混排，2 是 markdown，3 ark，4 embed，7 media 富媒体
+          content (str): 消息的文本内容。
+          embed (message.Embed): embed 消息，一种特殊的 ark
+          ark (message.Ark): ark 模版消息
+          message_reference (message.Reference): 对消息的引用。
+          media (message.Media): 富媒体消息
+          msg_id (str): 您要回复的消息的 ID。
+          event_id (str): 您要回复的消息的事件 ID。
+          markdown (message.MarkdownPayload): markdown 消息
+          keyboard (message.Keyboard): keyboard 消息
+
+        Returns:
+          message.Message: 一个消息字典对象。
+        """
+        payload = locals()
+        payload.pop("self", None)
+        route = Route("POST", "/v2/groups/{group_openid}/messages", group_openid=group_openid)
+        return await self._http.request(route, json=payload)
+
+    async def post_c2c_message(
+        self,
+        openid: str,
+        msg_type: int = 0,
+        content: str = None,
+        embed: message.Embed = None,
+        ark: message.Ark = None,
+        message_reference: message.Reference = None,
+        media: message.Media = None,
+        msg_id: str = None,
+        event_id: str = None,
+        markdown: message.MarkdownPayload = None,
+        keyboard: message.Keyboard = None,
+    ) -> message.Message:
+        """
+        发送消息。
+
+        注意:
+        - 要求操作人具有发送消息的权限。
+        - 发送成功之后，会触发一个创建消息的事件。
+        - 被动回复消息有效期为 5 分钟
+        - 发送消息接口要求机器人接口需要链接到websocket gateway 上保持在线状态
+
+        Args:
+          openid (str): 您要将消息发送到的用户的 ID。
+          msg_type (int): 消息类型：0 是文本，1 图文混排，2 是 markdown，3 ark，4 embed，7 media 富媒体
+          content (str): 消息的文本内容。
+          embed (message.Embed): embed 消息，一种特殊的 ark
+          ark (message.Ark): ark 模版消息
+          message_reference (message.Reference): 对消息的引用。
+          media (message.Media): 富媒体消息
+          msg_id (str): 您要回复的消息的 ID。
+          event_id (str): 您要回复的消息的事件 ID。
+          markdown (message.MarkdownPayload): markdown 消息
+          keyboard (message.Keyboard): keyboard 消息
+
+        Returns:
+          message.Message: 一个消息字典对象。
+        """
+        payload = locals()
+        payload.pop("self", None)
+        route = Route("POST", "/v2/users/{openid}/messages", openid=openid)
+        return await self._http.request(route, json=payload)
+
+    async def post_group_file(
+        self,
+        group_openid: str,
+        file_type: int,
+        url: str,
+        srv_send_msg: bool = False,
+    ) -> message.Media:
+        """
+        上传/发送群聊图片
+
+        Args:
+          file_type (int): 媒体类型：1 图片png/jpg，2 视频mp4，3 语音silk，4 文件（暂不开放）
+          url (str): 需要发送媒体资源的url
+          srv_send_msg (bool): 设置 true 会直接发送消息到目标端，且会占用主动消息频次
+        """
+        payload = locals()
+        payload.pop("self", None)
+        route = Route("POST", "/v2/groups/{group_openid}/files", group_openid=group_openid)
+        return await self._http.request(route, json=payload)
+
+    async def post_c2c_file(
+        self,
+        openid: str,
+        file_type: int,
+        url: str,
+        srv_send_msg: bool = False,
+    ) -> message.Media:
+        """
+        上传/发送c2c图片
+
+        Args:
+          file_type (int): 媒体类型：1 图片png/jpg，2 视频mp4，3 语音silk，4 文件（暂不开放）
+          url (str): 需要发送媒体资源的url
+          srv_send_msg (bool): 设置 true 会直接发送消息到目标端，且会占用主动消息频次
+        """
+        payload = locals()
+        payload.pop("self", None)
+        route = Route("POST", "/v2/users/{openid}/files", openid=openid)
+        return await self._http.request(route, json=payload)
+    
+

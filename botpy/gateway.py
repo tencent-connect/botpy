@@ -45,6 +45,7 @@ class BotWebSocket:
         self._parser = _connection.parser
         self._can_reconnect = True
         self._INVALID_RECONNECT_CODE = [9001, 9005]
+        self._AUTH_FAIL_CODE = [4004]
 
     async def on_error(self, exception: BaseException):
         _log.error("[botpy] websocket连接: %s, 异常信息 : %s" % (self._conn, exception))
@@ -52,6 +53,9 @@ class BotWebSocket:
 
     async def on_closed(self, close_status_code, close_msg):
         _log.info("[botpy] 关闭, 返回码: %s" % close_status_code + ", 返回信息: %s" % close_msg)
+        if close_status_code in self._AUTH_FAIL_CODE:
+            _log.info("[botpy] 鉴权失败，重置token...")
+            self._session["token"].access_token = None
         # 这种不能重新链接
         if close_status_code in self._INVALID_RECONNECT_CODE or not self._can_reconnect:
             _log.info("[botpy] 无法重连，创建新连接!")
@@ -134,7 +138,7 @@ class BotWebSocket:
             self._session["intent"] = 1
 
         _log.info("[botpy] 鉴权中...")
-
+        await self._session["token"].check_token()
         payload = {
             "op": self.WS_IDENTITY,
             "d": {
@@ -167,7 +171,7 @@ class BotWebSocket:
         websocket重连
         """
         _log.info("[botpy] 重连启动...")
-
+        await self._session["token"].check_token()
         payload = {
             "op": self.WS_RESUME,
             "d": {

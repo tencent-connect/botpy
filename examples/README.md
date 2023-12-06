@@ -43,7 +43,7 @@ pip install qq-botpy
     cp config.example.yaml config.yaml
     ```
 
-2. 修改 config.yaml ，填入自己的 BotAppID 和  Bot token 。
+2. 修改 config.yaml ，填入自己的 BotAppID 和  Bot secret 。
 3. 运行机器人。例如：
 
     ``` bash

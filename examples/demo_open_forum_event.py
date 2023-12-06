@@ -40,4 +40,4 @@ if __name__ == "__main__":
     # 通过kwargs，设置需要监听的事件通道
     intents = botpy.Intents(open_forum_event=True)
     client = MyClient(intents=intents)
-    client.run(appid="appid", token="token")
+    client.run(appid="appid", secret="secret")

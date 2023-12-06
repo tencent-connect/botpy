@@ -5,7 +5,7 @@ from typing import List, Callable, Dict, Any, Optional
 from .channel import Channel
 from .guild import Guild
 from .interaction import Interaction
-from .message import Message, DirectMessage, MessageAudit
+from .message import C2CMessage, GroupMessage, Message, DirectMessage, MessageAudit
 from .user import Member
 from .reaction import Reaction
 from .audio import Audio, PublicAudio
@@ -199,6 +199,15 @@ class ConnectionState:
     def parse_public_message_delete(self, payload):
         _message = Message(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("public_message_delete", _message)
+
+     # botpy.flags.Intents.public_messages
+    def parse_group_at_message_create(self, payload):
+        _message = GroupMessage(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("group_at_message_create", _message)
+
+    def parse_c2c_message_create(self, payload):
+        _message = C2CMessage(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("c2c_message_create", _message)
 
     # botpy.flags.Intents.forums
     def parse_forum_thread_create(self, payload):

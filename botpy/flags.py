@@ -104,6 +104,7 @@ class Flag:
 @fill_with_flags()
 class Intents(BaseFlags):
     """
+    public_messages 群/C2C公域消息事件
     public_guild_messages	公域消息事件
     guild_messages	消息事件 (仅 私域 机器人能够设置此 intents)
     direct_message	私信事件
@@ -139,6 +140,7 @@ class Intents(BaseFlags):
         self.guild_message_reactions = True
         self.direct_message = True
         self.message_audit = True
+        self.public_messages = True
         self.public_guild_messages = True
         self.audio_or_live_channel_member = True
         self.open_forum_event = True
@@ -315,7 +317,18 @@ class Intents(BaseFlags):
 
         """
         return 1 << 18
+    
+    @Flag
+    def public_messages(self):
+        """:class:`bool`: 是否打开公域群/C2C消息事件的监听.
 
+        通过增加`client`的`on_xx`事件可以获取事件下发的数据:
+
+        - :func:`on_group_at_message_create`            // 当收到群@机器人的消息时
+        - :func:`on_c2c_message_create`                 // 当收到c2c的消息时
+
+        """
+        return 1 << 25
 
 @fill_with_flags()
 class Permission(BaseFlags):
