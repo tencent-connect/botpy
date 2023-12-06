@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import botpy
+
+import os
 from botpy import logging
 from botpy.audio import PublicAudio
+from botpy.ext.cog_yaml import read
 
 _log = logging.get_logger()
 
+test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 
 class MyClient(botpy.Client):
     async def on_ready(self):
@@ -31,4 +35,4 @@ if __name__ == "__main__":
     # 通过kwargs，设置需要监听的事件通道
     intents = botpy.Intents(audio_or_live_channel_member=True)
     client = MyClient(intents=intents)
-    client.run(appid="secret", secret="secret")
+    client.run(appid=test_config["appid"], secret=test_config["secret"])

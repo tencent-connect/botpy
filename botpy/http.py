@@ -178,7 +178,6 @@ class BotHttp:
         route.is_sandbox = self.is_sandbox
         _log.debug(f"[botpy] 请求头部: {self._headers}, 请求方式: {route.method}, 请求url: {route.url}")
         _log.debug(self._session)
-        _log.info(self._headers)
         try:
             async with self._session.request(
                 method=route.method,
