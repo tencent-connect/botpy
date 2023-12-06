@@ -184,3 +184,99 @@ class MessageAudit:
 
     def __repr__(self):
         return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
+    
+class BaseMessage:
+    __slots__ = (
+        "_api",
+        "content",
+        "id",
+        "message_reference",
+        "mentions",
+        "attachments",
+        "msg_seq",
+        "timestamp",
+        "event_id"
+    )
+
+    def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
+        self._api = api
+        self.id = data.get("id", None)
+        self.content = data.get("content", None)
+        self.message_reference = self._MessageRef(data.get("message_reference", {}))
+        self.mentions = [self._User(items) for items in data.get("mentions", {})]
+        self.attachments = [self._Attachments(items) for items in data.get("attachments", {})]
+        self.msg_seq = data.get("msg_seq", None)  # 全局消息序号
+        self.timestamp = data.get("timestamp", None)
+        self.event_id = event_id
+    
+    def __repr__(self):
+        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith("_")})
+    
+    class _MessageRef:
+        def __init__(self, data):
+            self.message_id = data.get("message_id", None)
+
+        def __repr__(self):
+            return str(self.__dict__)
+    
+    class _Attachments:
+        def __init__(self, data):
+            self.content_type = data.get("content_type", None)
+            self.filename = data.get("filename", None)
+            self.height = data.get("height", None)
+            self.width = data.get("width", None)
+            self.id = data.get("id", None)
+            self.size = data.get("size", None)
+            self.url = data.get("url", None)
+
+        def __repr__(self):
+            return str(self.__dict__)
+        
+class GroupMessage(BaseMessage):
+    __slots___ = (
+        "author",
+        "group_openid"
+    )
+
+    def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
+        super().__init__(api, event_id, data)
+        self.author = self._User(data.get("author", {}))
+        self.group_openid = data.get("group_openid", None)
+
+    def __repr__(self):
+        slots = self.__slots__ + super().__slots__
+        return str({items: str(getattr(self, items)) for items in slots if not items.startswith("_")})
+    
+    class _User:
+        def __init__(self, data):
+            self.user_openid = data.get("user_openid", None)
+        
+        def __repr__(self):
+            return str(__dict__)
+        
+    async def reply(self, **kwargs):
+        return await self._api.post_c2c_message(openid=self.author.user_openid, msg_id=self.id, **kwargs)
+    
+class C2CMessage(BaseMessage):
+    __slots__ = ("author",)
+
+    def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
+        super().__init__(api, event_id, data)
+
+        self.author = self._User(data.get("author", {}))
+
+    def __repr__(self):
+        slots = self.__slots__ + super().__slots__
+        return str({items: str(getattr(self, items)) for items in slots if not items.startswith("_")})
+
+    class _User:
+        def __init__(self, data):
+            self.user_openid = data.get("user_openid", None)
+
+        def __repr__(self):
+            return str(self.__dict__)
+
+    async def reply(self, **kwargs):
+        return await self._api.post_c2c_message(openid=self.author.user_openid, msg_id=self.id, **kwargs)
+
+    
