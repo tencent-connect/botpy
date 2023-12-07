@@ -16,7 +16,7 @@ class MyClient(botpy.Client):
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
     async def on_c2c_message_create(self, message: C2CMessage):
-        file_url = "https://image.superqqshow.qq.com/qq/nearby/nearby_pro_guide_pic_1.png"  # 这里需要填写上传的资源Url
+        file_url = ""  # 这里需要填写上传的资源Url
         uploadMedia = await message._api.post_c2c_file(
             openid=message.author.user_openid, 
             file_type=1, # 文件类型要对应上，具体支持的类型见方法说明
