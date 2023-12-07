@@ -24,7 +24,10 @@ examples/
 ├── demo_pins_message.py         # 机器人消息置顶示例
 ├── demo_recall.py               # 机器人消息撤回示例
 ├── demo_schedule.py             # 机器人日程相关示例
-├── demo_recall.py               # 机器人消息撤回示例
+├── demo_group_reply_text.py     # 机器人群内发消息相关示例
+├── demo_group_reply_file.py     # 机器人群内发富媒体消息相关示例
+├── demo_c2c_reply_text.py       # 机器人好友内发消息相关示例
+├── demo_c2c_reply_file.py       # 机器人好友内发富媒体消息相关示例 
 ├── demo_audio_or_live_channel_member.py   # 音视频/直播子频道成员进出事件
 ├── demo_open_forum_event.py   # 开放论坛事件对象
 ```
