@@ -42,6 +42,12 @@ import botpy
 
 > 原机器人的老版本`qq-bot`仍然可以使用，但新接口的支持上会逐渐暂停，此次升级不会影响线上使用的机器人 
 
+## 版本更新说明
+### v1.1.4
+1. 更新鉴权方式。 新版本通过AppID + AppSecret进行鉴权，需要使用者进行适配。AppSecret见[QQ机器人开发设置页](https://q.qq.com/qqbot/#/developer/developer-setting)中的AppSecret字段。具体适配方式见示例  [鉴权配置示例](./examples/config.example.yaml) [鉴权传参接口变更示例](./examples/demo_at_reply.py)
+2. 增加群和好友内发消息能力。可参考[群内发消息示例](./examples/demo_group_reply_text.py) [好友内发消息示例](./examples/demo_c2c_reply_text.py)
+3. 增加群和好友内发送富媒体消息能力，目前支持图片、视频、语音类型。可参考  [群内发富媒体消息示例](./examples/demo_group_reply_file.py)   [好友内发富媒体消息示例](./examples/demo_c2c_reply_file.py)
+
 ## 使用方式
 
 ### 快速入门
