@@ -249,13 +249,13 @@ class GroupMessage(BaseMessage):
     
     class _User:
         def __init__(self, data):
-            self.user_openid = data.get("user_openid", None)
-        
+            self.member_openid = data.get("member_openid", None)
+
         def __repr__(self):
             return str(__dict__)
-        
+
     async def reply(self, **kwargs):
-        return await self._api.post_c2c_message(openid=self.author.user_openid, msg_id=self.id, **kwargs)
+        return await self._api.post_group_message(group_openid=self.group_openid, msg_id=self.id, **kwargs)
     
 class C2CMessage(BaseMessage):
     __slots__ = ("author",)
