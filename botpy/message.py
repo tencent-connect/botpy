@@ -233,7 +233,7 @@ class BaseMessage:
             return str(self.__dict__)
         
 class GroupMessage(BaseMessage):
-    __slots___ = (
+    __slots__ = (
         "author",
         "group_openid"
     )
@@ -252,7 +252,7 @@ class GroupMessage(BaseMessage):
             self.member_openid = data.get("member_openid", None)
 
         def __repr__(self):
-            return str(__dict__)
+            return str(self.__dict__)
 
     async def reply(self, **kwargs):
         return await self._api.post_group_message(group_openid=self.group_openid, msg_id=self.id, **kwargs)
