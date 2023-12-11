@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/ambv/black
-    rev: 21.12b0
+    rev: 23.11.0
     hooks:
       - id: black
         args: [-l 120]

@@ -26,6 +26,6 @@ async def _direct_message_handler(context: WsContext, deletion_info: qqbot.Delet
 
 
 if __name__ == "__main__":
-    t_token = qqbot.Token(test_config["token"]["appid"], test_config["token"]["token"])
+    t_token = qqbot.Token(test_config["appid"], test_config["secret"])
     qqbot_handler = qqbot.Handler(qqbot.HandlerType.DIRECT_MESSAGE_DELETE_EVENT_HANDLER, _direct_message_handler)
     qqbot.async_listen_events(t_token, False, qqbot_handler)

@@ -24,7 +24,7 @@ class _FormData(FormData):
     def _gen_form_data(self) -> multipart.MultipartWriter:
         """Encode a list of fields using the multipart/form-data MIME format"""
         if self._is_processed:
-            return self._writer   # rewrite this part of FormData object to enable retry of request
+            return self._writer  # rewrite this part of FormData object to enable retry of request
         for dispparams, headers, value in self._fields:
             try:
                 if hdrs.CONTENT_TYPE in headers:
@@ -36,18 +36,21 @@ class _FormData(FormData):
                     )
                 else:
                     part = payload.get_payload(
-                        value, headers=headers, encoding=self._charset
+                        value, 
+                        headers=headers,
+                        encoding=self._charset
                     )
             except Exception as exc:
                 print(value)
                 raise TypeError(
-                    "Can not serialize value type: %r\n "
-                    "headers: %r\n value: %r" % (type(value), headers, value)
+                   "Can not serialize value type: %r\n " "headers: %r\n value: %r" % (type(value), headers, value)
                 ) from exc
 
             if dispparams:
                 part.set_content_disposition(
-                    "form-data", quote_fields=self._quote_fields, **dispparams
+                    "form-data", 
+                    quote_fields=self._quote_fields,
+                    **dispparams
                 )
                 assert part.headers is not None
                 part.headers.popall(hdrs.CONTENT_LENGTH, None)
@@ -119,12 +122,12 @@ class BotHttp:
         timeout: int,
         is_sandbox: bool = False,
         app_id: str = None,
-        token: str = None,
+        secret: str = None,
     ):
         self.timeout = timeout
         self.is_sandbox = is_sandbox
 
-        self._token: Optional[Token] = None if not app_id else Token(app_id=app_id, access_token=token)
+        self._token: Optional[Token] = None
         self._session: Optional[aiohttp.ClientSession] = None
         self._global_over: Optional[asyncio.Event] = None
         self._headers: Optional[dict] = None
@@ -139,15 +142,15 @@ class BotHttp:
             await self._session.close()
 
     async def check_session(self):
-        if not self._headers:
-            self._headers = {
-                "Authorization": f"{self._token.get_type()} {self._token.get_string()}",
-                "User-Agent": "botpy/v1",
-            }
+        await self._token.check_token()
+        self._headers = {
+            "Authorization": self._token.get_string(),
+            "X-Union-Appid": self._token.app_id,
+        }
 
         if not self._session or self._session.closed:
             self._session = aiohttp.ClientSession(
-                headers=self._headers, connector=TCPConnector(limit=500, ssl=SSLContext(), force_close=True)
+                connector=TCPConnector(limit=500, ssl=SSLContext(), force_close=True)
             )
 
     async def request(self, route: Route, retry_time: int = 0, **kwargs: Any):
@@ -179,6 +182,7 @@ class BotHttp:
             async with self._session.request(
                 method=route.method,
                 url=route.url,
+                headers=self._headers,
                 timeout=(aiohttp.ClientTimeout(total=self.timeout)),
                 **kwargs,
             ) as response:
@@ -200,5 +204,4 @@ class BotHttp:
 
         data = await self.request(Route("GET", "/users/@me"))
         # TODO 检查机器人token错误的raise exception @veehou
-
         return data

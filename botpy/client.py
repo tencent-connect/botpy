@@ -134,20 +134,20 @@ class Client:
         except KeyboardInterrupt:
             return
 
-    async def start(self, appid: str, token: str, ret_coro: bool = False) -> Optional[Coroutine]:
+    async def start(self, appid: str, secret: str, ret_coro: bool = False) -> Optional[Coroutine]:
         """机器人开始执行
 
         参数
         ------------
         appid: :class:`str`
             机器人 appid
-        token: :class:`str`
-            机器人 token
+        secret: :class:`str`
+            机器人 secret
         ret_coro: :class:`bool`
             是否需要返回协程对象
         """
         # login后再进行后面的操作
-        token = Token(appid, token)
+        token = Token(appid, secret)
         self.ret_coro = ret_coro
 
         if self.loop is _loop:

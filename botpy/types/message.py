@@ -65,6 +65,11 @@ class KeyboardPayload(TypedDict, total=False):
     id: str
     content: Keyboard
 
+class Media(TypedDict):
+    file_uuid: str  # 文件ID
+    file_info: str  # 文件信息，用于发消息接口的media字段使用
+    ttl: int  # 有效期，标识剩余多少秒到期，到期后 file_info 失效，当等于 0 时，表示可长期使用
+
 
 class Message(MessagePayload):
     edited_timestamp: str

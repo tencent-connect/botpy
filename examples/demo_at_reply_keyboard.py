@@ -54,4 +54,4 @@ if __name__ == "__main__":
     # async的异步接口的使用示例
     intents = botpy.Intents(public_guild_messages=True)
     client = MyClient(intents=intents)
-    client.run(appid=test_config["appid"], token=test_config["token"])
+    client.run(appid=test_config["appid"], secret=test_config["secret"])
