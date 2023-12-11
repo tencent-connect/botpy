@@ -65,6 +65,7 @@ class KeyboardPayload(TypedDict, total=False):
     id: str
     content: Keyboard
 
+
 class Media(TypedDict):
     file_uuid: str  # 文件ID
     file_info: str  # 文件信息，用于发消息接口的media字段使用

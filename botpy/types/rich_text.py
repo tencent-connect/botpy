@@ -125,4 +125,3 @@ class RichObject(TypedDict):
     url_info: URLInfo
     emoji_info: EmojiInfo
     channel_info: ChannelInfo
-

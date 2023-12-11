@@ -12,6 +12,7 @@ AudioStatus = Literal[0, 1, 2, 3]
 
 PublicAudioType = Literal[2, 5]
 
+
 class AudioControl(TypedDict):
     audio_url: str
     text: str

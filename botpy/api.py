@@ -22,6 +22,7 @@ from .types import (
     forum,
 )
 
+
 class BotAPI:
     """
     机器人相关的API接口类
@@ -1418,6 +1419,7 @@ class BotAPI:
         上传/发送群聊图片
 
         Args:
+          group_openid (str): 您要将消息发送到的群的 ID
           file_type (int): 媒体类型：1 图片png/jpg，2 视频mp4，3 语音silk，4 文件（暂不开放）
           url (str): 需要发送媒体资源的url
           srv_send_msg (bool): 设置 true 会直接发送消息到目标端，且会占用主动消息频次
@@ -1438,6 +1440,7 @@ class BotAPI:
         上传/发送c2c图片
 
         Args:
+          openid (str): 您要将消息发送到的用户的 ID
           file_type (int): 媒体类型：1 图片png/jpg，2 视频mp4，3 语音silk，4 文件（暂不开放）
           url (str): 需要发送媒体资源的url
           srv_send_msg (bool): 设置 true 会直接发送消息到目标端，且会占用主动消息频次

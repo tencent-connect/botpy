@@ -27,12 +27,12 @@ class ConnectionSession:
     """
 
     def __init__(
-        self,
-        max_async,
-        connect: Callable,
-        dispatch: Callable,
-        loop=None,
-        api: BotAPI = None,
+            self,
+            max_async,
+            connect: Callable,
+            dispatch: Callable,
+            loop=None,
+            api: BotAPI = None,
     ):
         self.dispatch = dispatch
         self.state = ConnectionState(dispatch, api)
@@ -202,7 +202,7 @@ class ConnectionState:
         _message = Message(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("public_message_delete", _message)
 
-     # botpy.flags.Intents.public_messages
+    # botpy.flags.Intents.public_messages
     def parse_group_at_message_create(self, payload):
         _message = GroupMessage(self.api, payload.get("id", None), payload.get("d", {}))
         self._dispatch("group_at_message_create", _message)
@@ -210,6 +210,22 @@ class ConnectionState:
     def parse_c2c_message_create(self, payload):
         _message = C2CMessage(self.api, payload.get("id", None), payload.get("d", {}))
         self._dispatch("c2c_message_create", _message)
+
+    def parse_group_add_robot(self, payload):
+        _message = GroupMessage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_add_robot", _message)
+
+    def parse_group_del_robot(self, payload):
+        _message = GroupMessage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_del_robot", _message)
+
+    def parse_group_msg_reject(self, payload):
+        _message = GroupMessage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_msg_reject", _message)
+
+    def parse_group_msg_receive(self, payload):
+        _message = GroupMessage(self.api, payload.get('id', None), payload.get('d', {}))
+        self._dispatch("group_msg_receive", _message)
 
     # botpy.flags.Intents.forums
     def parse_forum_thread_create(self, payload):
@@ -274,24 +290,3 @@ class ConnectionState:
     def parse_open_forum_reply_delete(self, payload):
         _forum = OpenThread(self.api, payload.get('d', {}))
         self._dispatch("open_forum_reply_delete", payload.get('d', {}))
-
-    # botpy.flags.Intents.group_manage
-    def parse_group_add_robot(self, payload):
-        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
-        self._dispatch("group_add_robot", _message)
-
-    def parse_group_del_robot(self, payload):
-        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
-        self._dispatch("group_del_robot", _message)
-
-    def parse_group_msg_reject(self, payload):
-        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
-        self._dispatch("group_msg_reject", _message)
-
-    def parse_group_msg_receive(self, payload):
-        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
-        self._dispatch("group_msg_receive", _message)
-
-    def parse_group_at_message_create(self, payload):
-        _message = MessageGroup(self.api, payload.get('id', None), payload.get('d', {}))
-        self._dispatch("group_at_message_create", _message)

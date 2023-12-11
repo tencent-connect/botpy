@@ -5,6 +5,7 @@ from .logging import get_logger
 
 _log = get_logger()
 
+
 class Robot:
     def __init__(self, data: robot.Robot):
         self._update(data)

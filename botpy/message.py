@@ -196,28 +196,16 @@ class BaseMessage:
         "attachments",
         "msg_seq",
         "timestamp",
-        "event_id"
+        "event_id",
+        "author",
+        "group_openid",
+        "op_member_openid"
     )
-    
-    def __init__(self, api: BotAPI, event_id, data: gateway.MessageGroupPayload):
-        self._api = api
-
-        self.author = self._User(data.get("author", {}))
-        self.content = data.get("content", None)
-        self.group_openid = data.get("group_openid", None)
-        self.op_member_openid = data.get("op_member_openid", None)
-        self.id = data.get("id", None)
-        self.timestamp = data.get("timestamp", None)
-
-        self.event_id = event_id
-
-    def __repr__(self):
-        return str({items: str(getattr(self, items)) for items in self.__slots__ if not items.startswith('_')})
 
     class _User:
         def __init__(self, data):
             self.member_openid = data.get("member_openid", None)
-            
+
     def __init__(self, api: BotAPI, event_id, data: gateway.MessagePayload):
         self._api = api
         self.id = data.get("id", None)
@@ -251,6 +239,7 @@ class BaseMessage:
 
         def __repr__(self):
             return str(self.__dict__)
+
         
 class GroupMessage(BaseMessage):
     __slots__ = (
@@ -276,7 +265,8 @@ class GroupMessage(BaseMessage):
 
     async def reply(self, **kwargs):
         return await self._api.post_group_message(group_openid=self.group_openid, msg_id=self.id, **kwargs)
-    
+
+
 class C2CMessage(BaseMessage):
     __slots__ = ("author",)
 

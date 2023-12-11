@@ -234,19 +234,6 @@ class Intents(BaseFlags):
         return 1 << 12
 
     @Flag
-    def group_manage(self):
-        """:class:`bool`: 是否打开群管理事件的监听.
-
-        - :func:`group_add_robot`: 机器人加入群聊
-        - :func:`group_del_robot`: 机器人退出群聊
-        - :func:`group_msg_reject`: 群聊拒绝机器人主动消息
-        - :func:`group_msg_receive`: 群聊接受机器人主动消息
-        - :func:`group_at_message_create`: 当收到@机器人的消息时
-
-        """
-        return 1 << 25
-
-    @Flag
     def interaction(self):
         """:class:`bool`: 是否打开互动事件的监听.
 
@@ -343,9 +330,14 @@ class Intents(BaseFlags):
 
         - :func:`on_group_at_message_create`            // 当收到群@机器人的消息时
         - :func:`on_c2c_message_create`                 // 当收到c2c的消息时
+        - :func:`group_add_robot`                       //机器人加入群聊
+        - :func:`group_del_robot`                       //机器人退出群聊
+        - :func:`group_msg_reject`                      //群聊拒绝机器人主动消息
+        - :func:`group_msg_receive`                     //群聊接受机器人主动消息
 
         """
         return 1 << 25
+
 
 @fill_with_flags()
 class Permission(BaseFlags):

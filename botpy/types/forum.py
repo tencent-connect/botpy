@@ -69,6 +69,7 @@ class PostThreadRsp(TypedDict):
     task_id: str
     create_time: str
 
+
 class OpenForumEvent(TypedDict):
     guild_id: str
     channel_id: str
