@@ -14,7 +14,7 @@ class IntentsTestCase(unittest.TestCase):
 
     def test_default(self):
         intents = botpy.Intents.default()
-        self.assertEqual(1879047679, intents.value)
+        self.assertEqual(1846285315, intents.value)
 
 
 if __name__ == "__main__":

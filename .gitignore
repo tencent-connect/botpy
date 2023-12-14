@@ -145,3 +145,6 @@ temp/
 
 # idea config
 .idea
+
+# vscode config
+.vscode
