@@ -59,6 +59,9 @@ class Token:
             raise
         finally:
             await session.close()
+        if "access_token" not in data or "expires_in" not in data:
+            _log.error("[botpy] 获取token失败，请检查appid和secret填写是否正确！")
+            raise RuntimeError(str(data))
         _log.info("[botpy] access_token expires_in " + data["expires_in"])
         self.access_token = data["access_token"]
         self.expires_in = int(data["expires_in"]) + int(time.time())
