@@ -17,7 +17,7 @@ def fill_with_flags(*, inverted: bool = False) -> Callable[[Type[BF]], Type[BF]]
 
         if inverted:
             max_bits = max(cls.VALID_FLAGS.values()).bit_length()
-            cls.DEFAULT_VALUE = -1 + (2 ** max_bits)
+            cls.DEFAULT_VALUE = -1 + (2**max_bits)
         else:
             cls.DEFAULT_VALUE = 0
 
@@ -317,7 +317,7 @@ class Intents(BaseFlags):
 
         """
         return 1 << 18
-    
+
     @Flag
     def public_messages(self):
         """:class:`bool`: 是否打开公域群/C2C消息事件的监听.
@@ -326,9 +326,18 @@ class Intents(BaseFlags):
 
         - :func:`on_group_at_message_create`            // 当收到群@机器人的消息时
         - :func:`on_c2c_message_create`                 // 当收到c2c的消息时
+        - :func:`on_group_add_robot`                    // 机器人加入群聊
+        - :func:`on_group_del_robot`                    // 机器人退出群聊
+        - :func:`on_group_msg_reject`                   // 群聊拒绝机器人主动消息
+        - :func:`on_group_msg_receive`                  // 群聊接受机器人主动消息
+        - :func:`on_friend_add`                         // 用户添加机器人
+        - :func:`on_friend_del`                         // 用户删除机器人
+        - :func:`on_c2c_msg_reject`                     // 用户拒绝机器人主动消息
+        - :func:`on_c2c_msg_receive`                    // 用户接受机器人主动消息
 
         """
         return 1 << 25
+
 
 @fill_with_flags()
 class Permission(BaseFlags):

@@ -5,6 +5,7 @@ from typing import List, Callable, Dict, Any, Optional
 from .channel import Channel
 from .guild import Guild
 from .interaction import Interaction
+from .manage import C2CManageEvent, GroupManageEvent
 from .message import C2CMessage, GroupMessage, Message, DirectMessage, MessageAudit
 from .user import Member
 from .reaction import Reaction
@@ -200,7 +201,7 @@ class ConnectionState:
         _message = Message(self.api, payload.get('id', None), payload.get('d', {}))
         self._dispatch("public_message_delete", _message)
 
-     # botpy.flags.Intents.public_messages
+    # botpy.flags.Intents.public_messages
     def parse_group_at_message_create(self, payload):
         _message = GroupMessage(self.api, payload.get("id", None), payload.get("d", {}))
         self._dispatch("group_at_message_create", _message)
@@ -208,6 +209,38 @@ class ConnectionState:
     def parse_c2c_message_create(self, payload):
         _message = C2CMessage(self.api, payload.get("id", None), payload.get("d", {}))
         self._dispatch("c2c_message_create", _message)
+
+    def parse_group_add_robot(self, payload):
+        _event = GroupManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("group_add_robot", _event)
+
+    def parse_group_del_robot(self, payload):
+        _event = GroupManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("group_del_robot", _event)
+
+    def parse_group_msg_reject(self, payload):
+        _event = GroupManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("group_msg_reject", _event)
+
+    def parse_group_msg_receive(self, payload):
+        _event = GroupManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("group_msg_receive", _event)
+
+    def parse_friend_add(self, payload):
+        _event = C2CManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("friend_add", _event)
+
+    def parse_friend_del(self, payload):
+        _event = C2CManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("friend_del", _event)
+
+    def parse_c2c_msg_reject(self, payload):
+        _event = C2CManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("c2c_msg_reject", _event)
+
+    def parse_c2c_msg_receive(self, payload):
+        _event = C2CManageEvent(self.api, payload.get("id", None), payload.get("d", {}))
+        self._dispatch("c2c_msg_receive", _event)
 
     # botpy.flags.Intents.forums
     def parse_forum_thread_create(self, payload):

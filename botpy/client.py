@@ -103,6 +103,9 @@ class Client:
     def is_closed(self) -> bool:
         return self._closed
 
+    async def on_ready(self):
+        pass
+
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
         traceback.print_exc()
 
@@ -255,7 +258,7 @@ class Client:
         try:
             coro = getattr(self, method)
         except AttributeError:
-            pass
+            _log.warning("[botpy] 事件: %s 未注册", event)
         else:
             self._schedule_event(coro, method, *args, **kwargs)
 
