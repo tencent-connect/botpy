@@ -20,8 +20,10 @@ class Commands:
             message: BaseMessage = kwargs["message"]
             for command in self.commands:
                 if command in message.content:
-                    content_split = message.content.lstrip().split(command)
-                    # 当指令出现在消息文本的开头执行指令
+                    # 剔除消息文本中@机器人的字符串
+                    content = message.content.replace(f"<@!{(await message.api.me())['id']}>", "")
+                    content_split = content.lstrip().split(command)
+                    # 当指令出现在消息文本（已剔除@机器人的信息）的开头执行指令
                     if len(content_split[0]) == 0:
                         # 分割指令后面的指令参数
                         kwargs["params"] = content_split[1].strip()
