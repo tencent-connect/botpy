@@ -4,7 +4,7 @@ import os
 import botpy
 from botpy import logging
 
-from botpy.message import DirectMessage
+from botpy.message import DirectMessage, Message
 from botpy.ext.cog_yaml import read
 
 test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
@@ -23,6 +23,12 @@ class MyClient(botpy.Client):
             msg_id=message.id,
         )
 
+    async def on_at_message_create(self, message: Message):
+        if "/私信" in message.content:
+            dms_payload = await self.api.create_dms(message.guild_id, message.author.id)
+            _log.info("发送私信")
+            await self.api.post_dms(dms_payload["guild_id"], content="hello", msg_id=message.id)
+
 
 if __name__ == "__main__":
     # 通过预设置的类型，设置需要监听的事件通道
@@ -30,6 +36,6 @@ if __name__ == "__main__":
     # intents.public_guild_messages=True
 
     # 通过kwargs，设置需要监听的事件通道
-    intents = botpy.Intents(direct_message=True)
+    intents = botpy.Intents(direct_message=True, public_guild_messages=True)
     client = MyClient(intents=intents)
     client.run(appid=test_config["appid"], secret=test_config["secret"])

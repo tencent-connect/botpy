@@ -21,7 +21,8 @@ class MyClient(botpy.Client):
         await self.api.post_message(message.channel_id, content="command received: %s" % message.content)
 
         # 输入/xxx后的处理
-        message_id = "088de19cbeb883e7e97110a2e39c0138d401"
+        # 对用户引用回复的消息设置/删除公告
+        message_id = message.message_reference.message_id
         if "/建公告" in message.content:
             await self.api.create_announce(message.guild_id, message.channel_id, message_id)
 
