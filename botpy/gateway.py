@@ -50,6 +50,7 @@ class BotWebSocket:
     async def on_error(self, exception: BaseException):
         _log.error("[botpy] websocket连接: %s, 异常信息 : %s" % (self._conn, exception))
         traceback.print_exc()
+        self._connection.add(self._session)
 
     async def on_closed(self, close_status_code, close_msg):
         _log.info("[botpy] 关闭, 返回码: %s" % close_status_code + ", 返回信息: %s" % close_msg)
@@ -126,10 +127,11 @@ class BotWebSocket:
                         await self.on_message(ws_conn, msg.data)
                     elif msg.type == WSMsgType.ERROR:
                         await self.on_error(ws_conn.exception())
+                        await ws_conn.close()
                     elif msg.type == WSMsgType.CLOSED or msg.type == WSMsgType.CLOSE:
                         await self.on_closed(ws_conn.close_code, msg.extra)
                     if ws_conn.closed:
-                        _log.debug("[botpy] ws关闭, 停止接收消息!")
+                        _log.info("[botpy] ws关闭, 停止接收消息!")
                         break
 
     async def ws_identify(self):

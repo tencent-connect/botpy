@@ -103,6 +103,9 @@ class Client:
     def is_closed(self) -> bool:
         return self._closed
 
+    async def on_ready(self):
+        pass
+
     async def on_error(self, event_method: str, *args: Any, **kwargs: Any) -> None:
         traceback.print_exc()
 
@@ -218,8 +221,11 @@ class Client:
                 coroutine = self._connection.multi_run(session_interval)
                 if self.ret_coro:
                     return coroutine
-                else:
+                elif coroutine:
                     await coroutine
+                else:
+                    await self.close()
+                    _log.info("[botpy] 服务意外停止!")
             except KeyboardInterrupt:
                 _log.info("[botpy] 服务强行停止!")
                 # cancel all tasks lingering
@@ -252,7 +258,7 @@ class Client:
         try:
             coro = getattr(self, method)
         except AttributeError:
-            pass
+            _log.debug("[botpy] 事件: %s 未注册", event)
         else:
             self._schedule_event(coro, method, *args, **kwargs)
 

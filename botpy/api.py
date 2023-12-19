@@ -22,6 +22,7 @@ from .types import (
     forum,
 )
 
+
 class BotAPI:
     """
     机器人相关的API接口类
@@ -198,7 +199,7 @@ class BotAPI:
         guild_id: str,
         user_id: str,
         add_blacklist: bool = False,
-        delete_history_msg_days: int = 0
+        delete_history_msg_days: int = 0,
     ) -> str:
         """
         删除频道成员
@@ -246,7 +247,7 @@ class BotAPI:
             guild_id=guild_id,
         )
         return await self._http.request(route, params=params)
-    
+
     async def get_guild_role_members(
         self, guild_id: str, role_id: str, start_index: str = "0", limit: int = 1
     ) -> Dict[str, Union[List[user.Member], str]]:
@@ -270,7 +271,7 @@ class BotAPI:
             "GET",
             "/guilds/{guild_id}/roles/{role_id}/members",
             guild_id=guild_id,
-            role_id=role_id
+            role_id=role_id,
         )
         return await self._http.request(route, params=params)
 
@@ -341,6 +342,10 @@ class BotAPI:
         Kwargs（fields）:
           position (int): 排序，非必填
           parent_id (str): 否,分组 ID
+          private_type (int): 子频道私密类型 PrivateType
+          private_user_ids (List[str]): 子频道私密类型成员 ID
+          speak_permission (int): 子频道发言权限 SpeakPermission
+          application_id (str): 应用类型子频道 AppID，仅应用子频道需要该字段
 
         Returns:
           通道对象。
@@ -350,7 +355,14 @@ class BotAPI:
             "type": int(type),
             "subtype": int(sub_type),
         }
-        valid_keys = ("position", "parent_id")
+        valid_keys = (
+            "position",
+            "parent_id",
+            "private_type",
+            "private_user_ids",
+            "speak_permission",
+            "application_id",
+        )
         payload.update({k: v for k, v in fields.items() if k in valid_keys and v})
         route = Route("POST", "/guilds/{guild_id}/channels", guild_id=guild_id)
         return await self._http.request(route, json=payload)
@@ -584,6 +596,58 @@ class BotAPI:
         )
         return await self._http.request(route, json=payload)
 
+    async def on_interaction_result(self, interaction_id: str, code: int):
+        """
+        `on_interaction_result` 消息按钮回调结果
+
+        Args:
+          interaction_id (str): 消息按钮回调事件的 ID。
+          code (int): 回调结果 0 成功，1 操作失败，2 操作频繁，3 重复操作，4 没有权限，5 仅管理员操作
+
+        Returns:
+          无
+        """
+        payload = {"code": code}
+        route = Route(
+            "PUT",
+            "/interactions/{id}",
+            id=interaction_id,
+        )
+        return await self._http.request(route, json=payload)
+
+    async def patch_guild_message(
+        self,
+        channel_id: str,
+        patch_msg_id: str,
+        msg_id: str = None,
+        event_id: str = None,
+        markdown: message.MarkdownPayload = None,
+        keyboard: message.KeyboardPayload = message.KeyboardPayload(content={}),
+    ) -> message.Message:
+        """
+        修改频道markdown消息，需要先申请权限。
+
+        Args:
+          channel_id (str): 您要将消息发送到的频道的 ID。
+          patch_msg_id (str): 需要修改的消息id。
+          msg_id (str): 您要回复的消息的 ID。您可以从 AT_CREATE_MESSAGE 事件中获取此 ID。
+          event_id (str): 您要回复的消息的事件 ID。
+          markdown (message.MarkdownPayload): markdown 消息的构建参数。
+          keyboard (message.KeyboardPayload): keyboard 消息的构建参数
+
+        Returns:
+          message.Message: 一个消息字典对象。
+        """
+        payload = locals()
+        payload.pop("self", None)
+        route = Route(
+            "PATCH",
+            "/channels/{channel_id}/messages/{patch_msg_id}",
+            channel_id=channel_id,
+            patch_msg_id=patch_msg_id,
+        )
+        return await self._http.request(route, json=payload)
+
     # 私信消息
     async def create_dms(self, guild_id: str, user_id: str) -> message.DmsPayload:
         """
@@ -766,7 +830,7 @@ class BotAPI:
         """
         payload = {
             "mute_end_timestamp": mute_end_timestamp,
-            "mute_seconds": mute_seconds
+            "mute_seconds": mute_seconds,
         }
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
@@ -808,7 +872,7 @@ class BotAPI:
         """
         payload = {
             "mute_end_timestamp": mute_end_timestamp,
-            "mute_seconds": mute_seconds
+            "mute_seconds": mute_seconds,
         }
         route = Route("PATCH", "/guilds/{guild_id}/members/{user_id}/mute", guild_id=guild_id, user_id=user_id)
         return await self._http.request(route, json=payload)
@@ -831,7 +895,7 @@ class BotAPI:
         payload = {
             "mute_end_timestamp": mute_end_timestamp,
             "mute_seconds": mute_seconds,
-            "user_ids": user_ids
+            "user_ids": user_ids,
         }
         route = Route("PATCH", "/guilds/{guild_id}/mute", guild_id=guild_id)
         return await self._http.request(route, json=payload)
@@ -1312,7 +1376,7 @@ class BotAPI:
             "DELETE", "/channels/{channel_id}/threads/{thread_id}", channel_id=channel_id, thread_id=thread_id
         )
         return await self._http.request(route)
-    
+
     async def post_group_message(
         self,
         group_openid: str,
@@ -1416,6 +1480,7 @@ class BotAPI:
         上传/发送群聊图片
 
         Args:
+          group_openid (str): 您要将消息发送到的群的 ID
           file_type (int): 媒体类型：1 图片png/jpg，2 视频mp4，3 语音silk，4 文件（暂不开放）
           url (str): 需要发送媒体资源的url
           srv_send_msg (bool): 设置 true 会直接发送消息到目标端，且会占用主动消息频次
@@ -1436,6 +1501,7 @@ class BotAPI:
         上传/发送c2c图片
 
         Args:
+          openid (str): 您要将消息发送到的用户的 ID
           file_type (int): 媒体类型：1 图片png/jpg，2 视频mp4，3 语音silk，4 文件（暂不开放）
           url (str): 需要发送媒体资源的url
           srv_send_msg (bool): 设置 true 会直接发送消息到目标端，且会占用主动消息频次
@@ -1444,5 +1510,3 @@ class BotAPI:
         payload.pop("self", None)
         route = Route("POST", "/v2/users/{openid}/files", openid=openid)
         return await self._http.request(route, json=payload)
-    
-

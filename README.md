@@ -180,4 +180,4 @@ pytest
 
 欢迎扫码加入**QQ 频道开发者社区**。
 
-![开发者社区](https://mpqq.gtimg.cn/privacy/qq_guild_developer.png)
+![开发者社区](https://guild-1251316161.cos.ap-guangzhou.myqcloud.com/miniapp/icons/qq_guild_developer_doc.png)

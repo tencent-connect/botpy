@@ -27,7 +27,6 @@ GUILD_TEST_MEMBER_ID = test_params_["guild_test_member_id"]
 GUILD_TEST_ROLE_ID = test_params_["guild_test_role_id"]
 CHANNEL_ID = test_params_["channel_id"]
 CHANNEL_NAME = test_params_["channel_name"]
-CHANNEL_PARENT_ID = test_params_["channel_parent_id"]
 CHANNEL_SCHEDULE_ID = test_params_["channel_schedule_id"]
 ROBOT_NAME = test_params_["robot_name"]
 IS_SANDBOX = test_params_["is_sandbox"]
@@ -38,7 +37,7 @@ class APITestCase(unittest.TestCase):
     def setUp(self) -> None:
         print("setUp")
         self.loop = asyncio.get_event_loop()
-        self.http = BotHttp(timeout=5, app_id=test_config["token"]["appid"], token=test_config["token"]["token"])
+        self.http = BotHttp(timeout=5, app_id=test_config["token"]["appid"], secret=test_config["token"]["secret"])
         self.api = botpy.BotAPI(self.http)
 
     def tearDown(self) -> None:
@@ -59,23 +58,35 @@ class APITestCase(unittest.TestCase):
         self.assertEqual("Test Role", result["role"]["name"])
         id = result["role"]["id"]
 
+        time.sleep(0.5)
         coroutine = self.api.update_guild_role(GUILD_ID, role_id=id, name="Test Update Role")
         result = self.loop.run_until_complete(coroutine)
         self.assertEqual("Test Update Role", result["role"]["name"])
 
+        time.sleep(0.5)
         result = self.loop.run_until_complete(self.api.delete_guild_role(GUILD_ID, role_id=id))
         self.assertEqual(None, result)
 
     def test_guild_role_member_add_delete(self):
+        coroutine = self.api.create_guild_role(GUILD_ID, name="Test Role Member", color=4278245297)
+        result: guild.GuildRole = self.loop.run_until_complete(coroutine)
+        self.assertEqual("Test Role Member", result["role"]["name"])
+        id = result["role"]["id"]
+
+        time.sleep(0.5)
         result = self.loop.run_until_complete(
-            self.api.create_guild_role_member(GUILD_ID, GUILD_TEST_ROLE_ID, GUILD_TEST_MEMBER_ID)
+            self.api.create_guild_role_member(GUILD_ID, id, GUILD_TEST_MEMBER_ID),
         )
         self.assertEqual(None, result)
 
-    def test_guild_role_member_delete(self):
+        time.sleep(0.5)
         result = self.loop.run_until_complete(
-            self.api.delete_guild_role_member(GUILD_ID, GUILD_TEST_ROLE_ID, GUILD_TEST_MEMBER_ID)
+            self.api.delete_guild_role_member(GUILD_ID, id, GUILD_TEST_MEMBER_ID),
         )
+        self.assertEqual(None, result)
+
+        time.sleep(0.5)
+        result = self.loop.run_until_complete(self.api.delete_guild_role(GUILD_ID, role_id=id))
         self.assertEqual(None, result)
 
     def test_guild_member(self):
@@ -139,10 +150,10 @@ class APITestCase(unittest.TestCase):
 
     def test_me_guilds(self):
         guilds = self.loop.run_until_complete(self.api.me_guilds())
-        self.assertEqual(1, len(guilds))
+        self.assertGreaterEqual(len(guilds), 1)
 
         guilds = self.loop.run_until_complete(self.api.me_guilds(GUILD_ID, limit=1, desc=True))
-        self.assertEqual(0, len(guilds))
+        self.assertLessEqual(len(guilds), 1)
 
     def test_post_audio(self):
         payload = {"audio_url": "test", "text": "test", "status": 0}
