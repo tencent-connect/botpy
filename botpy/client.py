@@ -258,7 +258,7 @@ class Client:
         try:
             coro = getattr(self, method)
         except AttributeError:
-            _log.warning("[botpy] 事件: %s 未注册", event)
+            _log.debug("[botpy] 事件: %s 未注册", event)
         else:
             self._schedule_event(coro, method, *args, **kwargs)
 

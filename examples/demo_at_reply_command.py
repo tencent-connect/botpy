@@ -13,7 +13,7 @@ test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 _log = logging.get_logger()
 
 
-@Commands(name=("你好", "hello"))
+@Commands("你好", "hello")
 async def hello(api: BotAPI, message: Message, params=None):
     _log.info(params)
     # 第一种用reply发送消息
@@ -43,7 +43,6 @@ class MyClient(botpy.Client):
         for handler in handlers:
             if await handler(api=self.api, message=message):
                 return
-
 
 
 if __name__ == "__main__":

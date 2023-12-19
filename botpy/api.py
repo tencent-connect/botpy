@@ -342,6 +342,10 @@ class BotAPI:
         Kwargs（fields）:
           position (int): 排序，非必填
           parent_id (str): 否,分组 ID
+          private_type (int): 子频道私密类型 PrivateType
+          private_user_ids (List[str]): 子频道私密类型成员 ID
+          speak_permission (int): 子频道发言权限 SpeakPermission
+          application_id (str): 应用类型子频道 AppID，仅应用子频道需要该字段
 
         Returns:
           通道对象。
@@ -351,7 +355,14 @@ class BotAPI:
             "type": int(type),
             "subtype": int(sub_type),
         }
-        valid_keys = ("position", "parent_id")
+        valid_keys = (
+            "position",
+            "parent_id",
+            "private_type",
+            "private_user_ids",
+            "speak_permission",
+            "application_id",
+        )
         payload.update({k: v for k, v in fields.items() if k in valid_keys and v})
         route = Route("POST", "/guilds/{guild_id}/channels", guild_id=guild_id)
         return await self._http.request(route, json=payload)
