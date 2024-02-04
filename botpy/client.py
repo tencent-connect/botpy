@@ -255,12 +255,12 @@ class Client:
         _log.debug("[botpy] 调度事件: %s", event)
         method = "on_" + event
 
-        try:
+        if hasattr(self, method):
             coro = getattr(self, method)
-        except AttributeError:
-            _log.debug("[botpy] 事件: %s 未注册", event)
-        else:
             self._schedule_event(coro, method, *args, **kwargs)
+        else:
+            _log.debug("[botpy] 事件: %s 未注册", event)
+
 
     def _schedule_event(
         self,
