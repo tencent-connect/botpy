@@ -1387,7 +1387,7 @@ class BotAPI:
         message_reference: message.Reference = None,
         media: message.Media = None,
         msg_id: str = None,
-        msg_seq: str = 1,
+        msg_seq: int = 1,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
         keyboard: message.Keyboard = None,
