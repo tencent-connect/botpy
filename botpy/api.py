@@ -1390,7 +1390,7 @@ class BotAPI:
         msg_seq: int = 1,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
-        keyboard: message.Keyboard = None,
+        keyboard: message.KeyboardPayload = None,
     ) -> message.Message:
         """
         发送消息。
@@ -1413,7 +1413,7 @@ class BotAPI:
           msg_seq (int): 回复消息的序号，与 msg_id 联合使用，默认是1。相同的 msg_id + msg_seq 重复发送会失败。
           event_id (str): 您要回复的消息的事件 ID。
           markdown (message.MarkdownPayload): markdown 消息
-          keyboard (message.Keyboard): keyboard 消息
+          keyboard (message.KeyboardPayload): keyboard 消息
 
         Returns:
           message.Message: 一个消息字典对象。
@@ -1433,10 +1433,10 @@ class BotAPI:
         message_reference: message.Reference = None,
         media: message.Media = None,
         msg_id: str = None,
-        msg_seq: str = 1,
+        msg_seq: int = 1,
         event_id: str = None,
         markdown: message.MarkdownPayload = None,
-        keyboard: message.Keyboard = None,
+        keyboard: message.KeyboardPayload = None,
     ) -> message.Message:
         """
         发送消息。
@@ -1459,7 +1459,7 @@ class BotAPI:
           msg_seq (int): 回复消息的序号，与 msg_id 联合使用，默认是1。相同的 msg_id + msg_seq 重复发送会失败。
           event_id (str): 您要回复的消息的事件 ID。
           markdown (message.MarkdownPayload): markdown 消息
-          keyboard (message.Keyboard): keyboard 消息
+          keyboard (message.KeyboardPayload): keyboard 消息
 
         Returns:
           message.Message: 一个消息字典对象。
