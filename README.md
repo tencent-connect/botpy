@@ -87,7 +87,7 @@ class MyClient(botpy.Client):
 
 intents = botpy.Intents(public_guild_messages=True) 
 client = MyClient(intents=intents)
-client.run(appid="12345", token="xxxx")
+client.run(appid="12345", secret="xxxx")
 ```
 
 ### 备注
