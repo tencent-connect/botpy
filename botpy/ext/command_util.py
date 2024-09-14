@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+import re
 from functools import wraps
-from botpy.message import BaseMessage
-
+from typing import Tuple
 
 class Commands:
     """
@@ -13,18 +13,19 @@ class Commands:
 
     def __init__(self, *args):
         self.commands = args
+        # 构建正则表达式模式
+        self.pattern = re.compile(rf"({'|'.join(self.commands)})(?:\s+(.*))?")
 
     def __call__(self, func):
         @wraps(func)
         async def decorated(*args, **kwargs):
             message: BaseMessage = kwargs["message"]
-            for command in self.commands:
-                if command in message.content:
-                    # 分割指令后面的指令参数
-                    params = message.content.split(command)[1].strip()
-                    kwargs["params"] = params
-                    return await func(*args, **kwargs)
+            match = self.pattern.match(message.content)
+            if match:
+                command, params = match.groups()
+                if params:
+                    kwargs["params"] = params.strip()
+                return await func(*args, **kwargs)
             return False
 
         return decorated
-
