@@ -235,6 +235,12 @@ class BaseMessage:
             return str(self.__dict__)
 
 
+    @property
+    def api(self):
+        return self._api
+
+
+
 class GroupMessage(BaseMessage):
     __slots__ = (
         "author",
