@@ -17,11 +17,21 @@ class MyClient(botpy.Client):
         _log.info(f"robot 「{self.robot.name}」 on_ready!")
 
     async def on_group_at_message_create(self, message: GroupMessage):
+        
+        # 网络url资源
         file_url = ""  # 这里需要填写上传的资源Url
         uploadMedia = await message._api.post_group_file(
             group_openid=message.group_openid, 
             file_type=1, # 文件类型要对应上，具体支持的类型见方法说明
             url=file_url # 文件Url
+        )
+
+        # 本地资源/图片
+        file_base64 = "" # 这里需要填写上传的资源的base64编码
+        uploadMedia = await message._api.post_group_base64file(
+            group_openid=message.group_openid, 
+            file_type=1, # 文件类型要对应上，具体支持的类型见方法说明
+            file_data=file_base64 # 本地二进制文件的base64编码
         )
 
         # 资源上传后，会得到Media，用于发送消息
