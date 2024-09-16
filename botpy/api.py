@@ -571,6 +571,27 @@ class BotAPI:
         )
         return await self._http.request(route, params=params)
 
+    async def recall_group_message(self, group_openid: str, message_id: str) -> str:
+        """
+        撤回群消息。
+
+        用于撤回机器人发送在当前群 group_openid 的消息 message_id，发送超出2分钟的消息不可撤回
+
+        Args:
+          group_openid (str): 群聊的 openid
+          message_id (str): 要撤回的消息的 ID。
+
+        Returns:
+          成功执行返回`None`。
+        """
+        route = Route(
+            "DELETE",
+            "/v2/groups/{group_openid}/messages/{message_id}",
+            group_openid=group_openid,
+            message_id=message_id,
+        )
+        return await self._http.request(route)
+
     async def post_keyboard_message(
         self,
         channel_id: str,
