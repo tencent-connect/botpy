@@ -252,6 +252,7 @@ class GroupMessage(BaseMessage):
 
     class _User:
         def __init__(self, data):
+            self.id = data.get("id", None)
             self.member_openid = data.get("member_openid", None)
 
         def __repr__(self):
@@ -259,7 +260,8 @@ class GroupMessage(BaseMessage):
 
     async def reply(self, **kwargs):
         return await self._api.post_group_message(group_openid=self.group_openid, msg_id=self.id, **kwargs)
-    
+
+
 class C2CMessage(BaseMessage):
     __slots__ = ("author",)
 
