@@ -236,3 +236,7 @@ class BotWebSocket:
 
             await self.send_msg(json.dumps(payload))
             await asyncio.sleep(interval)
+
+    async def close(self):
+        await self._conn.close()
+        _log.info("[botpy] websocket连接关闭!")

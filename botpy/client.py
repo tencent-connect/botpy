@@ -99,6 +99,8 @@ class Client:
         self._closed = True
 
         await self.http.close()
+        if hasattr(self, 'client'):
+            await self.client.close()
 
     def is_closed(self) -> bool:
         return self._closed
@@ -242,6 +244,7 @@ class Client:
         _log.info("[botpy] 会话启动中...")
 
         client = BotWebSocket(session, self._connection)
+        self.client = client
         try:
             await client.ws_connect()
         except (Exception, KeyboardInterrupt, SystemExit) as e:
