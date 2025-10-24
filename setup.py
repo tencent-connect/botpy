@@ -9,7 +9,7 @@ setup(
     author="veehou",
     author_email="veehou@tencent.com",
     description="qq robot client with python3",
-    long_description=open("README.rst").read(),
+    long_description=open("README.rst", encoding="utf-8").read(),
     # 项目主页
     url="https://github.com/tencent-connect/botpy",
     # 你要安装的包，通过 setuptools.find_packages 找到当前目录下有哪些包
