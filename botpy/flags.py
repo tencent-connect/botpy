@@ -324,6 +324,7 @@ class Intents(BaseFlags):
 
         通过增加`client`的`on_xx`事件可以获取事件下发的数据:
 
+        - :func:`on_group_message_create`               // 当收到群消息时
         - :func:`on_group_at_message_create`            // 当收到群@机器人的消息时
         - :func:`on_c2c_message_create`                 // 当收到c2c的消息时
         - :func:`on_group_add_robot`                    // 机器人加入群聊

@@ -135,7 +135,7 @@ def configure_logging(
             )
 
     if _format is not None:
-        logging.basicConfig(format=_format)
+        logging.basicConfig(format=_format, force=True)
 
     if level is not None:
         for name, logger in logs.items():

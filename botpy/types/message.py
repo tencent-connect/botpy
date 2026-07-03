@@ -65,6 +65,7 @@ class KeyboardPayload(TypedDict, total=False):
     id: str
     content: Keyboard
 
+
 class Media(TypedDict):
     file_uuid: str  # 文件ID
     file_info: str  # 文件信息，用于发消息接口的media字段使用
@@ -121,3 +122,19 @@ class DeletionOperator(TypedDict):
 class DeletedMessageInfo(TypedDict):
     message: DeletedMessage
     op_user: DeletionOperator
+
+
+class FileType(Enum):
+    image = 1
+    video = 2
+    audio = 3
+    file = 4
+
+
+class GroupMessageType(Enum):
+    text = 0
+    text_image = 1
+    markdown = 2
+    ark = 3
+    embed = 4
+    media = 7
