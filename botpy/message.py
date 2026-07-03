@@ -254,6 +254,12 @@ class GroupMessage(BaseMessage):
         def __init__(self, data):
             self.id = data.get("id", None)
             self.member_openid = data.get("member_openid", None)
+            self.username = data.get("username", None)
+            self.bot = data.get("bot", None)
+            self.is_you = data.get("is_you", None)
+            self.member_role = data.get("member_role", None)
+            self.union_openid = data.get("union_openid", None)
+            self.scope = data.get("scope", None)
 
         def __repr__(self):
             return str(self.__dict__)
